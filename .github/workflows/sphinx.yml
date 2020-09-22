@@ -13,6 +13,9 @@ jobs:
   build-and-deploy:
     name: Build and gh-pages
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: build
     steps:
       # https://github.com/marketplace/actions/checkout
       - uses: actions/checkout@v2
