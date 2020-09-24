@@ -22,7 +22,7 @@ copyright = '2020, Aalto SciComp'
 author = 'Simo Tuomisto'
 github_user = 'AaltoSciComp'
 github_repo_name = 'data-analysis-workflows-course'  # auto-detected from dirname if blank
-github_version = 'master/' # with trailing slash
+github_version = 'master/lectures/' # with trailing slash
 
 
 # -- General configuration ---------------------------------------------------
