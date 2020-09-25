@@ -2,14 +2,18 @@ name: dataanalysis
 channels:
   - defaults
   - r
+  - conda-forge
 dependencies:
   - colorama
+  - git
   - gitdb
   - gitpython
   - jupyter
   - jupyterlab
+  - jupyterlab-git
   - matplotlib
   - numpy
+  - nodejs
   - pandas
   - pip
   - pyyaml
