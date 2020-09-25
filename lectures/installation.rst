@@ -12,21 +12,21 @@ installations for multiple operating systems.
 
 We recommend using
 `Anaconda <https://www.anaconda.com/products/individual>`_,
-but Miniconda will work as well.
+but Miniconda will work as well. Please follow installation instructions according to your operating system.
 
 *****************************
 Installing course environment
 *****************************
 
-All of the required software is included in the course's
+After Anaconda is successfully installed, you can proceed with installing the conda environment. All of the required software is included in the course's
 `environment.yml <https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml>`_:
 
 .. literalinclude:: ../environment.yml
 
 To install the environment, use the following instructions based on your operating system.
 
-Linux
-=====
+Linux/Mac
+=========
 
 In terminal where the Anaconda installation is activated, clone the course repository with::
 
