@@ -81,6 +81,19 @@ we'll show to our colleagues, put into our paper etc. So basically,
 Now we have our finished pipeline. Now let's investigate why this is
 important.
 
+.. challenge:: Understanding data analysis pipelines
+
+  A example pipeline is provided in ``X_exercises/ch1-X-ex1.ipynb``.
+
+  1. Look through the example pipeline. Mark which cells belong to which categories in this categorization:
+
+    - Data perparation and loading
+    - Modeling
+    - Evaluation
+    - Presentation
+
+  2. Try to determine the pieces of the code that are **unique** to this specific dataset. Discuss how you would generalize this pipeline to other datasets.
+
 ***********************************************************
 Modularity & Interfacing - Why pipeline design is important
 ***********************************************************
@@ -167,7 +180,6 @@ residuals. Thus if our evaluation function were to use
 `residual sum of squares <https://en.wikipedia.org/wiki/Residual_sum_of_squares>`_
 as a criterion of model evaluation, it would work with **all models that have a
 residuals-function**. This is an example of a good interface.
-
 
 Interfacing in the wild
 =======================

@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'Data analysis with R and Python'
+project = 'Data analysis workflows with R and Python'
 copyright = '2020, Aalto SciComp'
 author = 'Simo Tuomisto'
 github_user = 'AaltoSciComp'
