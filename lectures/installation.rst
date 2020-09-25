@@ -67,7 +67,7 @@ use::
 
   conda env create -n env_name environment.yml
 
-You can now close the terminal. In the Anaconda Navigator, next to
+You can now close the terminal. In the Anaconda Navigator **Home**-tab, next to
 **Applications on**, switch from `base (root)` environment to `dataanalysis`.
 Now you can launch a jupyterlab instance by clicking on **JupyterLab**.
 
