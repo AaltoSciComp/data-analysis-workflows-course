@@ -194,3 +194,76 @@ becomes much easier: the API's just work.
 This is also extremely important in the industry. Analyzing big data requires
 good interfaces. For a good example, see
 `Steve Yegge's rant on Google's platforms and on Jeff Bezos' 2002 interface mandate <https://gist.github.com/chitchcock/1281611>`_.
+
+Creating modules
+================
+
+Many complete pipelines have modules written as functions. In many deep
+learning frameworks these modules are also written as Python classes. For now
+let's use functions to create individual modules.
+
+For example, the data loading for ``iris.data`` could be written in
+the following way:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        def load_iris(iris_data_file):
+            iris_data = pd.read_csv(
+                iris_data_file,
+                names=['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species'],
+            )
+            iris_data['Species'] = iris_data['Species'].map(lambda x: x.replace('Iris-','')).astype('category')
+            return iris_data
+
+        dataset =  load_iris('../data/iris.data')
+
+  .. tab:: R
+
+    .. code-block:: r
+
+        load_iris <- function(iris_data_file) {
+            iris_data <- read_csv(iris_data_file, col_names=c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species')) %>%
+                mutate(Species=str_remove(Species, 'Iris-')) %>%
+                mutate(Species=as.factor(Species))
+            return(iris_data)
+        }
+
+        dataset <- load_iris('../data/iris.data')
+
+It might look like this approach just increases the amount of code needed and
+would not provide any benefits, but after we create a function for the row
+shuffling functionality, we can start to see the advantage of our approach.
+The ``shuffle_rows``-function might look something like this:
+
+.. tabs::
+
+   .. tab:: Python
+
+        .. code-block:: python
+
+            def shuffle_rows(data, random_state=None):
+                shuffled_data = data.sample(frac=1, random_state=random_state).reset_index(drop=True)
+                return shuffled_data
+
+            random_state = RandomState(seed=42)
+            dataset = shuffle_rows(dataset, random_state)
+
+   .. tab:: R
+
+        .. code-block:: r
+
+            shuffle_rows <- function(data) {
+                sample_ix <- sample(nrow(data))
+                shuffled_data <- data[sample_ix,]
+                return(shuffled_data)
+            }
+
+            set.seed(42)
+            dataset <- shuffle_rows(dataset)
+
+At this point it is important to notice that our `shuffle_rows`-function
+works with **any** dataset that is similar to our original ``iris``-dataset.
