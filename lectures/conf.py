@@ -32,6 +32,7 @@ github_version = 'master/lectures/' # with trailing slash
 # ones.
 extensions = [
     'sphinx_lesson',
+    'sphinx_tabs.tabs',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
