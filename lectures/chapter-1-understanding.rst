@@ -195,12 +195,12 @@ This is also extremely important in the industry. Analyzing big data requires
 good interfaces. For a good example, see
 `Steve Yegge's rant on Google's platforms and on Jeff Bezos' 2002 interface mandate <https://gist.github.com/chitchcock/1281611>`_.
 
-Creating modules
-================
+Creating modules for a pipeline
+===============================
 
 Many complete pipelines have modules written as functions. In many deep
 learning frameworks these modules are also written as Python classes. For now
-let's use functions to create individual modules.
+let's re-write the modules in exercise 1 pipeline as functions.
 
 For example, the data loading for ``iris.data`` could be written in
 the following way:
@@ -211,28 +211,33 @@ the following way:
 
     .. code-block:: python
 
+        # Define iris data loading function
         def load_iris(iris_data_file):
             iris_data = pd.read_csv(
                 iris_data_file,
                 names=['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species'],
             )
             iris_data['Species'] = iris_data['Species'].map(lambda x: x.replace('Iris-','')).astype('category')
+            iris_data = iris_data.rename(columns={'Species':'Target'})
             return iris_data
 
-        dataset =  load_iris('../data/iris.data')
+        iris_data = load_iris('../data/iris.data')
+
 
   .. tab:: R
 
     .. code-block:: r
 
+        # Define iris data loading function
         load_iris <- function(iris_data_file) {
             iris_data <- read_csv(iris_data_file, col_names=c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species')) %>%
                 mutate(Species=str_remove(Species, 'Iris-')) %>%
-                mutate(Species=as.factor(Species))
+                mutate(Species=as.factor(Species)) %>%
+                rename(Target=Species)
             return(iris_data)
         }
 
-        dataset <- load_iris('../data/iris.data')
+        iris_data = load_iris('../data/iris.data')
 
 It might look like this approach just increases the amount of code needed and
 would not provide any benefits, but after we create a function for the row
@@ -241,29 +246,123 @@ The ``shuffle_rows``-function might look something like this:
 
 .. tabs::
 
-   .. tab:: Python
+  .. tab:: Python
 
-        .. code-block:: python
+    .. code-block:: python
 
-            def shuffle_rows(data, random_state=None):
-                shuffled_data = data.sample(frac=1, random_state=random_state).reset_index(drop=True)
-                return shuffled_data
+        # Define function for dataset row shuffling
+        def shuffle_rows(data, random_state=None):
+            shuffled_data = data.sample(frac=1, random_state=random_state).reset_index(drop=True)
+            return shuffled_data
 
-            random_state = RandomState(seed=42)
-            dataset = shuffle_rows(dataset, random_state)
+        random_state = RandomState(seed=42)
+        iris_data = shuffle_rows(iris_data, random_state)
 
-   .. tab:: R
+  .. tab:: R
 
-        .. code-block:: r
+    .. code-block:: r
 
-            shuffle_rows <- function(data) {
-                sample_ix <- sample(nrow(data))
-                shuffled_data <- data[sample_ix,]
-                return(shuffled_data)
-            }
+        # Define function for dataset row shuffling
+        shuffle_rows <- function(data) {
+            sample_ix <- sample(nrow(data))
+            shuffled_data <- data[sample_ix,]
+            return(shuffled_data)
+        }
 
-            set.seed(42)
-            dataset <- shuffle_rows(dataset)
+        set.seed(42)
+        iris_data <- shuffle_rows(iris_data)
 
 At this point it is important to notice that our `shuffle_rows`-function
 works with **any** dataset that is similar to our original ``iris``-dataset.
+
+Let's finish off the whole pipeline with functions for dataset splitting,
+modeling, model evaluation and result plotting:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        # Define function for dataset splitting 
+        def split_dataset(data, train_fraction=0.8,random_state=None):
+            train_split, test_split = train_test_split(data, train_size=train_fraction, random_state=random_state)
+            print('Train split proportions:')
+            print(train_split.groupby('Target').size())
+            print('Test split proportions:')
+            print(test_split.groupby('Target').size())
+            return (train_split, test_split)
+
+        # Define function for decision tree classification
+        def decision_tree_classifier(train_split, random_state=None):
+            tree = DecisionTreeClassifier(random_state=random_state)
+            train_data = train_split.drop('Target', axis=1)
+            train_target = train_split['Target']
+            fitted_tree = tree.fit(train_data, train_target)
+            print(export_text(fitted_tree, feature_names=list(train_data.columns)))
+            return(fitted_tree)
+
+        # Define function for model evaluation
+        def prediction_evaluation(test_split, model):
+            test_data = test_split.drop('Target', axis=1)
+            test_target = test_split['Target']
+            result_data = test_split.copy()
+            result_data['PredictedValue'] = model.predict(test_data)
+            result_data['Prediction'] = result_data.apply(lambda x: x['Target'].capitalize() if x['Target'] == x['PredictedValue'] else 'Classification failure', axis=1)
+            print('Confusion matrix:\n', confusion_matrix(result_data['PredictedValue'], result_data['Target']))
+            print('Accuracy: ', accuracy_score(result_data['PredictedValue'], result_data['Target']))
+            return result_data
+
+        # Define function for prediction plotting
+        def plot_predictions(fitted_data, x, y):
+            petal_plot, petal_plot_ax = plt.subplots(figsize=(6.5, 6.5))
+            sb.scatterplot(x=x, y=y, data=fitted_data, hue=fitted_data['Prediction'])
+
+  .. tab:: R
+
+    .. code-block:: r
+
+        # Define function for dataset splitting
+        split_dataset <- function(data, train_fraction=0.8) {
+            dataset_split <- data %>%
+                resample_partition(c(train=train_fraction, test=1-train_fraction))
+            print('Train split proportions:')
+            dataset_split$train %>%
+                as_tibble() %>%
+                group_by(Target) %>%
+                tally() %>%
+                show()
+            print('Test split proportions:')
+            dataset_split$test %>%
+                as_tibble() %>%
+                group_by(Target) %>%
+                tally() %>%
+                show()
+            return(dataset_split)
+        }
+
+        # Define function for decision tree classification
+        decision_tree_classifier <- function(train_data) {
+            fitted_tree <- train_data %>%
+                as_tibble() %>%
+                rpart(Target ~ ., data=., method='class')
+            print(fitted_tree)
+            return(fitted_tree)
+        }
+
+        # Define function for model evaluation
+        prediction_evaluation <- function(test_data, model) {
+            prediction_data <- test_data %>%
+                as_tibble() %>%
+                mutate(PredictedValue = predict(model, newdata=., type='class')) %>%
+                mutate(Prediction=ifelse(Target == PredictedValue, str_to_title(as.character(Target)), 'Classification failure'))
+            show(confusionMatrix(prediction_data$Target, prediction_data$PredictedValue))
+            return(prediction_data)
+        }
+
+        # Define function for prediction plotting
+        plot_predictions <- function(fitted_data, x, y) {
+            options(repr.plot.width=13, repr.plot.height=7)
+            ggplot(data=fitted_data, aes_string(x=x, y=y, color='Prediction')) +
+                geom_point()
+        }
