@@ -366,3 +366,95 @@ modeling, model evaluation and result plotting:
             ggplot(data=fitted_data, aes_string(x=x, y=y, color='Prediction')) +
                 geom_point()
         }
+
+Now we can run the whole pipeline with:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        random_state = RandomState(seed=42)
+        iris_data = load_iris('../data/iris.data')
+        iris_data = shuffle_rows(iris_data, random_state)
+        iris_train, iris_test = split_dataset(iris_data, train_fraction=0.8, random_state=random_state)
+        iris_fitted_tree = decision_tree_classifier(iris_train, random_state=random_state)
+        iris_predicted = prediction_evaluation(iris_test, iris_fitted_tree)
+        plot_predictions(iris_predicted, 'Petal.Width', 'Petal.Length')
+        plot_predictions(iris_predicted, 'Sepal.Width', 'Sepal.Length')
+
+  .. tab:: R
+
+    .. code-block:: r
+    
+        set.seed(42)
+        iris_data <- load_iris('../data/iris.data')
+        iris_data <- shuffle_rows(iris_data)
+        iris_split <- split_dataset(iris_data, train_fraction=0.8)
+        iris_fitted_tree <- decision_tree_classifier(iris_split$train)
+        iris_predicted <- prediction_evaluation(iris_split$test, iris_fitted_tree)
+        plot_predictions(iris_predicted, x='Petal.Width', y='Petal.Length')
+        plot_predictions(iris_predicted, x='Sepal.Width', y='Sepal.Length')
+
+Writing our pipeline in this way provides many benefits:
+
+- We can see our whole pipeline with a single glance.
+- We can easily modify our pipeline e.g. disable shuffling. 
+- We can easily see and change our pipeline's hyperparameters (e.g. test
+  different values of `train_fraction`). 
+- By swapping `load_iris`-function to some other function that provides
+  its output in similar format, we can run the same pipeline on a different
+  dataset.
+- By swapping `decision_tree_classifier`-function to some other function that
+  provides its output in similar format, we can run the same pipeline on a
+  different model.
+
+However, it is also important to know that by writing our pipeline in this way
+we have created interfaces. Thus reliability of our pipeline relies on the fact
+that various hidden requirements are being fulfilled:
+
+- Using our chosen model makes sense in the context.
+- Data is in tidy format (`DataFrame`/`tibble`).
+- Target variable is in `Target`-column and there are no unnecessary variables.
+- The fitted model supports the `predict`-function for obtaining predictions.
+- Prediction names are stored in 'Prediction'-column.
+- etc.
+
+It might look like the amount of requirements would grow very rapidly and thus
+there would not be any generality to our pipeline. However, in Python and R the
+community is very good at using standards. E.g. in 
+`scikit-learn <https://scikit-learn.org/stable/glossary.html#term-predict>`_
+and in
+`R <https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict>`_
+the predict-methods are well defined. By adhering to the same standards that
+everybody else uses you will immediately get the benefits: hundreds of
+different models and libraries.
+
+In the next exercise we try to extend our pipeline.
+
+
+.. challenge:: Extending our data analysis pipeline
+
+  A example pipeline is provided in ``X_exercises/ch1-X-ex2.ipynb``.
+
+  Let's modify our simple data analysis pipeline so that it can handle another
+  classifications task: classifying breast cancers from a
+  `another famous dataset <http://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+%28diagnostic%29>`_.
+  This problem is bit trickier for a simple model such as decision tree, so
+  let's try out
+  `random forest classifier <https://en.wikipedia.org/wiki/Random_forest>`_,
+  which uses an ensemble of decision trees and let's compare the results. 
+
+  Problems are described in more detail in the example notebooks:
+
+  1. Create a data loading function for our new dataset.
+
+  2. Test the data loading function by running a pipeline with decision
+     tree classifier. Analyze results.
+  
+  3. Create a function for random forest classifier. Use the function in
+     the place of our decision tree classifier to classify cancer
+     diagnoses.
+     
+  4. Use the random forest classifier in our iris pipeline. Analyze results.
