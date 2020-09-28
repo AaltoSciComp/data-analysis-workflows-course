@@ -10,7 +10,7 @@ Data analysis workflows with R and Python
 
 Data analysis is nowadays at the center of almost all scientific fields.
 Whether a researcher is doing experiments, running simulations or analyzing
-datasets, at some point of their carreer they will be required to do data
+datasets, at some point of their career they will be required to do data
 analysis.
 
 R and Python are two languages that have a rich and powerful data
@@ -18,7 +18,7 @@ analysis libraries and many researchers use them to build their data analysis
 workflows. However, these libraries have been designed to work optimally
 in certain types of workflows. Thus if one wants to create reproducible,
 scalable and efficient data analysis workflows it is important to understand
-how to design the workflow from the get-go.
+how to design a good workflow from the get-go.
 
 This course contains four chapters:
 
@@ -53,6 +53,11 @@ principles that one should keep in mind throughout the course:
      is a good starting point.
 
    - Software installed via conda as described in :doc:`installation instructions <installation>`.
+
+.. warning::
+
+   Materials are still being worked on and the current state is not reflective
+   of the eventual state.
 
 .. csv-table::
    :widths: auto
@@ -94,8 +99,8 @@ is not a course on the basics of scientific programming. If you wish to
 prep up your scientific programming skills, we recommend taking our
 `Python for Scientific Computing <https://aaltoscicomp.github.io/python-for-scicomp/>`_-course.
 
-See also
---------
+.. See also
+  --------
 
 
 
@@ -104,3 +109,8 @@ See also
 Credits
 -------
 
+Author: Simo Tuomisto
+
+Technical help: Richard Darst
+
+Testing: Enrico Glerean
