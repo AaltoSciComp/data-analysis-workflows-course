@@ -458,3 +458,55 @@ In the next exercise we try to extend our pipeline.
      diagnoses.
      
   4. Use the random forest classifier in our iris pipeline. Analyze results.
+
+
+***************************************************
+Getting a bigger picture of data analysis pipelines
+***************************************************
+
+Split pipelines
+===============
+
+So far we've been looking at a pipelines that consist of single notebook.
+This is often not possible with bigger pipelines. For example, the initial data
+might be too big to fit into laptop's memory and plotting might be something
+that would be easier to do with the laptop.
+
+In cases such as this the pipeline would need to be split into multiple pieces.
+These pieces would then be connected by data transfer: output of the pipeline
+at certain step is saved and transfered to another system where the pipeline
+is continued. 
+
+.. image:: images/pipeline-split-1.svg
+
+Another example would be a pipeline where one part of the pipeline has
+higher resource requirements than other parts. If modeling takes multiple days,
+one rarely wants to connect plotting to it.
+
+.. image:: images/pipeline-split-2.svg
+
+In pipelines such as these it is important to know when to do the splitting.
+The questions to ask are usually:
+
+- Do I need to repeat some part of my pipeline more often than another?
+- Is some part of my pipeline more costly with respect to its resource
+  requirements?
+- Will I modify some part more often than another?
+- Is the pipeline data-parallel? Could it be split in a way that would
+  make scaling easier?
+
+Data analysis workflow as a pipeline
+====================================
+
+It is usually good idea to think of the data analysis pipeline in a larger
+context. A full workflow of creating a paper might consist of data gathering,
+pipeline creation, pipeline result evaluation and iteration on the pipeline,
+and finally the actual writing process. Thus there is a correspondence
+between the idea of a pipeline and the whole workflow.
+
+.. image:: images/pipeline-workflow.svg
+
+An example of this corresponce happens often when one tries various
+models and model hyperparameters, but this process is not recorded. This
+process could be recorded into a data table and used afterwards to get a
+better understanding why the chosen parameters were optimal. 
