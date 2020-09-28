@@ -22,6 +22,7 @@ dependencies:
   - r-e1071
   - r-feather
   - r-irkernel
+  - r-randomforest
   - r-recommended
   - r-tidyverse
   - scipy
