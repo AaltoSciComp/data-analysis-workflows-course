@@ -8,6 +8,8 @@ dependencies:
   - git
   - gitdb
   - gitpython
+  - feather-format
+  - h5py
   - jupyter
   - jupyterlab
   - jupyterlab-git
@@ -20,6 +22,7 @@ dependencies:
   - r-cairo
   - r-caret
   - r-e1071
+  - r-db
   - r-feather
   - r-irkernel
   - r-randomforest
@@ -33,6 +36,7 @@ dependencies:
   - sphinx
   - sphinx_rtd_theme
   - sqlalchemy
+  - xlrd
   - pip:
     - sphinx-tabs
     - https://github.com/coderefinery/sphinx-lesson/archive/master.zip
