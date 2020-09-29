@@ -2,6 +2,11 @@
 Chapter 2: Data preparation
 ===========================
 
+.. important::
+
+    Commands run on this chapter are present in the
+    ``X_exercises/ch2-X-lectures.ipynb``, where ``X`` is 
+
 Tidy data - Data in memory
 --------------------------
 
@@ -49,3 +54,55 @@ want to use tidy data to store e.g. image names or model parameters.
 
 In this course our data is mostly in tidy format and if it's not in that
 format, we'll want to convert our raw data into it as soon as possible.
+
+Loading data - CSVs
+-------------------
+
+Let's start with loading data in the most common data format: csv. Quite often
+datasets are provided in this format because it is human readable and easy to
+transfer among systems.
+
+Let's consider our previous loading of ``iris.data``-dataset with the ``read_csv``:
+
+.. tabs::
+
+  .. tab:: Python
+  
+    `read_csv <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_-function's
+    API page.
+
+    .. code-block:: python
+    
+        iris = pd.read_csv('../data/iris.data', names=['Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species'])
+
+  .. tab:: R
+  
+    `read_csv <https://readr.tidyverse.org/reference/read_delim.html>`_-function's
+    API page.
+
+    .. code-block:: R
+    
+        iris <- read_csv('../data/iris.data', col_names=c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width', 'Species'))
+
+This function not only parses the text, but also converts the columns to a best possible format. To check column data types, use:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        print(iris.dtypes)
+
+  .. tab:: R
+  
+    `read_csv <https://readr.tidyverse.org/reference/read_delim.html>`_-function's
+    API page.
+
+    .. code-block:: R
+    
+        # TODO
+        
+`read_excel <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html>`_
+
+`read_excel <https://readxl.tidyverse.org/reference/read_excel.html>`_
