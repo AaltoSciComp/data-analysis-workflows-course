@@ -27,6 +27,7 @@ dependencies:
   - r-irkernel
   - r-randomforest
   - r-recommended
+  - r-rsqlite
   - r-tidyverse
   - scipy
   - scikit-learn
