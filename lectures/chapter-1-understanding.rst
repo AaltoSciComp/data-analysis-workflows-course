@@ -506,7 +506,10 @@ between the idea of a pipeline and the whole workflow.
 
 .. image:: images/pipeline-workflow.svg
 
-An example of this corresponce happens often when one tries various
-models and model hyperparameters, but this process is not recorded. This
-process could be recorded into a data table and used afterwards to get a
-better understanding why the chosen parameters were optimal. 
+For example, it is often the case that when one tries various
+models and model hyperparameters, the search is done iteratively and
+only the final values are recorded. By keeping track of different models,
+hyperparameters etc. in a .csv file one can use the same data analysis tools
+to help with the process of searching the values. This will help with
+justifying the chosen parameters and getting a better understanding on
+how sensitive the model is to said parameters.
