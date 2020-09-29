@@ -18,6 +18,7 @@ dependencies:
   - nodejs
   - pandas
   - pip
+  - pytables
   - pyyaml
   - r-cairo
   - r-caret
@@ -25,6 +26,7 @@ dependencies:
   - r-db
   - r-feather
   - r-irkernel
+  - r-pryr
   - r-randomforest
   - r-recommended
   - r-rsqlite
