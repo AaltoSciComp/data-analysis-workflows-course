@@ -31,7 +31,7 @@ Linux
 In terminal where the Anaconda installation is activated, clone the course repository with::
 
   git clone https://github.com/AaltoSciComp/data-analysis-workflows-course.git
-  cd data-analysis-course
+  cd data-analysis-workflows-course
 
 After this, in the course repository, run::
 
@@ -56,7 +56,7 @@ prompt, install git with::
 After installation, clone the course repository with::
 
   git clone https://github.com/AaltoSciComp/data-analysis-workflows-course.git
-  cd data-analysis-course
+  cd data-analysis-workflows-course
 
 After this, in the course repository, run::
 
