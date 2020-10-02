@@ -49,10 +49,15 @@ principles that one should keep in mind throughout the course:
 
    - Knowledge of Python or R in the context of scientific computing.
      If you're unsure, our
-     `Python for Scientific computing-course <https://aaltoscicomp.github.io/python-for-scicomp>`_
+     `Python for Scientific computing-course <https://aaltoscicomp.github.io/python-for-scicomp>`__
      is a good starting point.
 
-   - Software installed via conda as described in :doc:`installation instructions <installation>`.
+   - Software installed via conda as described in :doc:`installation
+     instructions <installation>`.
+
+   - It will help if you know some Jupyter, since that's how we do our
+     exercises.  You can study some in the `CodeRefinery lesson
+     <https://coderefinery.github.io/jupyter/>`__.
 
 .. warning::
 

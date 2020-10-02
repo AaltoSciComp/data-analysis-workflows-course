@@ -103,8 +103,8 @@ jobs:
       # Deploy
       # https://github.com/peaceiris/actions-gh-pages
       - name: Deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' }}
         #if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         with:
           publish_branch: gh-pages
