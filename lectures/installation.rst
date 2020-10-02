@@ -37,9 +37,14 @@ After this, in the course repository, run::
 
   conda env create environment.yml
 
-If you wish to change the environment name from the default (`dataanalysis`), use::
+If you wish to change the environment name from the default (``dataanalysis``), use::
 
   conda env create -n env_name environment.yml
+
+Then activate the environment (if you didn't call it ``dataanalysis``,
+replace it with the name you used)::
+
+  conda activate dataanalysis
 
 Now you can launch a jupyterlab instance for running the exercises::
 
