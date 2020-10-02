@@ -58,31 +58,39 @@ Now you can launch a jupyterlab instance for running the exercises::
 Windows
 =======
 
-Start Anaconda Navigator. From the navigator, start **CMD.exe Prompt**. In the
-prompt, install git with::
+Download the environment file
+`environment.yml <https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml>`_
+somewhere.
 
-  conda install git
+Start Anaconda Navigator. From the navigator, go to **Environments**.
 
-After installation, clone the course repository with::
+From bottom, click **Import**. Choose **Name** - *dataanalysis* and
+for **Specification File** choose the downloaded environment file.
 
-  git clone https://github.com/AaltoSciComp/data-analysis-workflows-course.git
-  cd data-analysis-workflows-course
+The environment creation process can take a long time, as the
+environment is quite big.
 
-After this, in the course repository, run::
-
-  conda env create environment.yml
-
-If you wish to change the environment name from the default (`dataanalysis`),
-use::
-
-  conda env create -n env_name environment.yml
-
-You can now close the terminal. In the Anaconda Navigator **Home**-tab, next to
+After installation, in the Anaconda Navigator **Home**-tab, next to
 **Applications on**, switch from ``base (root)`` environment to ``dataanalysis``.
 Now you can launch a jupyterlab instance by clicking on **JupyterLab**.
 
 If your jupyterlab instance says something like "X needs to be added to
-the build", just click **Build**.
+the build", just click **Build** and continue forward. If the build gives
+an error later on, just ignore it.
+
+Now press the **+**-button on the top left and under **Console**, choose
+**Python 3**.
+
+In the console at the botton, type the following:
+
+.. code-block:: python
+
+    import git
+
+    git.Git().clone('https://github.com/AaltoSciComp/data-analysis-workflows-course.git')
+
+This will download the course repository to folder ``data-analysis-workflows-course``.
+You can now go the folder and commence the testing.
 
 
 Testing your installation
