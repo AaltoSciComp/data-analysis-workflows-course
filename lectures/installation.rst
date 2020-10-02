@@ -30,8 +30,8 @@ see `the conda environment docs
 (but there is more here than you need to know), if you can do the
 steps below that is enough.
 
-Linux
-=====
+Linux and Mac OSX
+=================
 
 In terminal where the Anaconda installation is activated, clone the course repository with::
 
