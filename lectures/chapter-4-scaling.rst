@@ -1,3 +1,3 @@
 ==================
-Chapter 3: Scaling
+Chapter 4: Scaling
 ==================
