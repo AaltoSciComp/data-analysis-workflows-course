@@ -14,6 +14,14 @@ We recommend using
 `Anaconda <https://www.anaconda.com/products/individual>`_,
 but Miniconda will work as well.
 
+.. warning::
+
+   If you install Anaconda through your university's software center,
+   you might not be able to create environments!  At least this is the
+   case with Aalto University on some operating systems.  It is safest
+   to install it yourself, as your user.
+
+
 *****************************
 Installing course environment
 *****************************
