@@ -14,6 +14,14 @@ We recommend using
 `Anaconda <https://www.anaconda.com/products/individual>`_,
 but Miniconda will work as well.
 
+.. warning::
+
+   If you install Anaconda through your university's software center,
+   you might not be able to create environments!  At least this is the
+   case with Aalto University on some operating systems.  It is safest
+   to install it yourself, as your user.
+
+
 *****************************
 Installing course environment
 *****************************
@@ -30,8 +38,13 @@ see `the conda environment docs
 (but there is more here than you need to know), if you can do the
 steps below that is enough.
 
-Linux and Mac OSX
-=================
+Linux and Mac OSX (terminal)
+============================
+
+.. admonition:: Video
+
+   See the Linux / MacOS video version at https://youtu.be/mkkJnkouZ2o
+   (the Windows version from the Anaconda Navigator might work, too).
 
 In terminal where the Anaconda installation is activated, clone the course repository with::
 
@@ -55,8 +68,12 @@ Now you can launch a jupyterlab instance for running the exercises::
 
   jupyter-lab
 
-Windows
-=======
+Windows (Anaconda Navigator)
+============================
+
+.. admonition:: Video
+
+   See the Windows / Anaconda Navigator video version at https://youtu.be/mkkJnkouZ2o
 
 Download the environment file
 `environment.yml <https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml>`_
@@ -96,10 +113,13 @@ You can now go the folder and commence the testing.
 Testing your installation
 =========================
 
+You must activate the Anaconda environment each time you use it.  The
+steps above also activate it.
+
 This workshop requires that you are familiar with Jupyter notebooks and how to run
 them. In the git repository that you have downloaded for the installation, you will
 find a notebook called ``download_datasets.ipynb``. Open it and run it. This will
-download multiple datasets into the subfolder `data/`. You can try loading some of
+download multiple datasets into the subfolder ``data/``. You can try loading some of
 these datasets to make sure the download went through. Next, open the notebook for
 the first exercise, you will find it under ``X_exercises/ch1-X-ex1.ipynb``
 (replace ``X`` with ``python`` or ``r``). Make sure you are able to fully run the
