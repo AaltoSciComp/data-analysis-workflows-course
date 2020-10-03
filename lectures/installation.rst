@@ -30,8 +30,13 @@ see `the conda environment docs
 (but there is more here than you need to know), if you can do the
 steps below that is enough.
 
-Linux and Mac OSX
-=================
+Linux and Mac OSX (terminal)
+============================
+
+.. admonition:: Video
+
+   See the Linux / MacOS video version at https://youtu.be/mkkJnkouZ2o
+   (the Windows version from the Anaconda Navigator might work, too).
 
 In terminal where the Anaconda installation is activated, clone the course repository with::
 
@@ -55,8 +60,12 @@ Now you can launch a jupyterlab instance for running the exercises::
 
   jupyter-lab
 
-Windows
-=======
+Windows (Anaconda Navigator)
+============================
+
+.. admonition:: Video
+
+   See the Windows / Anaconda Navigator video version at https://youtu.be/mkkJnkouZ2o
 
 Download the environment file
 `environment.yml <https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml>`_
@@ -95,6 +104,9 @@ You can now go the folder and commence the testing.
 
 Testing your installation
 =========================
+
+You must activate the Anaconda environment each time you use it.  The
+steps above also activate it.
 
 This workshop requires that you are familiar with Jupyter notebooks and how to run
 them. In the git repository that you have downloaded for the installation, you will
