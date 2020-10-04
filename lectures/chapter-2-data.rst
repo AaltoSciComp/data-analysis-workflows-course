@@ -762,4 +762,241 @@ in our rankings dataset.
 Demonstrating ATP dataset: Longest reign at rank 1
 ==================================================
 
-Let's use our newly generated dataset to find out longers
+Let's use our newly generated dataset to find out who has had the longest
+reign at top 1 spot during this time period. Now we're only interested on
+players that have attained rank 1. Let's pick only those rows.
+
+
+.. tabs::
+
+  .. tab:: Python
+
+    `Pandas indexing <https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#different-choices-for-indexing>`_
+
+    `pandas.DataFrame.loc <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.loc.html>`_
+
+    .. code-block:: python
+
+        atp_top1 = atp_data.loc[atp_data.loc[:,'rank']==1].copy()
+        atp_top1.head()
+
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1572 	2000-01-17 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        3143 	2000-01-24 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        4713 	2000-01-31 	1 	101736 	5045.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        6287 	2000-02-07 	1 	101736 	5045.0 	R 	1970-04-29 	USA 	Agassi, Andre
+
+  .. tab:: R
+
+    `Tidyverse filter <https://dplyr.tidyverse.org/reference/filter.html>`_
+
+    .. code-block:: R
+
+        # Better when we want to drop rows
+        atp_top1 <- atp_data %>%
+            filter(rank == 1)
+
+        # or
+
+        # Logical indexing is more useful when we want to edit certain rows
+        atp_top1 <- atp_data[atp_data['rank'] == 1,]
+
+        head(atp_top1)
+
+         ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA
+        2000-01-17 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA
+        2000-01-24 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA
+        2000-01-31 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA
+        2000-02-07 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA
+        2000-02-14 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA
+
+In order to see when the top 1 rank holder has changed we'll create a new
+column ``previous_top`` that contains a shifted version of the player name.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.shift <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.shift.html>`_
+
+    .. code-block:: python
+
+        atp_top1.loc[:, 'previous_top'] = atp_top1['player_id'].shift(1)
+        atp_top1.head()
+
+        ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name 	previous_top
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre 	NaN
+        1572 	2000-01-17 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre 	101736.0
+        3143 	2000-01-24 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre 	101736.0
+        4713 	2000-01-31 	1 	101736 	5045.0 	R 	1970-04-29 	USA 	Agassi, Andre 	101736.0
+        6287 	2000-02-07 	1 	101736 	5045.0 	R 	1970-04-29 	USA 	Agassi, Andre 	101736.0
+
+  .. tab:: R
+
+    `Tidyverse lag <https://dplyr.tidyverse.org/reference/lead-lag.html>`_
+
+    .. code-block:: R
+
+        atp_top1 <- atp_top1 %>%
+            mutate(previous_top=lag(player_id))
+
+        head(atp_top1)
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code	previous_top
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA 	NA
+        2000-01-17 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA 	101736
+        2000-01-24 	1 	101736 	4135 	Agassi, Andre	R 	1970-04-29 	USA 	101736
+        2000-01-31 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA 	101736
+        2000-02-07 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA 	101736
+        2000-02-14 	1 	101736 	5045 	Agassi, Andre	R 	1970-04-29 	USA 	101736
+
+Now let's further limit ourselves to those observations where the reign has
+changed. That is, rank 1 player is different to previous player. 
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        atp_top1_reigns = atp_top1.loc[atp_top1['player_id'] != atp_top1['previous_top'],:].copy()
+        atp_top1_reigns.head()
+
+        ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name 	previous_top
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre 	NaN
+        55359 	2000-09-11 	1 	101948 	3739.0 	R 	1971-08-12 	USA 	Sampras, Pete 	101736.0
+        71523 	2000-11-20 	1 	103498 	3920.0 	R 	1980-01-27 	RUS 	Safin, Marat 	101948.0
+        74761 	2000-12-04 	1 	102856 	4195.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo 	103498.0
+        87617 	2001-01-29 	1 	103498 	4265.0 	R 	1980-01-27 	RUS 	Safin, Marat 	102856.0
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        # Better when we want to drop rows
+        atp_top1_reigns <- atp_top1 %>%
+            filter(player_id != previous_top)
+        head(atp_top1_reigns)
+
+        # Logical indexing is more useful when we want to edit certain rows
+        atp_top1_reigns <- drop_na(atp_top1[atp_top1['player_id'] != atp_top1['previous_top'],])
+        head(atp_top1_reigns)
+
+         ranking_date	rank	player_id	points	name	hand	birth_date	country_code	previous_top
+        2000-09-11 	1 	101948 	3739 	Sampras, Pete 	R 	1971-08-12 	USA 	101736
+        2000-11-20 	1 	103498 	3920 	Safin, Marat 	R 	1980-01-27 	RUS 	101948
+        2000-12-04 	1 	102856 	4195 	Kuerten, Gustavo	R 	1976-09-10 	BRA 	103498
+        2001-01-29 	1 	103498 	4265 	Safin, Marat 	R 	1980-01-27 	RUS 	102856
+        2001-02-26 	1 	102856 	4365 	Kuerten, Gustavo	R 	1976-09-10 	BRA 	103498
+        2001-04-02 	1 	103498 	4270 	Safin, Marat 	R 	1980-01-27 	RUS 	102856
+
+Now we'll want to calculate the reign lengths of our top 1 players. To do this
+we'll calculate the difference on our ranking dates and shift it so that the
+result matches the player.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.diff <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.diff.html>`_
+
+    .. code-block:: python
+
+        atp_top1_reigns['reign_length'] = atp_top1_reigns.loc[:,'ranking_date'].diff().shift(-1)
+        atp_top1_reigns.head()
+
+        ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name 	previous_top 	reign_length
+        0 	2000-01-10  	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre   	NaN     	245 days
+        55359 	2000-09-11 	1 	101948 	3739.0 	R 	1971-08-12 	USA 	Sampras, Pete   	101736.0 	70 days
+        71523 	2000-11-20 	1 	103498 	3920.0 	R 	1980-01-27 	RUS 	Safin, Marat    	101948.0 	14 days
+        74761 	2000-12-04 	1 	102856 	4195.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo 	103498.0 	56 days
+        87617 	2001-01-29 	1 	103498 	4265.0 	R 	1980-01-27 	RUS 	Safin, Marat    	102856.0 	28 days
+
+  .. tab:: R
+
+    `Tidyverse lead <https://dplyr.tidyverse.org/reference/lead-lag.html>`_
+
+    `R difftime <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/difftime>`_
+
+    .. code-block:: R
+
+        atp_top1_reigns <- atp_top1_reigns %>%
+            mutate(reign_length=difftime(lead(ranking_date), ranking_date))
+        head(atp_top1_reigns)
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code	previous_top	reign_length
+        2000-09-11 	1 	101948 	3739 	Sampras, Pete 	R 	1971-08-12 	USA 	101736 	70 days
+        2000-11-20 	1 	103498 	3920 	Safin, Marat 	R 	1980-01-27 	RUS 	101948 	14 days
+        2000-12-04 	1 	102856 	4195 	Kuerten, Gustavo	R 	1976-09-10 	BRA 	103498 	56 days
+        2001-01-29 	1 	103498 	4265 	Safin, Marat 	R 	1980-01-27 	RUS 	102856 	28 days
+        2001-02-26 	1 	102856 	4365 	Kuerten, Gustavo	R 	1976-09-10 	BRA 	103498 	35 days
+        2001-04-02 	1 	103498 	4270 	Safin, Marat 	R 	1980-01-27 	RUS 	102856 	21 days
+
+Now let's sort these values to obtain the longest reigns. When we compare the
+results with
+`this list <https://en.wikipedia.org/wiki/List_of_ATP_number_1_ranked_singles_tennis_players#Weeks_at_No._1>`_
+of top reigns, we see that we have captured many of these reigns in our dataset.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.sort_values <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.sort_values.html>`_
+
+    .. code-block:: python
+
+        atp_top1_reigns.sort_values('reign_length', ascending=False).head(5)
+
+        ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name 	previous_top 	reign_length
+        346974  	2004-02-02 	1 	103819 	5225.0  	R 	1981-08-08 	SUI 	Federer, Roger  	104053.0 	1659 days
+        1331200 	2014-07-07 	1 	104925 	13130.0 	R 	1987-05-22 	SRB 	Djokovic, Novak 	104745.0 	854 days
+        155503  	2001-11-19 	1 	103720 	4365.0  	R 	1981-02-24 	AUS 	Hewitt, Lleyton 	102856.0 	525 days
+        960449  	2010-06-07 	1 	104745 	8700.0  	L 	1986-06-03 	ESP 	Nadal, Rafael   	103819.0 	392 days
+        1050927 	2011-07-04 	1 	104925 	13285.0 	R 	1987-05-22 	SRB 	Djokovic, Novak 	104745.0 	371 days
+
+  .. tab:: R
+
+    `Tidyverse top_n <https://dplyr.tidyverse.org/reference/top_n.html>`_
+
+    `Tidyverse arrange <https://dplyr.tidyverse.org/reference/arrange.html>`_
+
+    `Tidyverse desc <https://dplyr.tidyverse.org/reference/desc.html>`_
+
+    .. code-block:: R
+
+        atp_top1_reigns %>%
+            top_n(5, reign_length) %>%
+            arrange(desc(reign_length))
+
+         ranking_date	rank	player_id	points	name	hand	birth_date	country_code	previous_top	reign_length
+        2004-02-02 	1 	103819 	5225 	Federer, Roger 	R 	1981-08-08 	SUI 	104053 	1659 days
+        2014-07-07 	1 	104925 	13130 	Djokovic, Novak	R 	1987-05-22 	SRB 	104745 	854 days
+        2001-11-19 	1 	103720 	4365 	Hewitt, Lleyton	R 	1981-02-24 	AUS 	102856 	525 days
+        2010-06-07 	1 	104745 	8700 	Nadal, Rafael 	L 	1986-06-03 	ESP 	103819 	392 days
+        2011-07-04 	1 	104925 	13285 	Djokovic, Novak	R 	1987-05-22 	SRB 	104745 	371 days
+
+.. challenge:: Parsing Premiere League games
+
+    The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
+
+    In the exercise we'll create input parsing functions for
+    `Premier League results <https://github.com/footballcsv/england>`_.
+
+    Problems are described in detail in the notebooks, but they are basically
+    the following:
+
+    1. Create a function for reading the data.
+    2. Create a function that formats the data into a tidy format and adds
+       additional information based on existing data.
+    3. Create a function that turns some of our columns into categorical
+       format.
+    4. Create a function that can combine multiple data files into a single
+       dataset.
+
+    After solving problems 1 and 2 you can try out two demonstrations of what
+    can be done with the data:
+
+    1. Check whether home side has an advantage in football games.
+    2. Calculate Premier League winners.
