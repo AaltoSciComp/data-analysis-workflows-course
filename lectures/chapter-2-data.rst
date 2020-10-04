@@ -692,3 +692,74 @@ function that can read multiple files with a for-loop structure.
 This new function provides an interesting feature: we do not need to create
 duplicate variables for our new datasets. We could be reading 2 or 2000 files
 and our function would work identically.
+
+Let's now combine this rankings dataset with our player dataset. Now we're
+going to do dataset joining with ``player_id`` as our joining column. As our
+players dataset contains a lot of players who did not play during the time
+period that we have in our rankings dataset, we should use the rankings
+dataset as our master dataset and do a left join. This means that we only
+join those rows from the players dataset that have corresponding player ID
+in our rankings dataset.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.merge <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.merge.html#pandas.DataFrame.merge>`_
+
+    .. code-block:: python
+
+        atp_data = atp_rankings.merge(atp_players, on='player_id', how='left')
+        print(atp_data.dtypes)
+        atp_data.head()
+
+        ranking_date    datetime64[ns]
+        rank                     int64
+        player_id                int64
+        points                 float64
+        hand                  category
+        birth_date      datetime64[ns]
+        country_code          category
+        name                    object
+        dtype: object
+
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
+
+  .. tab:: R
+
+    `Tidyverse left_join <https://dplyr.tidyverse.org/reference/join.html>`_
+
+    .. code-block:: R
+
+        atp_data <- atp_rankings %>%
+            left_join(atp_players, by='player_id')
+        str(atp_data)
+        head(atp_data)
+
+        Classes ‘spec_tbl_df’, ‘tbl_df’, ‘tbl’ and 'data.frame':	1837203 obs. of  8 variables:
+         $ ranking_date: POSIXct, format: "2000-01-10" "2000-01-10" ...
+         $ rank        : num  1 2 3 4 5 6 7 8 9 10 ...
+         $ player_id   : num  101736 102338 101948 103017 102856 ...
+         $ points      : num  4135 2915 2419 2184 2169 ...
+         $ name        : chr  "Agassi, Andre" "Kafelnikov, Yevgeny" "Sampras, Pete" "Kiefer, Nicolas" ...
+         $ hand        : Factor w/ 4 levels "A","L","R","U": 3 3 3 3 3 3 3 3 2 3 ...
+         $ birth_date  : POSIXct, format: "1970-04-29" "1974-02-18" ...
+         $ country_code: Factor w/ 210 levels "AFG","AHO","ALB",..: 200 161 200 76 28 179 62 200 43 137 ...
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre 	R 	1970-04-29 	USA
+        2000-01-10 	2 	102338 	2915 	Kafelnikov, Yevgeny	R 	1974-02-18 	RUS
+        2000-01-10 	3 	101948 	2419 	Sampras, Pete 	R 	1971-08-12 	USA
+        2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
+        2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
+        2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+Demonstrating ATP dataset: Longest reign at rank 1
+==================================================
+
+Let's use our newly generated dataset to find out longers
