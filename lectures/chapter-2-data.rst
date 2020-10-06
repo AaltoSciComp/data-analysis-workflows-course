@@ -1005,12 +1005,51 @@ of top reigns, we see that we have captured many of these reigns in our dataset.
 Using binary data formats to improve your pipeline
 **************************************************
 
-CSVs and challenges with them
-=============================
+Why binary data formats?
+========================
+
+Quite often raw data is provided as CSVs or other delimited files (e.g.
+``.dat``-files). Sometimes you have a zips that contain huge amount of
+individual files or images. Reading such files can be slow, resource intensive,
+bad for a shared file system and complicated as one needs to do parsing each
+time the files are loaded.
+
+In situations like it is usually a good idea to do basic parsing for the data
+and store a working copy of the data in a binary format. Even though this
+causes data duplication, the performance benefits will easily outweight this
+cost. Benefits of binary formats include:
+
+- Data size is reduced due to better encodings (e.g. ASCII vs. binary float).
+- Data loading is much faster due to reduced parsing and better buffering
+  behavior.
+- All of the data does not need to be loaded in order to access parts of the
+  data.
+- Raw data can be stored in a separate location which reduces the risk of
+  spoiling the raw data.
+
+One should take few things into account when using binary data formats:
+
+- Choose a binary format that best suits the problem at hand. There isn't
+  **one** data format that works in all cases.
+- Write the files programatically using pipeline functions. This makes
+  testing easier and allows others to replicate your data format from
+  the raw data.
+- If the format supports metadata attributes, use them to store e.g. code
+  revision used to create the dataset, hyperparameters of the model used
+  etc.
+
+Of course one should also use binary data formats to store temporary
+data or intermediate results from the models. Easily readable/transferable
+formats such as CSVs can be used when the results are being shared and
+datasets are published, but due to reasons mentioned before, they are not
+optimal for storing temporary results.
+
+CSVs
+====
 
 CSVs (and other delimited text files) are common, but they are rarely the best
-format to use throughout a pipeline. Some of the pros and cons of CSVs are
-listed below.
+format to use throughout a pipeline. Raw datasets are often provided in CSV
+format as it is very easy to transport. 
 
 **Pros:**
 
@@ -1023,7 +1062,7 @@ listed below.
 1. One usually needs to manually specify column names, column types, delimiters
    etc.
 2. Data is stored very inefficiently. Storing e.g. a floating point number in
-   ascii takes a lot more space than storing it as binary.
+   ASCII takes a lot more space than storing it as binary.
 3. Using bad data readers (e.g. reading file without `read_csv`-functions) can
    result in huge number of small IO operations as text reading usually reads
    file some 4-64 kB at a time (a.k.a. small buffer size).
@@ -1171,7 +1210,7 @@ Feather
 
     To install the newer versions, please run
 
-    ``conda install --freeze-installed -c conda-forge pyarrow=1.0.1 r-arrow r-vctrs``
+    ``conda install --freeze-installed -c conda-forge pyarrow=1.0.1 r-arrow=1.0.1 r-vctrs``
 
     in an Anaconda shell.
 
@@ -1188,8 +1227,8 @@ Nowadays it's development is deeply connected with the Apache Arrow format.
 
 1. Easy to write and read.
 2. Very fast.
-3. Good for tabular data.
-4. Good format for moving tabular data between R and Python.
+3. Good for columnar data.
+4. Good format for moving columnar data between R and Python.
 
 **Cons**:
 
@@ -1249,11 +1288,12 @@ of encoding and compression to reduce file size.
 
 **Pros:**
 
-1. Very efficient spacewise.
-2. Good for long-term storage.
-3. Easy to read into big data applications (Spark/Hadoop/etc.)
-4. Good for big data.
+1. Easy to write and read.
+2. Very efficient spacewise.
+3. Good for long-term storage.
+4. Easy to read into big data applications (Spark/Hadoop/etc.)
 5. Good interoperability between different languages.
+6. Supports metadata in data files.
 
 **Cons:**
 
@@ -1271,6 +1311,8 @@ performance of Feather, Parquet and other popular formats.
     `pandas.DataFrame.to_parquet <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_parquet.html>`_
 
     `pandas.read_parquet <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_parquet.html>`_
+    
+    `pyarrow's parquet-functionality <http://arrow.apache.org/docs/python/parquet.html>`_
 
     .. code-block:: python
 
@@ -1322,13 +1364,11 @@ other data as well.
 
 **Pros:**
 
-1. Great for matrices or other big binary arrays.
-2. Good MPI support if your code supports it.
-3. Hierarchical data format where you can store multiple datasets and metadata
+1. Good for matrices or other big binary arrays.
+2. Hierarchical data format where you can store multiple datasets and metadata
    in a single file.
-4. Fast when reading big chunks.
-5. Very well supported as it is a commonly used format.
-6. Good for sharing finished datasets.
+3. Fast when reading big chunks.
+4. Good for sharing finished datasets.
 
 **Cons:**
 
@@ -1350,23 +1390,15 @@ other data as well.
 
     .. code-block:: python
 
-        atp_players.to_hdf('../data/atp_python.h5', '/atp_players')
-        atp_rankings.to_hdf('../data/atp_python.h5', '/atp_rankings')
-        print(pd.read_hdf('../data/atp_python.h5','/atp_players').head())
-        print(pd.read_hdf('../data/atp_python.h5','/atp_rankings').head())
+        atp_data.to_hdf('../data/atp_data_python.h5', '/atp_data')
+        pd.read_hdf('../data/atp_data_python.h5','/atp_data').head()
 
-           player_id hand birth_date country_code                      name
-        0     100001    R 1913-11-22          USA           Mulloy, Gardnar
-        1     100002    R 1921-06-20          ECU            Segura, Pancho
-        2     100003    R 1927-10-02          AUS            Sedgman, Frank
-        3     100004    R 1927-10-11          ITA           Merlo, Giuseppe
-        4     100005    R 1928-05-09          USA  Gonzales, Richard Pancho
-          ranking_date  rank  player_id  points
-        0   2000-01-10     1     101736  4135.0
-        1   2000-01-10     2     102338  2915.0
-        2   2000-01-10     3     101948  2419.0
-        3   2000-01-10     4     103017  2184.0
-        4   2000-01-10     5     102856  2169.0
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
 
 
   .. tab:: R
@@ -1376,35 +1408,25 @@ other data as well.
     .. code-block:: R
 
         library(hdf5r)
-            datafile_h5 <- H5File$new('../data/atp_r.h5', mode = 'w')
-            datasets_list = list('atp_players'=atp_players, 'atp_rankings'=atp_rankings)
-            for (dataset_name in names(datasets_list)) {
-                dataset <- datasets_list[[dataset_name]]
-                datagroup_h5 <- datafile_h5$create_group(dataset_name) 
-                for (column in colnames(dataset)) {
-                    datagroup_h5[[column]] <- dataset[[column]]
-                }
-                print(datagroup_h5)
-            }
-            print(datafile_h5)
+        h5_file <- H5File$new('../data/atp_data_r.h5', mode = 'w')
+        h5_group <- h5_file$create_group('atp_data')
+        for (column in colnames(atp_data)) {
+            h5_group[[column]] <- atp_data[[column]]
+        }
+        print(h5_group)
+        print(h5_file)
 
-            datafile_h5$close_all()
+        h5_file$close_all()
 
         Class: H5Group
         Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
-        Group: /atp_players
+        Group: /atp_data
         Listing:
                  name    obj_type dataset.dims dataset.type_class
-           birth_date H5I_DATASET        54938          H5T_FLOAT
-         country_code H5I_DATASET        54938           H5T_ENUM
-                 hand H5I_DATASET        54938           H5T_ENUM
-                 name H5I_DATASET        54938         H5T_STRING
-            player_id H5I_DATASET        54938          H5T_FLOAT
-        Class: H5Group
-        Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
-        Group: /atp_rankings
-        Listing:
-                 name    obj_type dataset.dims dataset.type_class
+           birth_date H5I_DATASET      1837203          H5T_FLOAT
+         country_code H5I_DATASET      1837203           H5T_ENUM
+                 hand H5I_DATASET      1837203           H5T_ENUM
+                 name H5I_DATASET      1837203         H5T_STRING
             player_id H5I_DATASET      1837203          H5T_FLOAT
                points H5I_DATASET      1837203          H5T_FLOAT
                  rank H5I_DATASET      1837203          H5T_FLOAT
@@ -1413,6 +1435,99 @@ other data as well.
         Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
         Access type: H5F_ACC_RDWR
         Listing:
-                 name  obj_type dataset.dims dataset.type_class
-          atp_players H5I_GROUP         <NA>               <NA>
-         atp_rankings H5I_GROUP         <NA>               <NA>
+             name  obj_type dataset.dims dataset.type_class
+         atp_data H5I_GROUP         <NA>               <NA>
+
+Binary data formats' sizes
+==========================
+
++-------------------------------+-------------------------+-----------+
+| Data format                   | Filename                | File size |
++===============================+=========================+===========+
+| Original data without joining | atp_players.csv         | 1.9 MB    |
+|                               |                         |           |
+|                               | atp_rankings_00s.csv    | 21 MB     |
+|                               |                         |           |
+|                               | atp_rankings_10s.csv    | 21 MB     |
++-------------------------------+-------------------------+-----------+
+| Saved CSV                     | atp_data_python.csv     | 123 MB    |
+|                               |                         |           |
+|                               | atp_data_r.csv          | 141 MB    |
++-------------------------------+-------------------------+-----------+
+| Serialized objects            | atp_data.pickle.gz      | 9.9 MB    |
+|                               |                         |           |
+|                               | atp_data.Rdata          | 22 MB     |
++-------------------------------+-------------------------+-----------+
+| Feather                       | atp_data_python.feather | 47  MB    |
+|                               |                         |           |
+|                               | atp_data_r.feather      | 33 MB     |
++-------------------------------+-------------------------+-----------+
+| Parquet                       | atp_data_python.parquet | 20  MB    |
+|                               |                         |           |
+|                               | atp_data_r.parquet      | 12 MB     |
++-------------------------------+-------------------------+-----------+
+| HDF5                          | atp_data_python.h5      | 104 MB    |
+|                               |                         |           |
+|                               | atp_data_r.h5           | 82 MB     |
++-------------------------------+-------------------------+-----------+
+
+******************
+Other data formats
+******************
+
+Excel spreadsheets
+==================
+
+Excel spreadsheets are often used in companies and economics to display and
+share data.
+
+**Pros:**
+
+1. Easy for beginners.
+2. Easy to do simple operations for rows and columns.
+
+**Cons:**
+
+1. Very space ineffective.
+2. Slow.
+3. Hard to do complicated analysis.
+4. Many proprietary features make sharing harder.
+
+Let's load Frasier Institutes
+`Economic Freedom of the World-dataset <https://www.fraserinstitute.org/economic-freedom/dataset>`_,
+which is provided as an Excel spreadsheet.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.read_excel <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_excel.html>`_
+
+    .. code-block:: python
+
+        efw = pd.read_excel('../data/efw.xlsx', skiprows=4, header=0, usecols='B:BU', nrows=4050)
+        efw.head()
+
+        Year 	ISO_Code 	Countries 	Economic Freedom Summary Index 	Rank 	Quartile 	Government consumption 	data 	Transfers and subsidies 	data.1 	... 	Conscription 	Labor market regulations 	Administrative requirements 	Regulatory Burden 	Starting a business 	Impartial Public Administration 	Licensing restrictions 	Tax compliance 	Business regulations 	Regulation
+        0 	2018 	ALB 	Albania 	7.80 	26.0 	1.0 	8.155882 	12.270000 	6.738420 	12.470000 	... 	10.0 	6.717929 	5.651538 	6.666667 	9.742477 	5.396 	5.621940 	7.175250 	6.708979 	7.721734
+        1 	2018 	DZA 	Algeria 	4.97 	157.0 	4.0 	3.220588 	29.050000 	7.817129 	8.511137 	... 	3.0 	5.645397 	4.215154 	2.444444 	9.305002 	3.906 	8.771111 	7.029528 	5.945207 	5.563704
+        2 	2018 	AGO 	Angola 	4.75 	159.0 	4.0 	7.698695 	13.824437 	9.623978 	1.880000 	... 	0.0 	5.338186 	2.937894 	2.444444 	8.730805 	5.044 	7.916416 	6.782923 	5.642747 	5.386200
+        3 	2018 	ARG 	Argentina 	5.78 	144.0 	4.0 	5.938235 	19.810000 	6.307902 	14.050000 	... 	10.0 	5.119549 	2.714233 	6.666667 	9.579288 	7.202 	5.726521 	6.508295 	6.399500 	5.757401
+        4 	2018 	ARM 	Armenia 	7.92 	18.0 	1.0 	7.717647 	13.760000 	7.711172 	8.900000 	... 	0.0 	6.461113 	5.170406 	6.000000 	9.863530 	6.298 	9.302574 	7.040738 	7.279208 	7.762321
+
+  .. tab:: R
+
+    `Tidyverse's read_excel <https://readxl.tidyverse.org/reference/read_excel.html>`_
+
+    .. code-block:: R
+
+        library(readxl)
+        efw <- read_excel('../data/efw.xlsx', col_names=TRUE, range='B5:BU4055')
+
+         Year	ISO_Code	Countries	Economic Freedom Summary Index	Rank	Quartile	Government consumption	data...8	Transfers and subsidies	data...10	...	Conscription	Labor market regulations	Administrative requirements	Regulatory Burden	Starting a business	Impartial Public Administration	Licensing restrictions	Tax compliance	Business regulations	Regulation
+        2018 	ALB 	Albania 	7.80 	26 	1 	8.155882 	12.27000 	6.738420 	12.470000	... 	10 	6.717929 	5.651538 	6.666667 	9.742477 	5.396 	5.621940 	7.175250 	6.708979 	7.721734
+        2018 	DZA 	Algeria 	4.97 	157 	4 	3.220588 	29.05000 	7.817129 	8.511137	... 	3 	5.645397 	4.215154 	2.444444 	9.305002 	3.906 	8.771111 	7.029528 	5.945207 	5.563704
+        2018 	AGO 	Angola 	4.75 	159 	4 	7.698695 	13.82444 	9.623978 	1.880000	... 	0 	5.338186 	2.937894 	2.444444 	8.730805 	5.044 	7.916416 	6.782923 	5.642747 	5.386200
+        2018 	ARG 	Argentina	5.78 	144 	4 	5.938235 	19.81000 	6.307902 	14.050000	... 	10 	5.119549 	2.714233 	6.666667 	9.579288 	7.202 	5.726521 	6.508295 	6.399500 	5.757401
+        2018 	ARM 	Armenia 	7.92 	18 	1 	7.717647 	13.76000 	7.711172 	8.900000	... 	0 	6.461113 	5.170406 	6.000000 	9.863530 	6.298 	9.302574 	7.040738 	7.279208 	7.762321
+        2018 	AUS 	Australia	8.23 	5 	1 	4.450000 	24.87000 	6.867958 	11.994595	... 	10 	7.803349 	3.981758 	8.888889 	9.928614 	10.000 	8.953087 	8.823021 	8.429228 	8.726281 
