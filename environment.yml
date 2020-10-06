@@ -18,8 +18,10 @@ dependencies:
   - nodejs
   - pandas
   - pip
+  - pyarrow==1.0.1
   - pytables
   - pyyaml
+  - r-arrow==1.0.1
   - r-cairo
   - r-caret
   - r-e1071
@@ -31,6 +33,7 @@ dependencies:
   - r-recommended
   - r-rsqlite
   - r-tidyverse
+  - r-vctrs
   - scipy
   - scikit-learn
   - seaborn
