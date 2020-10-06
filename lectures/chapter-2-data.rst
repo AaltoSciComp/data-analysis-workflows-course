@@ -57,6 +57,30 @@ want to use tidy data to store e.g. image names or model parameters.
 In this course our data is mostly in tidy format and if it's not in that
 format, we'll want to convert our raw data into it as soon as possible.
 
+.. challenge:: Parsing Premiere League games - Problem 1
+
+    The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
+
+    In the exercise we'll create input parsing functions for
+    `Premier League results <https://github.com/footballcsv/england>`_.
+
+    Problems are described in detail in the notebooks, but they are basically
+    the following:
+
+    1. Create a function for reading the data.
+    2. Create a function that formats the data into a tidy format and adds
+       additional information based on existing data.
+    3. Create a function that turns some of our columns into categorical
+       format.
+    4. Create a function that can combine multiple data files into a single
+       dataset.
+
+    After solving problems 1 and 2 you can try out two demonstrations of what
+    can be done with the data:
+
+    1. Check whether home side has an advantage in football games.
+    2. Calculate Premier League winners.
+
 **********************
 Simple data operations
 **********************
@@ -312,6 +336,63 @@ Now we can drop our unneeded columns:
          $ birth_date  : num  19131122 19210620 19271002 19271011 19280509 ...
          $ country_code: chr  "USA" "ECU" "AUS" "ITA" ...
 
+Turning input processing tasks into functions
+=============================================
+
+Now that we have an idea what operations we want to accomplish for our data
+loading, we should codify these operations by creating a data loading function.
+
+Let's create a data loading function for loading ATP player data:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        def load_atp_players(atp_players_file):
+            atp_players = pd.read_csv(atp_players_file, names=['player_id', 'first_name', 'last_name', 'hand', 'birth_date', 'country_code'])
+            atp_players.loc[:,'birth_date'] = pd.to_datetime(atp_players.loc[:,'birth_date'], format='%Y%m%d', errors='coerce')
+            atp_players['name'] = atp_players.loc[:,'last_name'] + ', ' + atp_players.loc[:,'first_name']
+            atp_players.drop(['first_name','last_name'], axis=1, inplace=True)
+            return atp_players
+
+        atp_players = load_atp_players('../data/atp_players.csv')
+        atp_players.head()
+
+        player_id 	first_name 	last_name 	hand 	birth_date 	country_code 	name
+        0 	100001 	Gardnar 	Mulloy 	R 	1913-11-22 	USA 	Mulloy, Gardnar
+        1 	100002 	Pancho 	Segura 	R 	1921-06-20 	ECU 	Segura, Pancho
+        2 	100003 	Frank 	Sedgman 	R 	1927-10-02 	AUS 	Sedgman, Frank
+        3 	100004 	Giuseppe 	Merlo 	R 	1927-10-11 	ITA 	Merlo, Giuseppe
+        4 	100005 	Richard Pancho 	Gonzales 	R 	1928-05-09 	USA 	Gonzales, Richard Pancho
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        load_atp_players <- function(atp_players_file){
+            atp_players <- read_csv(atp_players_file, col_names=c('player_id', 'first_name', 'last_name', 'hand', 'birth_date', 'country_code'), col_types=cols()) %>%
+                mutate(birth_date=parse_date_time(birth_date, order='%Y%m%d')) %>%
+                unite(name, last_name, first_name, sep=', ', remove=TRUE) %>%
+                mutate_at(c('country_code', 'hand'), as.factor)
+            return(atp_players)
+        }
+
+        atp_players <- load_atp_players('../data/atp_players.csv')
+        head(atp_players)
+
+        Warning message:
+        “ 125 failed to parse.”
+
+        player_id	name	hand	birth_date	country_code
+        100001 	Mulloy, Gardnar 	R 	1913-11-22 	USA
+        100002 	Segura, Pancho 	R 	1921-06-20 	ECU
+        100003 	Sedgman, Frank 	R 	1927-10-02 	AUS
+        100004 	Merlo, Giuseppe 	R 	1927-10-11 	ITA
+        100005 	Gonzales, Richard Pancho	R 	1928-05-09 	USA
+        100006 	Golden, Grant 	R 	1929-08-21 	USA
+
 Categorical data format
 =======================
 
@@ -338,38 +419,39 @@ Disadvantages include:
 .. tabs::
 
   .. tab:: Python
-  
+
     `Pandas categorical <https://pandas.pydata.org/pandas-docs/stable/user_guide/categorical.html>`_
-    
+
     `Pandas apply <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.apply.html>`_
 
     .. code-block:: python
-    
-        print(atp_players['hand'].nbytes)
-        atp_players[['country_code', 'hand']] = atp_players[['country_code', 'hand']].apply(lambda x: x.astype('category'))
-        print(atp_players['country_code'].nbytes)
-        print(atp_players['hand'].cat.categories)
-        atp_players.dtypes
 
-        439504
+        atp_players_categorized = atp_players.copy()
+        print(atp_players_categorized['hand'].nbytes)
+        atp_players_categorized.loc[:,['country_code', 'hand']] = atp_players_categorized.loc[:, ['country_code', 'hand']].apply(lambda x: x.astype('category'))
+        print(atp_players_categorized['country_code'].nbytes)
+        print(atp_players_categorized['hand'].cat.categories)
+        atp_players_categorized.dtypes
+
+        54970
         111556
         Index(['A', 'L', 'R', 'U'], dtype='object')
 
-        player_id          int64
-        hand            category
-        birth_date       float64
-        country_code    category
-        name              object
+        player_id                int64
+        hand                  category
+        birth_date      datetime64[ns]
+        country_code          category
+        name                    object
         dtype: object
 
   .. tab:: R
-  
+
     `R factor <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/factor>`_
-    
+
     `Tidyverse mutate_at <https://dplyr.tidyverse.org/reference/mutate_all.html>`__
 
     .. code-block:: R
-    
+
         object.size(atp_players[['hand']])
         atp_players <- atp_players %>%
             mutate_at(c('country_code', 'hand'), as.factor)
@@ -387,57 +469,62 @@ Disadvantages include:
          $ birth_date  : num  19131122 19210620 19271002 19271011 19280509 ...
          $ country_code: Factor w/ 210 levels "AFG","AHO","ALB",..: 200 62 13 97 200 200 160 58 88 43 ...
 
-Turning input processing tasks into functions
-=============================================
+Let's create a function for this behaviour as well:
 
 .. tabs::
 
   .. tab:: Python
 
     .. code-block:: python
-    
-        def load_atp_players(atp_players_file):
-            atp_players = pd.read_csv(atp_players_file, names=['player_id', 'first_name', 'last_name', 'hand', 'birth_date', 'country_code'])
-            atp_players.loc[:,'birth_date'] = pd.to_datetime(atp_players.loc[:,'birth_date'], format='%Y%m%d', errors='coerce')
-            atp_players['name'] = atp_players.loc[:,'last_name'] + ', ' + atp_players.loc[:,'first_name']
-            atp_players.drop(['first_name','last_name'], axis=1, inplace=True)
-            return atp_players
 
-        atp_players = load_atp_players('../data/atp_players.csv')
-        atp_players.head()
-        
-        player_id 	first_name 	last_name 	hand 	birth_date 	country_code 	name
-        0 	100001 	Gardnar 	Mulloy 	R 	1913-11-22 	USA 	Mulloy, Gardnar
-        1 	100002 	Pancho 	Segura 	R 	1921-06-20 	ECU 	Segura, Pancho
-        2 	100003 	Frank 	Sedgman 	R 	1927-10-02 	AUS 	Sedgman, Frank
-        3 	100004 	Giuseppe 	Merlo 	R 	1927-10-11 	ITA 	Merlo, Giuseppe
-        4 	100005 	Richard Pancho 	Gonzales 	R 	1928-05-09 	USA 	Gonzales, Richard Pancho
+        def categorize_players(players):
+            players.loc[:,['country_code', 'hand']] = players.loc[:, ['country_code', 'hand']].apply(lambda x: x.astype('category'))
+            return players
+
+        print(atp_players.dtypes)
+        atp_players = categorize_players(atp_players)
+        atp_players.dtypes
+
+        player_id                int64
+        hand                    object
+        birth_date      datetime64[ns]
+        country_code            object
+        name                    object
+        dtype: object
+
+        player_id                int64
+        hand                  category
+        birth_date      datetime64[ns]
+        country_code          category
+        name                    object
+        dtype: object
 
   .. tab:: R
 
     .. code-block:: R
-    
-        load_atp_players <- function(atp_players_file){
-            atp_players <- read_csv(atp_players_file, col_names=c('player_id', 'first_name', 'last_name', 'hand', 'birth_date', 'country_code'), col_types=cols()) %>%
-                mutate(birth_date=parse_date_time(birth_date, order='%Y%m%d')) %>%
-                unite(name, last_name, first_name, sep=', ', remove=TRUE) %>%
+
+        categorize_players <- function(players) {
+            players <- players %>%
                 mutate_at(c('country_code', 'hand'), as.factor)
-            return(atp_players)
+            return(players)
         }
+        str(atp_players)
+        atp_players <- categorize_players(atp_players)
+        str(atp_players)
+        
+        Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	54938 obs. of  5 variables:
+         $ player_id   : num  1e+05 1e+05 1e+05 1e+05 1e+05 ...
+         $ name        : chr  "Mulloy, Gardnar" "Segura, Pancho" "Sedgman, Frank" "Merlo, Giuseppe" ...
+         $ hand        : chr  "R" "R" "R" "R" ...
+         $ birth_date  : POSIXct, format: "1913-11-22" "1921-06-20" ...
+         $ country_code: chr  "USA" "ECU" "AUS" "ITA" ...
+        Classes ‘tbl_df’, ‘tbl’ and 'data.frame':	54938 obs. of  5 variables:
+         $ player_id   : num  1e+05 1e+05 1e+05 1e+05 1e+05 ...
+         $ name        : chr  "Mulloy, Gardnar" "Segura, Pancho" "Sedgman, Frank" "Merlo, Giuseppe" ...
+         $ hand        : Factor w/ 4 levels "A","L","R","U": 3 3 3 3 3 3 2 3 3 3 ...
+         $ birth_date  : POSIXct, format: "1913-11-22" "1921-06-20" ...
+         $ country_code: Factor w/ 210 levels "AFG","AHO","ALB",..: 200 62 13 97 200 200 160 58 88 43 ...
 
-        atp_players <- load_atp_players('../data/atp_players.csv')
-        head(atp_players)
-
-        Warning message:
-        “ 125 failed to parse.”
-
-        player_id	name	hand	birth_date	country_code
-        100001 	Mulloy, Gardnar 	R 	1913-11-22 	USA
-        100002 	Segura, Pancho 	R 	1921-06-20 	ECU
-        100003 	Sedgman, Frank 	R 	1927-10-02 	AUS
-        100004 	Merlo, Giuseppe 	R 	1927-10-11 	ITA
-        100005 	Gonzales, Richard Pancho	R 	1928-05-09 	USA
-        100006 	Golden, Grant 	R 	1929-08-21 	USA 
 
 Joining datasets together
 =========================
@@ -1390,7 +1477,7 @@ other data as well.
 
     .. code-block:: python
 
-        atp_data.to_hdf('../data/atp_data_python.h5', '/atp_data')
+        atp_data.to_hdf('../data/atp_data_python.h5', '/atp_data', format='table')
         pd.read_hdf('../data/atp_data_python.h5','/atp_data').head()
 
             ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
@@ -1466,7 +1553,7 @@ Binary data formats' sizes
 |                               |                         |           |
 |                               | atp_data_r.parquet      | 12 MB     |
 +-------------------------------+-------------------------+-----------+
-| HDF5                          | atp_data_python.h5      | 104 MB    |
+| HDF5                          | atp_data_python.h5      | 157 MB    |
 |                               |                         |           |
 |                               | atp_data_r.h5           | 82 MB     |
 +-------------------------------+-------------------------+-----------+
@@ -1530,4 +1617,103 @@ which is provided as an Excel spreadsheet.
         2018 	AGO 	Angola 	4.75 	159 	4 	7.698695 	13.82444 	9.623978 	1.880000	... 	0 	5.338186 	2.937894 	2.444444 	8.730805 	5.044 	7.916416 	6.782923 	5.642747 	5.386200
         2018 	ARG 	Argentina	5.78 	144 	4 	5.938235 	19.81000 	6.307902 	14.050000	... 	10 	5.119549 	2.714233 	6.666667 	9.579288 	7.202 	5.726521 	6.508295 	6.399500 	5.757401
         2018 	ARM 	Armenia 	7.92 	18 	1 	7.717647 	13.76000 	7.711172 	8.900000	... 	0 	6.461113 	5.170406 	6.000000 	9.863530 	6.298 	9.302574 	7.040738 	7.279208 	7.762321
-        2018 	AUS 	Australia	8.23 	5 	1 	4.450000 	24.87000 	6.867958 	11.994595	... 	10 	7.803349 	3.981758 	8.888889 	9.928614 	10.000 	8.953087 	8.823021 	8.429228 	8.726281 
+        2018 	AUS 	Australia	8.23 	5 	1 	4.450000 	24.87000 	6.867958 	11.994595	... 	10 	7.803349 	3.981758 	8.888889 	9.928614 	10.000 	8.953087 	8.823021 	8.429228 	8.726281
+
+SQL databases
+=============
+
+SQL databases are often used in industry, especially for storing transactions.
+Compared to R and Pandas, most SQL databases are row-oriented, which changes
+many aspect of a data pipeline.
+
+Row oriented databases have the following features:
+
+- Adding new observations (rows) is cheap. Thus adding new transactions,
+  results etc. does not have the same performance penalty as appending into
+  a column oriented dataset.
+- Adding new columns is expensive. Doing joins between databases can be very
+  complicated.
+- Columns usually cannot be cast to new types. One usually needs to specify
+  the column specification before adding rows.
+- For big databases doing queries in a correct order is very important. Queries
+  are usually also fully determined by pre-compiling them before they are
+  executed to allow the database to minimize the amount of data that needs
+  to be accessed.
+
+These features mean that SQL databases are good when you have constant flow
+of data that has a pre-determined data format and you know how to access them
+using pre-compiled SQL queries.
+
+There are plenty of different SQL databases and for this reason there are
+libraries that allow for simpler connections for many different databases.
+
+Let's save ``atp_players`` into a`SQLite <https://www.sqlite.org/index.html>`_ 
+database.
+
+
+
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_sql <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_sql.html>`_
+
+    `pandas.read_sql <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_sql.html>`_
+    
+    `SQLAlchemy's create_engine <https://docs.sqlalchemy.org/en/13/core/engines.html>`_
+
+    .. code-block:: python
+
+        from sqlalchemy import create_engine
+
+        engine = create_engine('sqlite:///../data/atp_players_python.sqlite')
+
+        atp_players.to_sql('atp_players', engine, if_exists='replace')
+
+        pd.read_sql('atp_players', engine)
+
+        index 	player_id 	hand 	birth_date 	country_code 	name
+        0 	0 	100001 	R 	1913-11-22 	USA 	Mulloy, Gardnar
+        1 	1 	100002 	R 	1921-06-20 	ECU 	Segura, Pancho
+        2 	2 	100003 	R 	1927-10-02 	AUS 	Sedgman, Frank
+        3 	3 	100004 	R 	1927-10-11 	ITA 	Merlo, Giuseppe
+        4 	4 	100005 	R 	1928-05-09 	USA 	Gonzales, Richard Pancho
+        ... 	... 	... 	... 	... 	... 	...
+        54933 	54933 	209899 	U 	NaT 	RUS 	Simakin, Ilia
+        54934 	54934 	209900 	U 	NaT 	RUS 	Galimardanov, Oscar
+        54935 	54935 	209901 	U 	NaT 	RUS 	Stepin, Alexander
+        54936 	54936 	209902 	U 	NaT 	RUS 	Trunov, Igor
+        54937 	54937 	209903 	U 	NaT 	AUT 	Neumayer, Lukas
+
+  .. tab:: R
+
+    `DBI's dbConnect <https://dbi.r-dbi.org/reference/dbconnect>`_
+
+    .. code-block:: R
+
+        library(DBI)
+        con <- DBI::dbConnect(RSQLite::SQLite(), dbname = "../data/atp_players_r.sqlite")
+        copy_to(con, atp_players, overwrite=TRUE, temporary=FALSE)
+        dbDisconnect(con)
+
+        con <- DBI::dbConnect(RSQLite::SQLite(), dbname = "../data/atp_players_r.sqlite")
+        print(tbl(con,'atp_players'))
+        dbDisconnect(con)
+
+        # Source:   table<atp_players> [?? x 5]
+        # Database: sqlite 3.22.0
+        #   [../data/atp_players_r.sqlite]
+           player_id name                     hand   birth_date country_code
+               <dbl> <chr>                    <chr>       <dbl> <chr>       
+         1    100001 Mulloy, Gardnar          R     -1770681600 USA         
+         2    100002 Segura, Pancho           R     -1531612800 ECU         
+         3    100003 Sedgman, Frank           R     -1333324800 AUS         
+         4    100004 Merlo, Giuseppe          R     -1332547200 ITA         
+         5    100005 Gonzales, Richard Pancho R     -1314316800 USA         
+         6    100006 Golden, Grant            R     -1273795200 USA         
+         7    100007 Segal, Abe               L     -1236816000 RSA         
+         8    100008 Nielsen, Kurt            R     -1234483200 DEN         
+         9    100009 Gulyas, Istvan           R     -1206057600 HUN         
+        10    100010 Ayala, Luis              R     -1176681600 CHI         
+        # … with more rows
