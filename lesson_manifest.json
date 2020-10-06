@@ -1,0 +1,8 @@
+{
+  "lesson 1": [
+    { "filename": "ch1-r-ex2.ipynb", "directory": "r_exercises" }
+  ],
+  "lesson 2": [
+    { "filename": "ch2-r-ex2.ipynb", "directory": "r_exercises" }
+  ]
+}
