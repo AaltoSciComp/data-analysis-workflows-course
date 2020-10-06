@@ -27,6 +27,7 @@ dependencies:
   - r-e1071
   - r-dbi
   - r-feather
+  - r-hdf5r
   - r-irkernel
   - r-pryr
   - r-randomforest
