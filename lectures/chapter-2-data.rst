@@ -1000,3 +1000,419 @@ of top reigns, we see that we have captured many of these reigns in our dataset.
 
     1. Check whether home side has an advantage in football games.
     2. Calculate Premier League winners.
+
+**************************************************
+Using binary data formats to improve your pipeline
+**************************************************
+
+CSVs and challenges with them
+=============================
+
+CSVs (and other delimited text files) are common, but they are rarely the best
+format to use throughout a pipeline. Some of the pros and cons of CSVs are
+listed below.
+
+**Pros:**
+
+1. CSVs are human readable, so data loading is easy to verify.
+2. They area usually easy to parse.
+3. Easy to share with other users.
+
+**Cons**:
+
+1. One usually needs to manually specify column names, column types, delimiters
+   etc.
+2. Data is stored very inefficiently. Storing e.g. a floating point number in
+   ascii takes a lot more space than storing it as binary.
+3. Using bad data readers (e.g. reading file without `read_csv`-functions) can
+   result in huge number of small IO operations as text reading usually reads
+   file some 4-64 kB at a time (a.k.a. small buffer size).
+4. ``read_csv`` data loaders usually require lots of memory as data needs to be
+   first loaded as generic strings before it can be parsed to binary columns.
+5. Reading huge CSV files requires using more advanced libraries like
+   `Dask <https://dask.org/>`_ (Python) or
+   `data.table <https://github.com/Rdatatable/data.table>`_ (R).
+
+There are many binary data formats that one can use to mitigate most of these
+issues. We'll be looking at them next, but first let's save our data as a CSV
+file using the writing functions.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_csv <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html>`_
+
+    `pandas.read_csv <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html>`_
+
+    .. code-block:: python
+
+        atp_data.to_csv('../data/atp_data_python.csv')
+        pd.read_csv('../data/atp_data_python.csv').head()
+
+        Unnamed: 0 	ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
+
+  .. tab:: R
+
+    `R tidyverse write_csv <https://readr.tidyverse.org/reference/write_delim.html>`_
+
+    .. code-block:: R
+
+        write_csv(atp_data, '../data/atp_data_r.csv')
+        head(read_csv('../data/atp_data_r.csv'))
+
+        Parsed with column specification:
+        cols(
+          ranking_date = col_datetime(format = ""),
+          rank = col_double(),
+          player_id = col_double(),
+          points = col_double(),
+          name = col_character(),
+          hand = col_character(),
+          birth_date = col_datetime(format = ""),
+          country_code = col_character()
+        )
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre 	R 	1970-04-29 	USA
+        2000-01-10 	2 	102338 	2915 	Kafelnikov, Yevgeny	R 	1974-02-18 	RUS
+        2000-01-10 	3 	101948 	2419 	Sampras, Pete 	R 	1971-08-12 	USA
+        2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
+        2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
+        2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+
+Serialized objects
+==================
+
+Serialized objects are basically the objects stored into file as they are in
+memory. In Python the default serialized format is Pickle and in R Rdata.
+
+**Pros:**
+
+1. Easy to write and read.
+2. Binary data format.
+3. Data can be automatically compressed.
+
+**Cons:**
+
+1. Data needs to be read as is was. You cannot easily read only parts of it.
+2. Somewhat unreliable to share.
+3. Buffer size is most likely not very big.
+
+Serialized objects are good for debugging the state of the code, but not
+necessarily best for actual data storage or transporting to collaborators.
+At the same time they support all kinds of objects, so they are good if
+you do not have a better format.
+
+Let's save our ``atp_data``-dataset using these formats:
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_pickle <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_pickle.html>`_
+
+    `pandas.read_pickle <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_pickle.html>`_
+
+    .. code-block:: python
+
+        atp_data.to_pickle('../data/atp_data.pickle.gz')
+        pd.read_pickle('../data/atp_data.pickle.gz').head()
+
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
+
+  .. tab:: R
+
+    `R save <https://stat.ethz.ch/R-manual/R-devel/library/base/html/save.html>`_
+
+    `R load <https://stat.ethz.ch/R-manual/R-devel/library/base/html/load.html>`_
+
+    .. code-block:: R
+
+        save(atp_data, file='../data/atp_data.Rdata')
+        rm(atp_data)
+
+        load('../data/atp_data.Rdata')
+        head(atp_data)
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre 	R 	1970-04-29 	USA
+        2000-01-10 	2 	102338 	2915 	Kafelnikov, Yevgeny	R 	1974-02-18 	RUS
+        2000-01-10 	3 	101948 	2419 	Sampras, Pete 	R 	1971-08-12 	USA
+        2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
+        2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
+        2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+Feather
+=======
+
+.. important::
+
+    The course ``environment.yml`` contains a older implementations
+    of the feather-format from ``feather``-library.
+
+    Nowadays R has a faster feather in
+    `arrow-library <http://arrow.apache.org/blog/2019/08/08/r-package-on-cran/>`_.
+
+    Likewise Python implementation is nowadays included in
+    `pyarrow-library <https://arrow.apache.org/docs/python/feather.html>`_,
+    and ``environment.yml`` installed the old version, which no longer works.
+
+    To install the newer versions, please run
+
+    ``conda install --freeze-installed -c conda-forge pyarrow=1.0.1 r-arrow r-vctrs``
+
+    in an Anaconda shell.
+
+    Please use the ``arrow``-versions, if you want to use feather with your
+    own code.
+
+`Feather format <https://github.com/wesm/feather>`_ is a data format for
+efficient storing of tabular data. It's built on top of Apache Arrow columnar
+data specification and it was created by the developers of Pandas and
+Tidyverse to allow writing and reading big tables from both Pandas and R.
+Nowadays it's development is deeply connected with the Apache Arrow format.
+
+**Pros**:
+
+1. Easy to write and read.
+2. Very fast.
+3. Good for tabular data.
+4. Good format for moving tabular data between R and Python.
+
+**Cons**:
+
+1. Only for tabular data.
+2. Limited amount of supported column data formats.
+3. Not something for long term storage as the format is quite new.
+
+Let's save our ``atp_data``-dataset using feather:
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_feather <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_feather.html>`_
+
+    `pandas.read_feather <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_feather.html>`_
+
+    .. code-block:: python
+
+        atp_data.to_feather('../data/atp_data_python.feather')
+        pd.read_feather('../data/atp_data_python.feather').head()
+
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
+
+  .. tab:: R
+
+    `arrow's write_feather <https://arrow.apache.org/docs/r/reference/write_feather.html>`_
+    `arrow's read_feather <https://arrow.apache.org/docs/r/reference/read_feather.html>`_
+
+
+    .. code-block:: R
+
+        library(arrow)
+        write_feather(atp_data ,'../data/atp_data_r.feather')
+        head(read_feather('../data/atp_data_r.feather'))
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre 	R 	1970-04-29 	USA
+        2000-01-10 	2 	102338 	2915 	Kafelnikov, Yevgeny	R 	1974-02-18 	RUS
+        2000-01-10 	3 	101948 	2419 	Sampras, Pete 	R 	1971-08-12 	USA
+        2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
+        2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
+        2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+Parquet
+=======
+
+`Apache Parquet <https://parquet.apache.org/>`_ is a columnar data format that
+many big data systems use to store data in their backend.
+`The format <https://github.com/apache/parquet-format>`_ uses multiple levels
+of encoding and compression to reduce file size.
+
+**Pros:**
+
+1. Very efficient spacewise.
+2. Good for long-term storage.
+3. Easy to read into big data applications (Spark/Hadoop/etc.)
+4. Good for big data.
+5. Good interoperability between different languages.
+
+**Cons:**
+
+1. Slower to read from / write to disk due to encoding and compression.
+2. Big data access needs well designed workflows for efficient data loading.
+
+Wes McKinney has made a
+`good blog post <https://ursalabs.org/blog/2019-10-columnar-perf/>`_ about
+performance of Feather, Parquet and other popular formats.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_parquet <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_parquet.html>`_
+
+    `pandas.read_parquet <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_parquet.html>`_
+
+    .. code-block:: python
+
+        atp_data.to_parquet('../data/atp_data_python.parquet')
+        pd.read_parquet('../data/atp_data_python.parquet').head()
+
+            ranking_date 	rank 	player_id 	points 	hand 	birth_date 	country_code 	name
+        0 	2000-01-10 	1 	101736 	4135.0 	R 	1970-04-29 	USA 	Agassi, Andre
+        1 	2000-01-10 	2 	102338 	2915.0 	R 	1974-02-18 	RUS 	Kafelnikov, Yevgeny
+        2 	2000-01-10 	3 	101948 	2419.0 	R 	1971-08-12 	USA 	Sampras, Pete
+        3 	2000-01-10 	4 	103017 	2184.0 	R 	1977-07-05 	GER 	Kiefer, Nicolas
+        4 	2000-01-10 	5 	102856 	2169.0 	R 	1976-09-10 	BRA 	Kuerten, Gustavo
+
+  .. tab:: R
+
+    `arrow-library's write_parquet <https://arrow.apache.org/docs/r/reference/write_parquet.html>`_
+    `arrow-library's read_parquet <https://arrow.apache.org/docs/r/reference/read_parquet.html>`_
+
+    .. code-block:: R
+
+        library(arrow)
+        write_parquet(atp_data ,'../data/atp_data_r.parquet')
+        head(read_parquet('../data/atp_data_r.parquet'))
+
+        ranking_date	rank	player_id	points	name	hand	birth_date	country_code
+        2000-01-10 	1 	101736 	4135 	Agassi, Andre 	R 	1970-04-29 	USA
+        2000-01-10 	2 	102338 	2915 	Kafelnikov, Yevgeny	R 	1974-02-18 	RUS
+        2000-01-10 	3 	101948 	2419 	Sampras, Pete 	R 	1971-08-12 	USA
+        2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
+        2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
+        2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+HDF5
+====
+
+.. important::
+
+    R interface to HDF was missing from ``environment.yml``. If you want to
+    install it, please run
+
+    ``conda install --freeze-installed -c conda-forge r-hdf5r``
+
+    in an Anaconda shell.
+
+Hierarchical Data Format version 5 (HDF5) is a binary format designed to store
+multiple datasets in a single file. It is especially used to store array data
+in physics and similar fields with large arrays, but it can be used to store
+other data as well.
+
+**Pros:**
+
+1. Great for matrices or other big binary arrays.
+2. Good MPI support if your code supports it.
+3. Hierarchical data format where you can store multiple datasets and metadata
+   in a single file.
+4. Fast when reading big chunks.
+5. Very well supported as it is a commonly used format.
+6. Good for sharing finished datasets.
+
+**Cons:**
+
+1. Bad performance when you want to do random reads from within a dataset.
+2. Similar directory management hassle as with individual files.
+3. Pandas HDF5 interface uses pickled pytables-objects, so the format
+   is no longer that good for sharing.
+   `h5py <https://www.h5py.org/>`_ is a better interface for full access
+   to all HDF features.
+4. R interface is quite clunky.
+
+.. tabs::
+
+  .. tab:: Python
+
+    `pandas.DataFrame.to_hdf <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_feather.html>`_
+
+    `pandas.read_hdf <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_feather.html>`_
+
+    .. code-block:: python
+
+        atp_players.to_hdf('../data/atp_python.h5', '/atp_players')
+        atp_rankings.to_hdf('../data/atp_python.h5', '/atp_rankings')
+        print(pd.read_hdf('../data/atp_python.h5','/atp_players').head())
+        print(pd.read_hdf('../data/atp_python.h5','/atp_rankings').head())
+
+           player_id hand birth_date country_code                      name
+        0     100001    R 1913-11-22          USA           Mulloy, Gardnar
+        1     100002    R 1921-06-20          ECU            Segura, Pancho
+        2     100003    R 1927-10-02          AUS            Sedgman, Frank
+        3     100004    R 1927-10-11          ITA           Merlo, Giuseppe
+        4     100005    R 1928-05-09          USA  Gonzales, Richard Pancho
+          ranking_date  rank  player_id  points
+        0   2000-01-10     1     101736  4135.0
+        1   2000-01-10     2     102338  2915.0
+        2   2000-01-10     3     101948  2419.0
+        3   2000-01-10     4     103017  2184.0
+        4   2000-01-10     5     102856  2169.0
+
+
+  .. tab:: R
+
+    `R hdf5r-package <https://cran.r-project.org/web/packages/hdf5r/vignettes/hdf5r.html>`_
+
+    .. code-block:: R
+
+        library(hdf5r)
+            datafile_h5 <- H5File$new('../data/atp_r.h5', mode = 'w')
+            datasets_list = list('atp_players'=atp_players, 'atp_rankings'=atp_rankings)
+            for (dataset_name in names(datasets_list)) {
+                dataset <- datasets_list[[dataset_name]]
+                datagroup_h5 <- datafile_h5$create_group(dataset_name) 
+                for (column in colnames(dataset)) {
+                    datagroup_h5[[column]] <- dataset[[column]]
+                }
+                print(datagroup_h5)
+            }
+            print(datafile_h5)
+
+            datafile_h5$close_all()
+
+        Class: H5Group
+        Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
+        Group: /atp_players
+        Listing:
+                 name    obj_type dataset.dims dataset.type_class
+           birth_date H5I_DATASET        54938          H5T_FLOAT
+         country_code H5I_DATASET        54938           H5T_ENUM
+                 hand H5I_DATASET        54938           H5T_ENUM
+                 name H5I_DATASET        54938         H5T_STRING
+            player_id H5I_DATASET        54938          H5T_FLOAT
+        Class: H5Group
+        Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
+        Group: /atp_rankings
+        Listing:
+                 name    obj_type dataset.dims dataset.type_class
+            player_id H5I_DATASET      1837203          H5T_FLOAT
+               points H5I_DATASET      1837203          H5T_FLOAT
+                 rank H5I_DATASET      1837203          H5T_FLOAT
+         ranking_date H5I_DATASET      1837203          H5T_FLOAT
+        Class: H5File
+        Filename: /u/59/tuomiss1/unix/dataanalysis/data-analysis-workflows-course/data/atp_data_r.h5
+        Access type: H5F_ACC_RDWR
+        Listing:
+                 name  obj_type dataset.dims dataset.type_class
+          atp_players H5I_GROUP         <NA>               <NA>
+         atp_rankings H5I_GROUP         <NA>               <NA>
