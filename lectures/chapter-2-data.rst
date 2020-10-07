@@ -5,7 +5,7 @@ Chapter 2: Data preparation
 .. important::
 
     Commands run on this chapter are present in the
-    ``X_exercises/ch2-X-lectures.ipynb``, where ``X`` is the programming
+    ``X_exercises/ch2-X-lecture.ipynb``, where ``X`` is the programming
     language.
 
 *********
@@ -64,22 +64,10 @@ format, we'll want to convert our raw data into it as soon as possible.
     In the exercise we'll create input parsing functions for
     `Premier League results <https://github.com/footballcsv/england>`_.
 
-    Problems are described in detail in the notebooks, but they are basically
-    the following:
-
-    1. Create a function for reading the data.
-    2. Create a function that formats the data into a tidy format and adds
-       additional information based on existing data.
-    3. Create a function that turns some of our columns into categorical
-       format.
-    4. Create a function that can combine multiple data files into a single
-       dataset.
-
-    After solving problems 1 and 2 you can try out two demonstrations of what
-    can be done with the data:
-
-    1. Check whether home side has an advantage in football games.
-    2. Calculate Premier League winners.
+    - Look at the one of the
+      ``./data/england-master/XXXXs/XXXX-XX/eng.1.csv``-datasets.
+    - Determine whether the data is in a tidy format.
+    - If not, how would you modify the data format?
 
 **********************
 Simple data operations
@@ -392,6 +380,16 @@ Let's create a data loading function for loading ATP player data:
         100004 	Merlo, Giuseppe 	R 	1927-10-11 	ITA
         100005 	Gonzales, Richard Pancho	R 	1928-05-09 	USA
         100006 	Golden, Grant 	R 	1929-08-21 	USA
+
+.. challenge:: Parsing Premiere League games - Problem 2
+
+    The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
+
+    In the exercise we'll create input parsing functions for
+    `Premier League results <https://github.com/footballcsv/england>`_.
+
+    2. Create a function that formats the data into a tidy format and adds
+       additional information based on existing data.
 
 Categorical data format
 =======================
@@ -712,6 +710,7 @@ be using that to join these datasets together.
         2000-01-10	5 	102856 	2169
         2000-01-10	6 	102358 	2107
 
+
 Now that we have figured how we want to parse these datasets, let's create a
 function that can read multiple files with a for-loop structure.
         
@@ -845,6 +844,27 @@ in our rankings dataset.
         2000-01-10 	4 	103017 	2184 	Kiefer, Nicolas 	R 	1977-07-05 	GER
         2000-01-10 	5 	102856 	2169 	Kuerten, Gustavo 	R 	1976-09-10 	BRA
         2000-01-10 	6 	102358 	2107 	Enqvist, Thomas 	R 	1974-03-13 	SWE
+
+
+.. challenge:: Parsing Premiere League games - Problems 3, 4 and 5
+
+    The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
+
+    In the exercise we'll create input parsing functions for
+    `Premier League results <https://github.com/footballcsv/england>`_.
+
+    3. Create a function that formats the data into a tidy format and adds
+       additional information based on existing data.
+    4. Create a function that turns some of our columns into categorical
+       format.
+    5. Create a function that can combine multiple data files into a single
+       dataset.
+
+    After solving problem 2 and 3 you can try out two demonstrations of what
+    can be done with the data:
+
+    1. Check whether home side has an advantage in football games.
+    2. Calculate Premier League winners.
 
 Demonstrating ATP dataset: Longest reign at rank 1
 ==================================================
@@ -1063,30 +1083,6 @@ of top reigns, we see that we have captured many of these reigns in our dataset.
         2001-11-19 	1 	103720 	4365 	Hewitt, Lleyton	R 	1981-02-24 	AUS 	102856 	525 days
         2010-06-07 	1 	104745 	8700 	Nadal, Rafael 	L 	1986-06-03 	ESP 	103819 	392 days
         2011-07-04 	1 	104925 	13285 	Djokovic, Novak	R 	1987-05-22 	SRB 	104745 	371 days
-
-.. challenge:: Parsing Premiere League games
-
-    The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
-
-    In the exercise we'll create input parsing functions for
-    `Premier League results <https://github.com/footballcsv/england>`_.
-
-    Problems are described in detail in the notebooks, but they are basically
-    the following:
-
-    1. Create a function for reading the data.
-    2. Create a function that formats the data into a tidy format and adds
-       additional information based on existing data.
-    3. Create a function that turns some of our columns into categorical
-       format.
-    4. Create a function that can combine multiple data files into a single
-       dataset.
-
-    After solving problems 1 and 2 you can try out two demonstrations of what
-    can be done with the data:
-
-    1. Check whether home side has an advantage in football games.
-    2. Calculate Premier League winners.
 
 **************************************************
 Using binary data formats to improve your pipeline
