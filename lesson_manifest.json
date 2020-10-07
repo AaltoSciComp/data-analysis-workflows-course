@@ -13,8 +13,10 @@
     { "filename": "ch1-r-ex2-solution.ipynb", "directory": "r_exercises" }
   ],
   "lesson 2": [
+    { "filename": "ch2-python-lecture.ipynb", "directory": "python_exercises" },
     { "filename": "ch2-python-ex1.ipynb", "directory": "python_exercises" },
     { "filename": "ch2-python-ex1-solution.ipynb", "directory": "python_exercises" },
+    { "filename": "ch2-r-lecture.ipynb", "directory": "python_exercises" },
     { "filename": "ch2-r-ex1.ipynb", "directory": "r_exercises" },
     { "filename": "ch2-r-ex1-solution.ipynb", "directory": "r_exercises" }
   ]
