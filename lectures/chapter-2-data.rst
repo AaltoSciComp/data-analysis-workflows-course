@@ -385,11 +385,12 @@ Let's create a data loading function for loading ATP player data:
 
     The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
 
-    In the exercise we'll create input parsing functions for
+    In this exercise we'll create input parsing functions for
     `Premier League results <https://github.com/footballcsv/england>`_.
 
-    2. Create a function that formats the data into a tidy format and adds
-       additional information based on existing data.
+    - Create a function that loads the match data, converts date
+      into a proper date object and determines the season from
+      the date.
 
 Categorical data format
 =======================
@@ -850,8 +851,10 @@ in our rankings dataset.
 
     The exercise is provided in ``X_exercises/ch2-X-ex1.ipynb``.
 
-    In the exercise we'll create input parsing functions for
+    In this exercise we'll create input parsing functions for
     `Premier League results <https://github.com/footballcsv/england>`_.
+
+    Problems 3, 4 and 5:
 
     3. Create a function that formats the data into a tidy format and adds
        additional information based on existing data.
