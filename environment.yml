@@ -1,14 +1,12 @@
 name: dataanalysis
 channels:
-  - defaults
-  - r
   - conda-forge
+  - defaults
 dependencies:
   - colorama
   - git
   - gitdb
   - gitpython
-  - feather-format
   - h5py
   - jupyter
   - jupyterlab
@@ -26,13 +24,13 @@ dependencies:
   - r-caret
   - r-e1071
   - r-dbi
-  - r-feather
   - r-hdf5r
   - r-irkernel
   - r-pryr
   - r-randomforest
   - r-recommended
   - r-rsqlite
+  - r-svglite
   - r-tidyverse
   - r-vctrs
   - scipy
