@@ -168,7 +168,7 @@ and files sizes).
     
         print(newfiles_relevant.shape)
         
-        newfiles_yearly_sum = newfiles_relevant.groupby(['Year']).agg('sum')
+        newfiles_yearly_sum = newfiles_relevant.groupby('Year').agg('sum')
         
         print(newfiles_yearly_sum.shape)
         newfiles_yearly_sum.head()
@@ -185,29 +185,14 @@ and files sizes).
 
         glimpse(newfiles_yearly_sum)
         head(newfiles_yearly_sum)
-        
-
-.. tabs::
-
-  .. tab:: Python
-
-    .. code-block:: python
-    
-        pass
-
-  .. tab:: R
-
-    .. code-block:: R
-
-        NULL
 
 In Python we see that the output of 
-`agg <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.agg.html>
+`agg <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.agg.html>`_
 is still grouped and for plotting, we'll want
 to reset the grouping. R
-`summarise <https://dplyr.tidyverse.org/reference/summarise.html>`
+`summarise <https://dplyr.tidyverse.org/reference/summarise.html>`_
 removes the last layer of groupings, but let's
-verify that the data is ungrouped. 
+verify that the data is ungrouped.
 
 .. tabs::
 
@@ -216,13 +201,17 @@ verify that the data is ungrouped.
     .. code-block:: python
     
         filesizes_yearly_sum = filesizes_yearly_sum.reset_index()
+        
+        newfiles_yearly_sum.head()
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        newfiles_yearly_sum <- newfiles_yearly_sum %>%
+            ungroup()
 
+        head(newfiles_yearly_sum)
 
 Let's plot this data in a bar plot:
 
@@ -238,7 +227,14 @@ Let's plot this data in a bar plot:
 
     .. code-block:: R
 
-        NULL
+        options(repr.plot.width=8, repr.plot.height=4)
+
+        newfiles_yearly_sum %>%
+            ggplot(aes(x=Year, y=Files, fill=Year)) +
+            geom_col()
+
+Let's create a function for this workflow so that we can easily do similar
+calculations with various different groups.
 
 .. tabs::
 
@@ -246,7 +242,52 @@ Let's plot this data in a bar plot:
 
     .. code-block:: python
     
-        filesizes_yearly_sum = filesizes_yearly_sum.reset_index()
+        pass
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        pass
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        pass
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        pass
 
   .. tab:: R
 
