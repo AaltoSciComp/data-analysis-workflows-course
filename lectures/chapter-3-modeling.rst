@@ -242,14 +242,63 @@ calculations with various different groups.
 
     .. code-block:: python
     
-        pass
+        def aggregate_filesize_data(data, groupings, target, agg_function):
+            # Drop rows with NaNs (invalid years)
+            data_relevant = data.dropna(axis=0)
+            # Pick relevant columns
+            data_relevant = data_relevant.loc[:, groupings + [target]]
+            # Change grouping to category for prettier plotting
+            data_relevant[groupings] = data_relevant[groupings].astype('category')
+            # Aggregate data
+            data_aggregated = data_relevant.groupby(groupings).agg(agg_function).reset_index()
+            return data_aggregated
+
+        newfiles_yearly_sum = aggregate_filesize_data(filesizes, ['Year'], 'Files', 'sum')
+        newfiles_yearly_sum.head()
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        aggregate_filesize_data <- function(data, grouping, target, agg_function) {
+            data_relevant <- data %>%
+                # Drop rows with NaNs (invalid years)
+                drop_na() %>%
+                # Pick relevant columns
+                select_at(vars(c(grouping, target))) %>%
+                # Change grouping to category for prettier plotting
+                mutate_at(vars(grouping), as.factor)
 
+            data_aggregated <- data_relevant %>%
+                group_by_at((grouping)) %>%
+                summarize_at(vars(target), agg_function) %>%
+                ungroup()
+        }
+
+        newfiles_yearly_sum <- aggregate_filesize_data(filesizes, 'Year', 'Files', sum)
+
+        options(repr.plot.width=8, repr.plot.height=4)
+
+        newfiles_yearly_sum %>%
+            ggplot(aes(x=Year, y=Files, fill=Year)) +
+            geom_col()
+
+Now we can use this function to create the following plots:
+
+- Yearly new files
+- Yearly new file space usage
+- Monthly new files
+- Monthly new file space usage
+
+From these we can see the following:
+
+- Both the number of files and the space usage are growing non-linearly as the
+  number of new files and number of new bytes used are growing linearly. 
+- July seems to be the month when a lot of new files are created, but it
+  is not the month when the largest files are created. This is probably because
+  lots of new users start using the cluster (summer students) who might have
+  inefficient workflows with large number of files, but do not work with large
+  datasets.
 
 .. tabs::
 
@@ -257,13 +306,40 @@ calculations with various different groups.
 
     .. code-block:: python
     
-        pass
+        yearly_sum = aggregate_filesize_data(filesizes, ['Year'], ['Files', 'SpaceUsage'], 'sum')
+        monthly_sum = aggregate_filesize_data(filesizes, ['Month'], ['Files', 'SpaceUsage'], 'sum')
+
+        yearly_sum['Year'] = yearly_sum['Year'].astype(int).astype('category')
+
+        print(yearly_sum.head())
+        print(monthly_sum.head())
+        
+        fig, ((ax1, ax2, ax3, ax4))=plt.subplots(nrows=4, figsize=(8,16))
+        sb.barplot(x='Year', y='Files', data=yearly_sum, ci=None, ax=ax1)
+        sb.barplot(x='Year', y='SpaceUsage', data=yearly_sum, ci=None, ax=ax2)
+        sb.barplot(x='Month', y='Files', data=monthly_sum, ci=None, ax=ax3)
+        sb.barplot(x='Month', y='SpaceUsage', data=monthly_sum, ci=None, ax=ax4)
+        plt.tight_layout()
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        yearly_sum <- aggregate_filesize_data(filesizes, c('Year'), c('Files', 'SpaceUsage'), sum)
+        monthly_sum <- aggregate_filesize_data(filesizes, c('Month'), c('Files', 'SpaceUsage'), sum)
+
+        print(yearly_sum %>%
+            ggplot(aes(x=Year, y=Files, fill=Year)) +
+            geom_col())
+        print(yearly_sum %>%
+            ggplot(aes(x=Year, y=SpaceUsage, fill=Year)) +
+            geom_col())
+        print(monthly_sum %>%
+            ggplot(aes(x=Month, y=Files, fill=Month)) +
+            geom_col())
+        print(monthly_sum %>%
+            ggplot(aes(x=Month, y=SpaceUsage, fill=Month)) +
+            geom_col())
 
 
 .. tabs::
