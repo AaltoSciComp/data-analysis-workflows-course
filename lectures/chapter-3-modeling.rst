@@ -91,6 +91,13 @@ stored on Aalto University's Triton cluster's file system. Columns are:
 
         filesizes = load_filesizes('../data/filesizes_timestamps.txt')
         filesizes.head()
+        
+         	Bytes 	Files 	BytesLog2 	SpaceUsage 	Year 	Month 	Date
+        287 	1 	5 	0 	5 	2010.0 	January 	2010-01-01
+        451 	2 	3 	1 	6 	2010.0 	January 	2010-01-01
+        627 	4 	27 	2 	108 	2010.0 	January 	2010-01-01
+        822 	8 	136 	3 	1088 	2010.0 	January 	2010-01-01
+        1057 	16 	208 	4 	3328 	2010.0 	January 	2010-01-01
 
   .. tab:: R
 
@@ -159,6 +166,13 @@ columns.
         # Pick relevant columns
         newfiles_relevant = newfiles_relevant.loc[:,['Year','Files']]
         newfiles_relevant.head()
+        
+         	Year 	Files
+        287 	2010.0 	5
+        451 	2010.0 	3
+        627 	2010.0 	27
+        822 	2010.0 	136
+        1057 	2010.0 	208
 
   .. tab:: R
 
@@ -189,6 +203,17 @@ and files sizes).
 
         print(newfiles_yearly_sum.shape)
         newfiles_yearly_sum.head()
+        
+        (4698, 2)
+        (11, 1)
+
+            Files
+        Year 	
+        2010.0 	5590287
+        2011.0 	13197038
+        2012.0 	17099900
+        2013.0 	14755151
+        2014.0 	26329321
 
   .. tab:: R
 
@@ -220,6 +245,13 @@ verify that the data is ungrouped.
         newfiles_yearly_sum.reset_index(inplace=True)
 
         newfiles_yearly_sum.head()
+        
+         	Year 	Files
+        0 	2010.0 	5590287
+        1 	2011.0 	13197038
+        2 	2012.0 	17099900
+        3 	2013.0 	14755151
+        4 	2014.0 	26329321
 
   .. tab:: R
 
@@ -240,7 +272,8 @@ Let's plot this data in a bar plot:
     
         newfiles_yearly_sum['Year'] = newfiles_yearly_sum['Year'].astype(int).astype('category')
         sb.barplot(x='Year', y='Files', data=newfiles_yearly_sum, ci=None)
-        plt.savefig('newfiles_yearly_sum_python.svg')
+        
+    .. image:: images/newfiles_yearly_sum_python.svg
 
   .. tab:: R
 
@@ -278,6 +311,13 @@ calculations with various different groups.
 
         newfiles_yearly_sum = aggregate_filesize_data(filesizes, ['Year'], ['Files'], 'sum')
         newfiles_yearly_sum.head()
+        
+         	Year 	Files
+        0 	2010.0 	5590287
+        1 	2011.0 	13197038
+        2 	2012.0 	17099900
+        3 	2013.0 	14755151
+        4 	2014.0 	26329321
 
   .. tab:: R
 
@@ -336,6 +376,21 @@ From these we can see the following:
         sb.barplot(x='Month', y='Files', data=monthly_sum, ci=None, ax=ax3)
         sb.barplot(x='Month', y='SpaceUsage', data=monthly_sum, ci=None, ax=ax4)
         plt.tight_layout()
+        
+           Year     Files      SpaceUsage
+        0  2010   5590287   2260716407068
+        1  2011  13197038   7000732111463
+        2  2012  17099900  15475575370580
+        3  2013  14755151  15445375302767
+        4  2014  26329321  42530364324322
+              Month     Files      SpaceUsage
+        0   January  34921070  43131219269056
+        1  February  35707864  71022501061692
+        2     March  25494722  56516865081262
+        3     April  31224476  75382094990077
+        4       May  37816173  75338621861676
+
+    .. image:: images/newall_python.svg
 
   .. tab:: R
 
@@ -396,6 +451,14 @@ a grouping based on both ``Year`` and ``BytesLog2``.
         newfiles_yearly_sum2 = newfiles_relevant2.groupby(['Year','BytesLog2']).agg('sum')
 
         newfiles_yearly_sum2.head()
+        
+         		Files
+        Year 	BytesLog2 	
+        2010.0 	0 	124
+                1 	1632
+                2 	5626
+                3 	26287
+                4 	65074
 
   .. tab:: R
 
@@ -435,6 +498,8 @@ for year 2020:
         sb.barplot(x='BytesLog2', y='Files', data=bytes_2020, ci=None)
         plt.title(2020)
         plt.tight_layout()
+        
+    .. image:: images/file-distribution-2020_python.svg
 
   .. tab:: R
 
@@ -484,6 +549,19 @@ probabilities with the distribution of our sample data (new files created on
 
         print(target_data.head())
         print(weight_data.head())
+        
+        430    0
+        431    1
+        432    2
+        433    3
+        434    4
+        Name: BytesLog2, dtype: int64
+        430    0.000327
+        431    0.001940
+        432    0.001471
+        433    0.007406
+        434    0.014570
+        Name: Files, dtype: float64
 
   .. tab:: R
 
@@ -522,7 +600,12 @@ the peak of the distribution.
             # Calculate resampled mean
             means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
         means = pd.Series({'SampledMeans': means})
+        print(means.head())
         print('Estimated sample mean:', means['SampledMeans'].mean())
+        
+        SampledMeans    [13.96, 13.37, 13.03, 13.17, 13.17, 12.76, 12....
+        dtype: object
+        Estimated sample mean: 13.222
 
   .. tab:: R
 
@@ -571,6 +654,11 @@ Let's now create a function for this bootstrapping feature:
         bootstrapped_means = get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files', n_means=1000)
         print(bootstrapped_means.head())
         print('Estimated sample mean:', bootstrapped_means['SampledMeans'].mean())
+        
+        SampledMeans    [13.8, 13.03, 13.42, 13.02, 13.42, 12.69, 13.7...
+        dtype: object
+        Estimated sample mean: 13.194700000000001
+
 
   .. tab:: R
 
@@ -622,6 +710,14 @@ for all of the years using nested dataframes.
     
         bootstrapped_means = yearly_bytes_sum.groupby('Year').apply(lambda x: get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))
         bootstrapped_means.head()
+        
+         	SampledMeans
+        Year 	
+        2010.0 	[13.07, 13.32, 13.34, 12.34, 13.03]
+        2011.0 	[13.73, 14.56, 14.2, 13.89, 13.71]
+        2012.0 	[9.9, 9.73, 10.42, 10.63, 10.59]
+        2013.0 	[13.52, 13.35, 13.14, 13.22, 14.02]
+        2014.0 	[14.01, 14.49, 13.68, 14.05, 13.72]
 
   .. tab:: R
 
@@ -650,6 +746,14 @@ Now we can calculate means for each of these bootstrapped means:
 
         bootstrapped_means['Mean'] = bootstrapped_means['SampledMeans'].apply(np.mean)
         bootstrapped_means.head()
+        
+         	SampledMeans 	Mean
+        Year 		
+        2010.0 	[13.07, 13.32, 13.34, 12.34, 13.03] 	13.020
+        2011.0 	[13.73, 14.56, 14.2, 13.89, 13.71] 	14.018
+        2012.0 	[9.9, 9.73, 10.42, 10.63, 10.59] 	10.254
+        2013.0 	[13.52, 13.35, 13.14, 13.22, 14.02] 	13.450
+        2014.0 	[14.01, 14.49, 13.68, 14.05, 13.72] 	13.990
 
   .. tab:: R
 
@@ -680,6 +784,14 @@ different columns:
 
         bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
         bootstrapped_yearly_means.head()
+        
+                    SampledMeans 	Mean
+        Year 		
+        2010.0 	[12.55, 12.83, 14.01, 12.28, 12.86, 13.04, 13.... 	12.97764
+        2011.0 	[14.27, 14.27, 13.89, 13.97, 13.81, 13.76, 13.... 	14.05083
+        2012.0 	[10.69, 10.88, 11.12, 10.09, 11.15, 10.84, 10.... 	10.65042
+        2013.0 	[13.39, 13.01, 13.22, 13.61, 12.81, 12.82, 13.... 	13.39958
+        2014.0 	[14.04, 13.96, 14.5, 13.21, 13.64, 14.68, 14.3... 	14.03843
 
   .. tab:: R
 
@@ -714,6 +826,13 @@ For plotting we can unstack the ``SampledMeans``-dataframe.
         bootstrapped_yearly_means_distribution = bootstrapped_yearly_means.drop('Mean', axis=1).explode('SampledMeans').reset_index()
 
         bootstrapped_yearly_means_distribution.head()
+        
+         	Year 	SampledMeans
+        0 	2010.0 	12.55
+        1 	2010.0 	12.83
+        2 	2010.0 	14.01
+        3 	2010.0 	12.28
+        4 	2010.0 	12.86
 
   .. tab:: R
 
@@ -740,6 +859,18 @@ Now we can plot distributions for the data and for the sample mean.
             sb.histplot(x='SampledMeans', binwidth=0.5, data=bootstrapped_data, ax=ax2)
             plt.xlim(left=min(yearly_bytes_sum['BytesLog2']), right=max(yearly_bytes_sum['BytesLog2']))
             plt.tight_layout()
+        
+    .. image:: images/file-distributions-2010_python.svg
+    .. image:: images/file-distributions-2011_python.svg
+    .. image:: images/file-distributions-2012_python.svg
+    .. image:: images/file-distributions-2013_python.svg
+    .. image:: images/file-distributions-2014_python.svg
+    .. image:: images/file-distributions-2015_python.svg
+    .. image:: images/file-distributions-2016_python.svg
+    .. image:: images/file-distributions-2017_python.svg
+    .. image:: images/file-distributions-2018_python.svg
+    .. image:: images/file-distributions-2019_python.svg
+    .. image:: images/file-distributions-2020_python.svg
 
   .. tab:: R
 
@@ -786,6 +917,19 @@ Let's use our new functions for monthly data as well:
             sb.histplot(x='SampledMeans', binwidth=0.5, data=bootstrapped_data, ax=ax2)
             plt.xlim(left=min(yearly_bytes_sum['BytesLog2']), right=max(yearly_bytes_sum['BytesLog2']))
             plt.tight_layout()
+        
+    .. image:: images/file-distributions-January_python.svg
+    .. image:: images/file-distributions-February_python.svg
+    .. image:: images/file-distributions-March_python.svg
+    .. image:: images/file-distributions-April_python.svg
+    .. image:: images/file-distributions-May_python.svg
+    .. image:: images/file-distributions-June_python.svg
+    .. image:: images/file-distributions-July_python.svg
+    .. image:: images/file-distributions-August_python.svg
+    .. image:: images/file-distributions-September_python.svg
+    .. image:: images/file-distributions-October_python.svg
+    .. image:: images/file-distributions-November_python.svg
+    .. image:: images/file-distributions-December_python.svg
 
   .. tab:: R
 
