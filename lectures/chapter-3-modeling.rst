@@ -34,7 +34,11 @@ Description of data - Triton cluster file statistics
 In grouping one determines one or more variables to use as grouping index and
 then these indices are used to apply some function to each subgroup. They are
 especially useful when one is calculating some statistics from each subgroup,
-doing multiple plots or determining plot colors. 
+doing multiple plots or determining plot colors.
+
+This can be visualized in the following way:
+
+.. image:: images/dataframe-grouped.svg
 
 Let's consider the dataset presented below. It is contains the number of files
 stored on Aalto University's Triton cluster's file system. Columns are:
@@ -71,9 +75,14 @@ stored on Aalto University's Triton cluster's file system. Columns are:
             invalid_years = (filesizes['Year'] < 2010) | (filesizes['Year'] > 2020)
             filesizes.loc[invalid_years, ['Year','Month']] = np.NaN
 
-            # Create Date and get the name for the month
+            # Get month names for the correct ordering of Month categories
+            month_names = pd.date_range(start='2000-01', freq='M', periods=12).month_name()
+            # Create Date
             filesizes['Date'] = pd.to_datetime(filesizes[['Year', 'Month', 'Day']])
-            filesizes['MonthName'] = filesizes['Date'].dt.month_name()
+            # Set Month
+            filesizes['Month'] = pd.Categorical(filesizes['Date'].dt.month_name(), categories=month_names, ordered=True)
+            # Set Month to be an ordered categorical with predefined levels 
+            filesizes['Month'] = pd.Categorical(filesizes['Month'], categories=month_names, ordered=True)
             # Sort data based on Date and BytesLog2
             filesizes.sort_values(['Date','BytesLog2'], inplace=True)
             # Remove old columns
@@ -91,7 +100,7 @@ stored on Aalto University's Triton cluster's file system. Columns are:
             filesizes <- read_table2(filesizes_file, col_names=c('Bytes','MonthsTo2021', 'Files'))
 
             filesizes <- filesizes %>%
-            # Remove empty files
+                # Remove empty files
                 filter(Bytes != 0) %>%
                 # Create a column for log2 of bytes
                 mutate(BytesLog2 = log2(Bytes)) %>%
@@ -109,11 +118,16 @@ stored on Aalto University's Triton cluster's file system. Columns are:
             invalid_years = c((filesizes['Year'] < 2010) | (filesizes['Year'] > 2020))
             filesizes[invalid_years, c('Year','Month')] <- NaN
 
-            # Create Date and get the name for the month
+            # Get month names for the correct ordering of Month categories
+            month_names <- month(seq(1,12), label=TRUE, locale='C')
             filesizes <- filesizes %>%
                 mutate(
+                    # Create Date and get the name for the month
                     Date = make_datetime(Year, Month, Day),
-                    MonthName= month(Month, label=TRUE, locale='C'))
+                    # Set Month 
+                    Month=month(Month, label=TRUE, locale='C'),
+                    # Set Month to be an ordered categorical with predefined levels 
+                    Month=factor(Month, ordered=TRUE, levels=month_names))
             filesizes <- filesizes %>%
                 # Sort data based on Date and BytesLog2
                 arrange(Date, BytesLog2) %>%
@@ -143,9 +157,7 @@ columns.
         # Drop rows with NaNs (invalid years)
         newfiles_relevant = filesizes.dropna(axis=0)
         # Pick relevant columns
-        newfiles_relevant = newfiles_relevant.loc[:,['Year','BytesLog2','Files']]
-        # Change year to category for prettier plotting
-        newfiles_relevant['Year'] = newfiles_relevant['Year'].astype('int').astype('category')
+        newfiles_relevant = newfiles_relevant.loc[:,['Year','Files']]
         newfiles_relevant.head()
 
   .. tab:: R
@@ -159,7 +171,7 @@ columns.
             select(Year, Files) %>%
             # Change year to category for prettier plotting
             mutate(Year=as.factor(Year))
-            head(newfiles_relevant)
+        head(newfiles_relevant)
 
 Now, we'll want to group our data based on the year-column (``Year``) and
 calculate the total number of files (``Files``) across all rows (all dates
@@ -172,9 +184,9 @@ and files sizes).
     .. code-block:: python
     
         print(newfiles_relevant.shape)
-        
+
         newfiles_yearly_sum = newfiles_relevant.groupby('Year').agg('sum')
-        
+
         print(newfiles_yearly_sum.shape)
         newfiles_yearly_sum.head()
 
@@ -205,8 +217,8 @@ verify that the data is ungrouped.
 
     .. code-block:: python
     
-        filesizes_yearly_sum = filesizes_yearly_sum.reset_index()
-        
+        newfiles_yearly_sum.reset_index(inplace=True)
+
         newfiles_yearly_sum.head()
 
   .. tab:: R
@@ -226,7 +238,9 @@ Let's plot this data in a bar plot:
 
     .. code-block:: python
     
-        sb.barplot(x='Year', y='Files', data=filesizes_yearly_sum, ci=None)
+        newfiles_yearly_sum['Year'] = newfiles_yearly_sum['Year'].astype(int).astype('category')
+        sb.barplot(x='Year', y='Files', data=newfiles_yearly_sum, ci=None)
+        plt.savefig('newfiles_yearly_sum_python.svg')
 
   .. tab:: R
 
@@ -249,20 +263,20 @@ calculations with various different groups.
   .. tab:: Python
 
     .. code-block:: python
-    
-        def aggregate_filesize_data(data, groupings, target, agg_function):
+
+        def aggregate_filesize_data(data, groupings, targets, agg_function):
             # Drop rows with NaNs (invalid years)
             data_relevant = data.dropna(axis=0)
             # Pick relevant columns
-            data_relevant = data_relevant.loc[:, groupings + [target]]
+            data_relevant = data_relevant.loc[:, groupings + targets]
             # Change grouping to category for prettier plotting
             data_relevant[groupings] = data_relevant[groupings].astype('category')
-            
+
             # Aggregate data
             data_aggregated = data_relevant.groupby(groupings).agg(agg_function).reset_index()
             return data_aggregated
 
-        newfiles_yearly_sum = aggregate_filesize_data(filesizes, ['Year'], 'Files', 'sum')
+        newfiles_yearly_sum = aggregate_filesize_data(filesizes, ['Year'], ['Files'], 'sum')
         newfiles_yearly_sum.head()
 
   .. tab:: R
@@ -280,10 +294,10 @@ calculations with various different groups.
 
             # Aggregate data
             data_aggregated <- data_relevant %>%
-                group_by_at(grouping) %>%
+                group_by_at((grouping)) %>%
                 summarize_at(vars(target), agg_function) %>%
                 ungroup()
-    
+
             return(data_aggregated)
         }
 
@@ -299,10 +313,8 @@ From these we can see the following:
 - Both the number of files and the space usage are growing non-linearly as the
   number of new files and number of new bytes used are growing linearly. 
 - July seems to be the month when a lot of new files are created, but it
-  is not the month when the largest files are created. This is probably because
-  lots of new users start using the cluster (summer students) who might have
-  inefficient workflows with large number of files, but do not work with large
-  datasets.
+  is not the month when the largest files are created. Something strange is
+  definitely happening there.
 
 .. tabs::
 
@@ -317,7 +329,7 @@ From these we can see the following:
 
         print(yearly_sum.head())
         print(monthly_sum.head())
-        
+
         fig, ((ax1, ax2, ax3, ax4))=plt.subplots(nrows=4, figsize=(8,16))
         sb.barplot(x='Year', y='Files', data=yearly_sum, ci=None, ax=ax1)
         sb.barplot(x='Year', y='SpaceUsage', data=yearly_sum, ci=None, ax=ax2)
@@ -331,6 +343,9 @@ From these we can see the following:
 
         yearly_sum <- aggregate_filesize_data(filesizes, c('Year'), c('Files', 'SpaceUsage'), sum)
         monthly_sum <- aggregate_filesize_data(filesizes, c('Month'), c('Files', 'SpaceUsage'), sum)
+
+        head(yearly_sum)
+        head(monthly_sum)
 
         print(yearly_sum %>%
             ggplot(aes(x=Year, y=Files, fill=Year)) +
@@ -386,7 +401,16 @@ a grouping based on both ``Year`` and ``BytesLog2``.
 
     .. code-block:: R
 
-        NULL
+        newfiles_relevant2 <- filesizes %>%
+            # Drop rows with NaNs (invalid years)
+            drop_na() %>%
+            # Pick relevant columns
+            select(Year, BytesLog2, Files) %>%
+            # Aggregate based on Year and BytesLog2
+            group_by(Year, BytesLog2) %>%
+            summarize(Files=sum(Files))
+
+        head(newfiles_relevant2)
 
 From here we can see that our data is grouped in two different layers: first
 in terms of ``Year`` and then in terms of ``BytesLog2``. Summation is
@@ -407,14 +431,24 @@ for year 2020:
 
         bytes_2020 = yearly_bytes_sum[yearly_bytes_sum['Year'] == 2020]
 
+        plt.figure(figsize=(12,6))
         sb.barplot(x='BytesLog2', y='Files', data=bytes_2020, ci=None)
         plt.title(2020)
+        plt.tight_layout()
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        yearly_bytes_sum = aggregate_filesize_data(filesizes, c('Year','BytesLog2'), c('Files', 'SpaceUsage'), sum)
+
+        bytes_2020 <- yearly_bytes_sum %>%
+            filter(Year == 2020)
+
+        bytes_2020 %>%
+            ggplot(aes(x=BytesLog2, y=Files, fill=BytesLog2)) +
+            geom_col() +
+            theme(legend.position = "none")
 
 Let's use
 `np.random.choice <https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.random.choice.html#numpy.random.choice>`_
@@ -435,14 +469,19 @@ probabilities with the distribution of our sample data (new files created on
 
     .. code-block:: python
     
-        # Pick target data column
-        target_data = bytes_2020['BytesLog2'].copy()
+        # Pick target data column and convert it to integer
+        target_data = bytes_2020['BytesLog2'].copy().astype('int')
         # Pick weight data column
-        weight_data = bytes_2020['Files'].copy()]
-        # Fill zeros to those byte sizes that are not present in the Files-data
+        weight_data = bytes_2020['Files'].copy()
+
+        # IMPORTANT:
+        #    There might be categories in BytesLog2 that do not contain any data.
+        #    We'll have to fill zeros to those rows of Files.
         weight_data.fillna(0, inplace=True)
+
         # Normalize weight_data into probabilities
         weight_data = weight_data/weight_data.sum()
+
         print(target_data.head())
         print(weight_data.head())
 
@@ -450,7 +489,21 @@ probabilities with the distribution of our sample data (new files created on
 
     .. code-block:: R
 
-        NULL
+        # Pick target data column and convert it to integer
+        # IMPORTANT:
+        #    Do notice that we'll have to first convert our target
+        #    into characters as we do not want convert factor ENCODING,
+        #    but the actual decoded DATA
+        target_data <- as.numeric(as.character(bytes_2020[['BytesLog2']]))
+
+        # Pick weight data column
+        weight_data <- bytes_2020[['Files']]
+
+        # Normalize weight_data into probabilities
+        weight_data <- weight_data/sum(weight_data)
+
+        print(head(target_data))
+        print(head(weight_data))
 
 Now we can create a vector of means and fill it with random resampled means.
 The sample mean of our original distribution is then the mean of this vector.
@@ -464,18 +517,25 @@ the peak of the distribution.
     .. code-block:: python
     
         # Create means vector
-        means = np.zeros(100, dtype=np.float64)
-        for i in range(100):
+        means = np.zeros(10, dtype=np.float64)
+        for i in range(10):
             # Calculate resampled mean
             means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
-        print(means)
-        print('Estimated sample mean:', np.mean(means))
+        means = pd.Series({'SampledMeans': means})
+        print('Estimated sample mean:', means['SampledMeans'].mean())
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        # Create means vector
+        means <- numeric(10)
+        for (i in seq(10)) {
+            # Calculate resampled mean
+            means[[i]] <- mean(sample(target_data, 100, replace=TRUE, prob=weight_data))
+        }
+        print(means)
+        print(paste0('Estimated sample mean: ', mean(means)))
 
 Let's now create a function for this bootstrapping feature:
 
@@ -486,26 +546,73 @@ Let's now create a function for this bootstrapping feature:
     .. code-block:: python
     
         def get_bootstrapped_means(dataset, target_col, weight_col, n_means=1000):
+            # Pick relevant columns
             df = dataset[[target_col, weight_col]].copy()
+            # Pick target data column
             target_data = df[target_col]
+            # Pick weight data column
             weight_data = df[weight_col]
+            # Fill zeros to those byte sizes that are not present in the Files-data
             weight_data.fillna(0, inplace=True)
+            # Normalize weight_data into probabilities
             weight_data = weight_data/weight_data.sum()
+
+            # Create means vector
             means = np.zeros(n_means, dtype=np.float64)
             for i in range(n_means):
+                # Calculate resampled mean
                 means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
+
+            # Store results as a DataFrame
+            means = pd.Series({'SampledMeans': means})
+
             return means
 
-        get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files')
+        bootstrapped_means = get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files', n_means=1000)
+        print(bootstrapped_means.head())
+        print('Estimated sample mean:', bootstrapped_means['SampledMeans'].mean())
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        get_bootstrapped_means <- function(dataset, target_col, weight_col, n_means=1000) {
+            # Pick relevant columns
+            # Pick target data column and convert it to integer
+            target_data <- as.numeric(as.character(dataset[[target_col]]))
+            # Pick weight data column
+            weight_data <- dataset[[weight_col]]
+            weight_data <- weight_data/sum(weight_data)
+
+            # Create means vector
+            means <- numeric(n_means)
+            for (i in seq(n_means)) {
+                # Calculate resampled mean
+                means[[i]] <- mean(sample(target_data, 100, replace=TRUE, prob=weight_data))
+            }
+            means <- tibble(SampledMeans=means)
+            return(means)
+        }
+
+        means <- get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files', n_means=1000)
+        print(head(means))
+        print(paste0('Estimated sample mean: ', mean(means[['SampledMeans']])))
 
 Using nested dataframes to help with bootstrapping
 ==================================================
+
+Models that need multiple columns (or even the full dataset), but need to be
+grouped along some column, are usually easier to run using nested dataframes.
+When using nested dataframes we split our initial data based on a grouping and
+apply some function for each of these dataframes. The result of this function
+can be a dataframe.
+
+This can be visualized in the following way:
+
+.. image:: images/dataframe-nested.svg
+
+Let's use our data (``yearly_bytes_sum``) and let's create bootstrapped means
+for all of the years using nested dataframes.
 
 .. tabs::
 
@@ -513,15 +620,203 @@ Using nested dataframes to help with bootstrapping
 
     .. code-block:: python
     
-        pass
+        bootstrapped_means = yearly_bytes_sum.groupby('Year').apply(lambda x: get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))
+        bootstrapped_means.head()
 
   .. tab:: R
 
     .. code-block:: R
 
-        NULL
+        yearly_bytes_sum_nested <- yearly_bytes_sum %>%
+            group_by(Year) %>%
+            nest()
 
+        print(glimpse(yearly_bytes_sum_nested))
 
+        bootstrapped_means <- yearly_bytes_sum_nested %>%
+            mutate(SampledMeans=map(data, function(x) get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=100))) %>%
+            select(-data)
+
+        print(glimpse(bootstrapped_means))
+        head(bootstrapped_means,1)
+
+Now we can calculate means for each of these bootstrapped means:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        bootstrapped_means['Mean'] = bootstrapped_means['SampledMeans'].apply(np.mean)
+        bootstrapped_means.head()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        bootstrapped_means <- bootstrapped_means  %>%
+            mutate(Means=map(SampledMeans, function(x) mean(x[['SampledMeans']])))
+
+        print(glimpse(bootstrapped_means))
+        head(bootstrapped_means, 1)
+
+Let's create a function for this procedure so that we can run it for multiple
+different columns:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        def bootstrap_byteslog2_mean(dataset, group_variable, target_variable, n_means=1000):
+
+            bootstrapping_function = lambda x: get_bootstrapped_means(x, 'BytesLog2', target_variable, n_means=n_means)
+
+            bootstrapped_means = dataset.groupby(group_variable).apply(bootstrapping_function)
+            bootstrapped_means['Mean'] = bootstrapped_means['SampledMeans'].apply(np.mean)
+            return bootstrapped_means
+
+        bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
+        bootstrapped_yearly_means.head()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        bootstrap_byteslog2_mean <- function(dataset, group_variable, target_variable, n_means=1000) {
+
+            bootstrapping_function <- function(x) get_bootstrapped_means(x, 'BytesLog2', target_variable, n_means=n_means)
+
+            bootstrapped_means <- dataset %>%
+                group_by_at(vars(group_variable)) %>%
+                nest() %>%
+                mutate(
+                    SampledMeans=map(data, bootstrapping_function),
+                    Means=map(SampledMeans, function(x) mean(x[['SampledMeans']]))) %>%
+                select(-data)
+
+            return(bootstrapped_means)
+        }
+
+        bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
+        glimpse(bootstrapped_yearly_means)
+
+For plotting we can unstack the ``SampledMeans``-dataframe.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        bootstrapped_yearly_means_distribution = bootstrapped_yearly_means.drop('Mean', axis=1).explode('SampledMeans').reset_index()
+
+        bootstrapped_yearly_means_distribution.head()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        bootstrapped_yearly_means_distribution <- bootstrapped_yearly_means %>%
+            select(-Means) %>%
+            unnest()
+
+        head(bootstrapped_yearly_means_distribution)
+
+Now we can plot distributions for the data and for the sample mean.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        for (year, real_data), (year_sampled, bootstrapped_data) in zip(yearly_bytes_sum.groupby('Year'), bootstrapped_yearly_means_distribution.groupby('Year')):
+            figure, (ax1, ax2) = plt.subplots(1,2,figsize=(16,3))
+            figure.suptitle(int(year))
+            sb.barplot(x='BytesLog2', y='Files', data=real_data, ci=None, ax=ax1)
+            sb.histplot(x='SampledMeans', binwidth=0.5, data=bootstrapped_data, ax=ax2)
+            plt.xlim(left=min(yearly_bytes_sum['BytesLog2']), right=max(yearly_bytes_sum['BytesLog2']))
+            plt.tight_layout()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        options(repr.plot.width=8, repr.plot.height=16)
+
+        x_limits <- range(as.numeric(levels(yearly_bytes_sum[['BytesLog2']])))
+
+        yearly_bytes_sum %>%
+            ggplot(aes(x=as.factor(BytesLog2), y=Files, fill=Year)) +
+                geom_bar(stat='identity') +
+                ylab('N') +
+                xlab('Bytes (log2)') +
+                ggtitle('Yearly files') +
+                facet_grid(rows=vars(Year))
+
+        bootstrapped_yearly_means_distribution %>%
+            ggplot(aes(x=SampledMeans, fill=Year)) +
+                geom_histogram(binwidth=0.1) +
+                ylab('Number of bootstrapped means') +
+                xlab('Mean of Bytes (log2)') +
+                xlim(x_limits) +
+                ggtitle('Distribution of means') +
+                facet_grid(rows=vars(Year))
+
+Let's use our new functions for monthly data as well:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        monthly_bytes_sum = aggregate_filesize_data(filesizes, ['Month','BytesLog2'], ['Files', 'SpaceUsage'], 'sum')
+        bootstrapped_monthly_means = bootstrap_byteslog2_mean(monthly_bytes_sum, 'Month', 'Files', n_means=1000)
+        bootstrapped_monthly_means_distribution = bootstrapped_monthly_means.drop('Mean', axis=1).explode('SampledMeans').reset_index()
+        bootstrapped_monthly_means_distribution.head()
+
+        for (month, real_data), (month_sampled, bootstrapped_data) in zip(monthly_bytes_sum.groupby('Month'), bootstrapped_monthly_means_distribution.groupby('Month')):
+            figure, (ax1, ax2) = plt.subplots(1,2,figsize=(16,3))
+            figure.suptitle(month)
+            sb.barplot(x='BytesLog2', y='Files', data=real_data, ci=None, ax=ax1)
+            sb.histplot(x='SampledMeans', binwidth=0.5, data=bootstrapped_data, ax=ax2)
+            plt.xlim(left=min(yearly_bytes_sum['BytesLog2']), right=max(yearly_bytes_sum['BytesLog2']))
+            plt.tight_layout()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        monthly_bytes_sum <- aggregate_filesize_data(filesizes, c('Month','BytesLog2'), c('Files', 'SpaceUsage'), sum)
+        bootstrapped_monthly_means = bootstrap_byteslog2_mean(monthly_bytes_sum, 'Month', 'Files', n_means=1000)
+        bootstrapped_monthly_means_distribution <- bootstrapped_monthly_means %>%
+            select(-Means) %>%
+            unnest()
+
+        options(repr.plot.width=10, repr.plot.height=16)
+
+        x_limits <- range(as.numeric(levels(monthly_bytes_sum[['BytesLog2']])))
+
+        monthly_bytes_sum %>%
+            ggplot(aes(x=as.factor(BytesLog2), y=Files, fill=Month)) +
+                geom_bar(stat='identity') +
+                ylab('N') +
+                xlab('Bytes (log2)') +
+                ggtitle('Yearly files') +
+                facet_grid(rows=vars(Month))
+
+        bootstrapped_monthly_means_distribution %>%
+            ggplot(aes(x=SampledMeans, fill=Month)) +
+                geom_histogram(binwidth=0.1) +
+                ylab('Number of bootstrapped means') +
+                xlab('Mean of Bytes (log2)') +
+                xlim(x_limits) +
+                ggtitle('Distribution of means') +
+                facet_grid(rows=vars(Month))
 
 .. tabs::
 
