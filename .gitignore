@@ -3,3 +3,5 @@
 */_build
 **.swp
 _build
+r_exercises/*.svg
+python_exercises/*.svg
