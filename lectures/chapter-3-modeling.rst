@@ -12,8 +12,8 @@ a result. We'll be doing four differing types of modeling:
 
 1. Creating summaries of our data by calculating statistics
    (e.g. mean, variance).
-2. Using bootstrapping methods to calculate statistical moments.
-3. Fitting a function into our data.
+2. Fitting a function into our data.
+3. Using bootstrapping methods to calculate statistical moments.
 4. Running a machine learning model with training and test steps.
 
 To accomplish these task, we'll be using various features of our frameworks:
@@ -27,6 +27,9 @@ To accomplish these task, we'll be using various features of our frameworks:
 **********************************
 Grouping data by a common variable
 **********************************
+
+Description of data - Triton cluster file statistics
+====================================================
 
 In grouping one determines one or more variables to use as grouping index and
 then these indices are used to apply some function to each subgroup. They are
@@ -122,6 +125,9 @@ stored on Aalto University's Triton cluster's file system. Columns are:
         filesizes <- load_filesizes('../data/filesizes_timestamps.txt')
         head(filesizes)
 
+Simple groupings and summaries - Calculating new files per year
+===============================================================
+
 Our parsed file contains columns for date, year, month, month name, the size of
 files in two different formats, the number of files and the total space used by
 the files. Let's say we're interested in the how the number of file has
@@ -154,7 +160,6 @@ columns.
             # Change year to category for prettier plotting
             mutate(Year=as.factor(Year))
             head(newfiles_relevant)
-
 
 Now, we'll want to group our data based on the year-column (``Year``) and
 calculate the total number of files (``Files``) across all rows (all dates
@@ -233,6 +238,9 @@ Let's plot this data in a bar plot:
             ggplot(aes(x=Year, y=Files, fill=Year)) +
             geom_col()
 
+Creating a function for many different summaries 
+================================================
+
 Let's create a function for this workflow so that we can easily do similar
 calculations with various different groups.
 
@@ -249,6 +257,7 @@ calculations with various different groups.
             data_relevant = data_relevant.loc[:, groupings + [target]]
             # Change grouping to category for prettier plotting
             data_relevant[groupings] = data_relevant[groupings].astype('category')
+            
             # Aggregate data
             data_aggregated = data_relevant.groupby(groupings).agg(agg_function).reset_index()
             return data_aggregated
@@ -269,19 +278,14 @@ calculations with various different groups.
                 # Change grouping to category for prettier plotting
                 mutate_at(vars(grouping), as.factor)
 
+            # Aggregate data
             data_aggregated <- data_relevant %>%
-                group_by_at((grouping)) %>%
+                group_by_at(grouping) %>%
                 summarize_at(vars(target), agg_function) %>%
                 ungroup()
+    
+            return(data_aggregated)
         }
-
-        newfiles_yearly_sum <- aggregate_filesize_data(filesizes, 'Year', 'Files', sum)
-
-        options(repr.plot.width=8, repr.plot.height=4)
-
-        newfiles_yearly_sum %>%
-            ggplot(aes(x=Year, y=Files, fill=Year)) +
-            geom_col()
 
 Now we can use this function to create the following plots:
 
@@ -342,6 +346,167 @@ From these we can see the following:
             geom_col())
 
 
+*********************************************************************************
+Using bootstrapping/resampling methods for the calculation of statistical moments
+*********************************************************************************
+
+Quick overview of bootstrapping
+===============================
+
+`Bootstrapping methods <https://en.wikipedia.org/wiki/Bootstrapping_(statistics)>`_
+are commonly used to calculate statistical moments (mean, variance, etc.) from
+a sample distribution obtained from raw data.
+
+The basic idea of bootstrapping methods is that if you have a sample
+distribution and you want to calculate e.g. distribution for the sample mean,
+you can take lots of resamples from the distribution with replacement and
+calculate means for those resamples. Now the distribution of these means
+will approach the distribution of the sample mean due to the
+`law of large numbers <https://en.wikipedia.org/wiki/Law_of_large_numbers>`_.
+
+Let's use these methods to calculate the mean file size. First, we need to get
+a grouping based on both ``Year`` and ``BytesLog2``.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        # Drop rows with NaNs (invalid years)
+        newfiles_relevant2 = filesizes.dropna(axis=0)
+        # Pick relevant columns
+        newfiles_relevant2 = newfiles_relevant2.loc[:,['Year','BytesLog2','Files']]
+        # Aggregate based on Year and BytesLog2
+        newfiles_yearly_sum2 = newfiles_relevant2.groupby(['Year','BytesLog2']).agg('sum')
+
+        newfiles_yearly_sum2.head()
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+From here we can see that our data is grouped in two different layers: first
+in terms of ``Year`` and then in terms of ``BytesLog2``. Summation is
+afterwards done for ``Files``.
+
+Now we can notice that because our function ``aggregate_filesize_data`` took
+its arguments as lists, we can use it to do these aggregations as well. We can
+use it to get our aggregated data and plot the size distribution of new files
+for year 2020:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        yearly_bytes_sum = aggregate_filesize_data(filesizes, ['Year','BytesLog2'], ['Files', 'SpaceUsage'], 'sum')
+
+        bytes_2020 = yearly_bytes_sum[yearly_bytes_sum['Year'] == 2020]
+
+        sb.barplot(x='BytesLog2', y='Files', data=bytes_2020, ci=None)
+        plt.title(2020)
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+Let's use
+`np.random.choice <https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.random.choice.html#numpy.random.choice>`_
+(Python) /
+`sample <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/sample>`_
+(R) for the sampling because these functions are much faster when we're creating
+hundreds to thousands of samples (resampling functions of Pandas/Tidyverse are
+designed for few random samples).
+
+Now we'll want to pick from all available byte sizes with replacement (each
+byte size can be picked more than once) and we'll want to weight the picking
+probabilities with the distribution of our sample data (new files created on
+2020).
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        # Pick target data column
+        target_data = bytes_2020['BytesLog2'].copy()
+        # Pick weight data column
+        weight_data = bytes_2020['Files'].copy()]
+        # Fill zeros to those byte sizes that are not present in the Files-data
+        weight_data.fillna(0, inplace=True)
+        # Normalize weight_data into probabilities
+        weight_data = weight_data/weight_data.sum()
+        print(target_data.head())
+        print(weight_data.head())
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+Now we can create a vector of means and fill it with random resampled means.
+The sample mean of our original distribution is then the mean of this vector.
+By looking at our plot we can see that the sample mean corresponds well with
+the peak of the distribution.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        # Create means vector
+        means = np.zeros(100, dtype=np.float64)
+        for i in range(100):
+            # Calculate resampled mean
+            means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
+        print(means)
+        print('Estimated sample mean:', np.mean(means))
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+Let's now create a function for this bootstrapping feature:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        def get_bootstrapped_means(dataset, target_col, weight_col, n_means=1000):
+            df = dataset[[target_col, weight_col]].copy()
+            target_data = df[target_col]
+            weight_data = df[weight_col]
+            weight_data.fillna(0, inplace=True)
+            weight_data = weight_data/weight_data.sum()
+            means = np.zeros(n_means, dtype=np.float64)
+            for i in range(n_means):
+                means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
+            return means
+
+        get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files')
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        NULL
+
+Using nested dataframes to help with bootstrapping
+==================================================
+
 .. tabs::
 
   .. tab:: Python
@@ -355,6 +520,7 @@ From these we can see the following:
     .. code-block:: R
 
         NULL
+
 
 
 .. tabs::
