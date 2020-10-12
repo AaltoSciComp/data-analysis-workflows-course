@@ -145,6 +145,22 @@ stored on Aalto University's Triton cluster's file system. Columns are:
 
         filesizes <- load_filesizes('../data/filesizes_timestamps.txt')
         head(filesizes)
+        
+        Parsed with column specification:
+        cols(
+          Bytes = col_double(),
+          MonthsTo2021 = col_double(),
+          Files = col_double()
+        )
+
+        A tibble: 6 × 7 Bytes	Files	BytesLog2	SpaceUsage	Year	Month	Date
+        <dbl>	<dbl>	<dbl>	<dbl>	<dbl>	<ord>	<dttm>
+        1	5	0	5	2010	Jan	2010-01-01
+        2	3	1	6	2010	Jan	2010-01-01
+        4	27	2	108	2010	Jan	2010-01-01
+        8	136	3	1088	2010	Jan	2010-01-01
+        16	208	4	3328	2010	Jan	2010-01-01
+        32	653	5	20896	2010	Jan	2010-01-01
 
 Simple groupings and summaries - Calculating new files per year
 ===============================================================
@@ -186,6 +202,15 @@ columns.
             # Change year to category for prettier plotting
             mutate(Year=as.factor(Year))
         head(newfiles_relevant)
+        
+         A tibble: 6 × 2 Year	Files
+        <fct>	<dbl>
+        2010	5
+        2010	3
+        2010	27
+        2010	136
+        2010	208
+        2010	653
 
 Now, we'll want to group our data based on the year-column (``Year``) and
 calculate the total number of files (``Files``) across all rows (all dates
@@ -227,6 +252,14 @@ and files sizes).
 
         glimpse(newfiles_yearly_sum)
         head(newfiles_yearly_sum)
+        
+        Year	Files
+        2010 	5590287
+        2011 	13197038
+        2012 	17099900
+        2013 	14755151
+        2014 	26329321
+        2015 	24896331
 
 In Python we see that the output of 
 `agg <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.agg.html>`_
@@ -261,6 +294,14 @@ verify that the data is ungrouped.
             ungroup()
 
         head(newfiles_yearly_sum)
+        
+         Year	Files
+        2010 	5590287
+        2011 	13197038
+        2012 	17099900
+        2013 	14755151
+        2014 	26329321
+        2015 	24896331
 
 Let's plot this data in a bar plot:
 
@@ -284,6 +325,9 @@ Let's plot this data in a bar plot:
         newfiles_yearly_sum %>%
             ggplot(aes(x=Year, y=Files, fill=Year)) +
             geom_col()
+
+    .. image:: images/newfiles_yearly_sum_r.svg
+
 
 Creating a function for many different summaries
 ================================================
@@ -340,6 +384,17 @@ calculations with various different groups.
 
             return(data_aggregated)
         }
+
+        newfiles_yearly_sum <- aggregate_filesize_data(filesizes, c('Year'), c('Files'), sum)
+        head(newfiles_yearly_sum)
+        
+         Year	Files
+        2010 	5590287
+        2011 	13197038
+        2012 	17099900
+        2013 	14755151
+        2014 	26329321
+        2015 	24896331
 
 Now we can use this function to create the following plots:
 
@@ -414,7 +469,26 @@ From these we can see the following:
         print(monthly_sum %>%
             ggplot(aes(x=Month, y=SpaceUsage, fill=Month)) +
             geom_col())
+            
+        Year	Files	SpaceUsage
+        2010 	5590287 	2,260716e+12
+        2011 	13197038 	7,000732e+12
+        2012 	17099900 	1,547558e+13
+        2013 	14755151 	1,544538e+13
+        2014 	26329321 	4,253036e+13
+        2015 	24896331 	3,096538e+13
+        Month	Files	SpaceUsage
+        Jan 	34921070 	4,313122e+13
+        Feb 	35707864 	7,102250e+13
+        Mar 	25494722 	5,651687e+13
+        Apr 	31224476 	7,538209e+13
+        May 	37816173 	7,533862e+13
+        Jun 	33804495 	7,010947e+13
 
+    .. image:: images/newall1_r.svg
+    .. image:: images/newall2_r.svg
+    .. image:: images/newall3_r.svg
+    .. image:: images/newall4_r.svg
 
 *********************************************************************************
 Using bootstrapping/resampling methods for the calculation of statistical moments
@@ -474,6 +548,14 @@ a grouping based on both ``Year`` and ``BytesLog2``.
             summarize(Files=sum(Files))
 
         head(newfiles_relevant2)
+        
+        Year	BytesLog2	Files
+        2010 	0 	124
+        2010 	1 	1632
+        2010 	2 	5626
+        2010 	3 	26287
+        2010 	4 	65074
+        2010 	5 	202543
 
 From here we can see that our data is grouped in two different layers: first
 in terms of ``Year`` and then in terms of ``BytesLog2``. Summation is
@@ -514,6 +596,9 @@ for year 2020:
             ggplot(aes(x=BytesLog2, y=Files, fill=BytesLog2)) +
             geom_col() +
             theme(legend.position = "none")
+    
+    .. image:: images/file-distribution-2020_r.svg
+
 
 Let's use
 `np.random.choice <https://docs.scipy.org/doc/numpy-1.15.0/reference/generated/numpy.random.choice.html#numpy.random.choice>`_
@@ -582,6 +667,10 @@ probabilities with the distribution of our sample data (new files created on
 
         print(head(target_data))
         print(head(weight_data))
+        
+        [1] 0 1 2 3 4 5
+        [1] 0,0003271367 0,0019404559 0,0014705603 0,0074056601 0,0145700668
+        [6] 0,0156263905
 
 Now we can create a vector of means and fill it with random resampled means.
 The sample mean of our original distribution is then the mean of this vector.
@@ -619,6 +708,9 @@ the peak of the distribution.
         }
         print(means)
         print(paste0('Estimated sample mean: ', mean(means)))
+        
+        [1] 12,19 12,19 12,80 12,90 13,18 13,48 12,97 12,39 13,49 12,57
+        [1] "Estimated sample mean: 12,816"
 
 Let's now create a function for this bootstrapping feature:
 
@@ -735,6 +827,17 @@ for all of the years using nested dataframes.
 
         print(glimpse(bootstrapped_means))
         head(bootstrapped_means,1)
+        
+        # A tibble: 6 x 1
+          SampledMeans
+                 <dbl>
+        1         14.0
+        2         12.9
+        3         13.5
+        4         12.9
+        5         13.2
+        6         12.9
+        [1] "Estimated sample mean: 13,2043"
 
 Now we can calculate means for each of these bootstrapped means:
 
@@ -764,6 +867,46 @@ Now we can calculate means for each of these bootstrapped means:
 
         print(glimpse(bootstrapped_means))
         head(bootstrapped_means, 1)
+        
+        Observations: 11
+        Variables: 2
+        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
+        $ data <list> [<tbl_df[37 x 3]>, <tbl_df[37 x 3]>, <tbl_df[38 x 3]>, <tbl_df[…
+        # A tibble: 11 x 2
+           Year  data             
+           <fct> <list>           
+         1 2010  <tibble [37 × 3]>
+         2 2011  <tibble [37 × 3]>
+         3 2012  <tibble [38 × 3]>
+         4 2013  <tibble [38 × 3]>
+         5 2014  <tibble [40 × 3]>
+         6 2015  <tibble [40 × 3]>
+         7 2016  <tibble [40 × 3]>
+         8 2017  <tibble [40 × 3]>
+         9 2018  <tibble [42 × 3]>
+        10 2019  <tibble [40 × 3]>
+        11 2020  <tibble [42 × 3]>
+        Observations: 11
+        Variables: 2
+        $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
+        $ SampledMeans <list> [<tbl_df[100 x 1]>, <tbl_df[100 x 1]>, <tbl_df[100 x 1]…
+        # A tibble: 11 x 2
+           Year  SampledMeans      
+           <fct> <list>            
+         1 2010  <tibble [100 × 1]>
+         2 2011  <tibble [100 × 1]>
+         3 2012  <tibble [100 × 1]>
+         4 2013  <tibble [100 × 1]>
+         5 2014  <tibble [100 × 1]>
+         6 2015  <tibble [100 × 1]>
+         7 2016  <tibble [100 × 1]>
+         8 2017  <tibble [100 × 1]>
+         9 2018  <tibble [100 × 1]>
+        10 2019  <tibble [100 × 1]>
+        11 2020  <tibble [100 × 1]>
+
+        Year	SampledMeans
+        2010 	13,06, 13,10, 13,90, 13,23, 12,39, 13,28, 12,81, 12,86, 12,96, 12,66, 13,48, 12,94, 12,81, 13,49, 13,32, 12,55, 13,28, 11,99, 13,17, 13,04, 12,63, 12,92, 13,11, 13,30, 13,33, 12,99, 12,88, 13,23, 13,54, 14,06, 13,26, 13,36, 13,10, 13,26, 13,80, 12,83, 13,29, 12,87, 12,48, 12,81, 12,37, 12,20, 12,52, 12,21, 13,26, 12,14, 13,31, 13,38, 13,13, 13,19, 12,68, 13,16, 13,34, 12,65, 13,16, 13,36, 13,29, 13,00, 13,48, 12,89, 12,51, 12,64, 12,78, 12,72, 12,51, 12,81, 13,54, 12,85, 13,24, 13,23, 12,98, 13,38, 12,12, 13,31, 13,09, 13,17, 13,32, 13,21, 13,23, 13,51, 13,73, 13,56, 12,72, 12,77, 12,84, 12,33, 12,20, 13,12, 12,05, 12,15, 13,20, 14,03, 13,19, 13,05, 13,08, 13,31, 12,93, 13,25, 13,48, 12,77
 
 Let's create a function for this procedure so that we can run it for multiple
 different columns:
@@ -814,6 +957,12 @@ different columns:
 
         bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
         glimpse(bootstrapped_yearly_means)
+        
+        Observations: 11
+        Variables: 3
+        $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
+        $ SampledMeans <list> [<tbl_df[1000 x 1]>, <tbl_df[1000 x 1]>, <tbl_df[1000 x…
+        $ Means        <list> [12,96696, 14,04812, 10,67652, 13,39827, 14,02425, 11,7…
 
 For plotting we can unstack the ``SampledMeans``-dataframe.
 
@@ -843,6 +992,14 @@ For plotting we can unstack the ``SampledMeans``-dataframe.
             unnest()
 
         head(bootstrapped_yearly_means_distribution)
+
+        Year	SampledMeans
+        2010 	13,29
+        2010 	13,01
+        2010 	13,28
+        2010 	12,40
+        2010 	13,26
+        2010 	12,76
 
 Now we can plot distributions for the data and for the sample mean.
 
@@ -896,6 +1053,9 @@ Now we can plot distributions for the data and for the sample mean.
                 xlim(x_limits) +
                 ggtitle('Distribution of means') +
                 facet_grid(rows=vars(Year))
+
+    .. image:: images/yearly-file-distributions_r.svg
+    .. image:: images/yearly-mean-distributions_r.svg
 
 Let's use our new functions for monthly data as well:
 
@@ -961,6 +1121,10 @@ Let's use our new functions for monthly data as well:
                 xlim(x_limits) +
                 ggtitle('Distribution of means') +
                 facet_grid(rows=vars(Month))
+
+    .. image:: images/monthly-file-distributions_r.svg
+    .. image:: images/monthly-mean-distributions_r.svg
+
 
 .. tabs::
 
