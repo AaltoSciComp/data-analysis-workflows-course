@@ -238,7 +238,7 @@ Let's plot this data in a bar plot:
             ggplot(aes(x=Year, y=Files, fill=Year)) +
             geom_col()
 
-Creating a function for many different summaries 
+Creating a function for many different summaries
 ================================================
 
 Let's create a function for this workflow so that we can easily do similar
