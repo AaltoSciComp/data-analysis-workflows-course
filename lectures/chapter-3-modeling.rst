@@ -1552,17 +1552,17 @@ Let's use our new functions for monthly data as well:
     .. image:: images/monthly-file-distributions_r.svg
     .. image:: images/monthly-mean-distributions_r.svg
 
+..
+    .. tabs::
 
-.. tabs::
+      .. tab:: Python
 
-  .. tab:: Python
+        .. code-block:: python
 
-    .. code-block:: python
-    
-        pass
+            pass
 
-  .. tab:: R
+      .. tab:: R
 
-    .. code-block:: R
+        .. code-block:: R
 
-        NULL
+            NULL
