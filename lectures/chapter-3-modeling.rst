@@ -164,6 +164,17 @@ stored on Aalto University's Triton cluster's file system. Columns are:
 Simple groupings and summaries - Calculating new files per year
 ===============================================================
 
+Summaries are usually statistics that are calculated on some (or all) columns
+based on some grouping. Typical summarys include calculating mean, variance and
+covariance. It is important to note that summaries are done with respect to
+some axis of our dataset. Typically they are done column-wise as that is the 
+recommended direction for observations. They also reduce the size of our
+dataset.
+
+Summaries can be visualized in the following way:
+
+.. image:: images/dataframe-summary.svg
+
 Our parsed file contains columns for date, year, month, month name, the size of
 files in two different formats, the number of files and the total space used by
 the files. Let's say we're interested in the how the number of file has
@@ -1123,13 +1134,11 @@ the peak of the distribution.
         for i in range(10):
             # Calculate resampled mean
             means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
-        means = pd.Series({'SampledMeans': means})
-        print(means.head())
-        print('Estimated sample mean:', means['SampledMeans'].mean())
-        
-        SampledMeans    [13.96, 13.37, 13.03, 13.17, 13.17, 12.76, 12....
-        dtype: object
-        Estimated sample mean: 13.222
+        print(means[:10])
+        print('Estimated sample mean:', np.mean(means))
+
+        [13.06 13.27 13.57 13.45 12.7  13.05 13.28 12.94 12.91 14.07]
+        Estimated sample mean: 13.229999999999999
 
   .. tab:: R
 
@@ -1173,19 +1182,14 @@ Let's now create a function for this bootstrapping feature:
                 # Calculate resampled mean
                 means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
 
-            # Store results as a DataFrame
-            means = pd.Series({'SampledMeans': means})
-
             return means
 
         bootstrapped_means = get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files', n_means=1000)
-        print(bootstrapped_means.head())
-        print('Estimated sample mean:', bootstrapped_means['SampledMeans'].mean())
-        
-        SampledMeans    [13.8, 13.03, 13.42, 13.02, 13.42, 12.69, 13.7...
-        dtype: object
-        Estimated sample mean: 13.194700000000001
+        print(bootstrapped_means[:10])
+        print('Estimated sample mean:', np.mean(bootstrapped_means))
 
+        [12.59 13.9  13.09 13.34 12.65 13.1  13.16 12.98 13.28 12.74]
+        Estimated sample mean: 13.225010000000001
 
   .. tab:: R
 
@@ -1205,13 +1209,15 @@ Let's now create a function for this bootstrapping feature:
                 # Calculate resampled mean
                 means[[i]] <- mean(sample(target_data, 100, replace=TRUE, prob=weight_data))
             }
-            means <- tibble(SampledMeans=means)
             return(means)
         }
 
         means <- get_bootstrapped_means(bytes_2020, 'BytesLog2', 'Files', n_means=1000)
         print(head(means))
-        print(paste0('Estimated sample mean: ', mean(means[['SampledMeans']])))
+        print(paste0('Estimated sample mean: ', mean(means)))
+
+        [1] 13,47 13,78 13,11 12,75 13,50 12,83
+        [1] "Estimated sample mean: 13,2317"
 
 Using nested dataframes to help with bootstrapping
 ==================================================
@@ -1224,10 +1230,9 @@ can be a dataframe.
 
 This can be visualized in the following way:
 
-.. image:: images/dataframe-nested.svg
+.. image:: images/dataframe-nested2.svg
 
-Let's use our data (``yearly_bytes_sum``) and let's create bootstrapped means
-for all of the years using nested dataframes.
+Lets create a nested view of our data (``yearly_bytes_sum``):
 
 .. tabs::
 
@@ -1235,7 +1240,43 @@ for all of the years using nested dataframes.
 
     .. code-block:: python
     
-        bootstrapped_means = yearly_bytes_sum.groupby('Year').apply(lambda x: get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))
+        bootstrapped_means = yearly_bytes_sum.groupby('Year').apply(lambda x: pd.Series({'data': x}))
+        bootstrapped_means.head()
+        
+                data
+        Year 	
+        2010.0 	Year BytesLog2 Files SpaceUsage ...
+        2011.0 	Year BytesLog2 Files SpaceUsage ...
+        2012.0 	Year BytesLog2 Files SpaceUsage...
+        2013.0 	Year BytesLog2 Files SpaceUsage...
+        2014.0 	Year BytesLog2 Files SpaceUsage...
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        yearly_bytes_sum_nested <- yearly_bytes_sum %>%
+            group_by(Year) %>%
+            nest()
+
+        glimpse(yearly_bytes_sum_nested)
+        
+        Observations: 11
+        Variables: 2
+        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
+        $ data <list> [<tbl_df[37 x 3]>, <tbl_df[37 x 3]>, <tbl_df[38 x 3]>, <tbl_df[…
+    
+Now we can create bootstrapped means for all of the years with
+apply/map-statements.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        bootstrapped_means['SampledMeans'] = bootstrapped_means['data'].apply(lambda x: get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))
+        bootstrapped_means.drop('data', axis=1, inplace=True)
         bootstrapped_means.head()
         
          	SampledMeans
@@ -1249,59 +1290,35 @@ for all of the years using nested dataframes.
   .. tab:: R
 
     .. code-block:: R
-
-        yearly_bytes_sum_nested <- yearly_bytes_sum %>%
-            group_by(Year) %>%
-            nest()
-
-        print(glimpse(yearly_bytes_sum_nested))
-
+    
         bootstrapped_means <- yearly_bytes_sum_nested %>%
             mutate(SampledMeans=map(data, function(x) get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))) %>%
             select(-data)
 
         print(glimpse(bootstrapped_means))
         head(bootstrapped_means,1)
-        
-        Observations: 11
-        Variables: 2
-        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
-        $ data <list> [<tbl_df[37 x 3]>, <tbl_df[37 x 3]>, <tbl_df[38 x 3]>, <tbl_df[…
-        # A tibble: 11 x 2
-           Year  data             
-           <fct> <list>           
-         1 2010  <tibble [37 × 3]>
-         2 2011  <tibble [37 × 3]>
-         3 2012  <tibble [38 × 3]>
-         4 2013  <tibble [38 × 3]>
-         5 2014  <tibble [40 × 3]>
-         6 2015  <tibble [40 × 3]>
-         7 2016  <tibble [40 × 3]>
-         8 2017  <tibble [40 × 3]>
-         9 2018  <tibble [42 × 3]>
-        10 2019  <tibble [40 × 3]>
-        11 2020  <tibble [42 × 3]>
+
         Observations: 11
         Variables: 2
         $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
-        $ SampledMeans <list> [<tbl_df[5 x 1]>, <tbl_df[5 x 1]>, <tbl_df[5 x 1]>, <tb…
+        $ SampledMeans <list> [<12,94, 13,12, 12,74, 13,03, 13,21>, <14,33, 14,01, 14…
         # A tibble: 11 x 2
-           Year  SampledMeans    
-           <fct> <list>          
-         1 2010  <tibble [5 × 1]>
-         2 2011  <tibble [5 × 1]>
-         3 2012  <tibble [5 × 1]>
-         4 2013  <tibble [5 × 1]>
-         5 2014  <tibble [5 × 1]>
-         6 2015  <tibble [5 × 1]>
-         7 2016  <tibble [5 × 1]>
-         8 2017  <tibble [5 × 1]>
-         9 2018  <tibble [5 × 1]>
-        10 2019  <tibble [5 × 1]>
-        11 2020  <tibble [5 × 1]>
+           Year  SampledMeans
+           <fct> <list>      
+         1 2010  <dbl [5]>   
+         2 2011  <dbl [5]>   
+         3 2012  <dbl [5]>   
+         4 2013  <dbl [5]>   
+         5 2014  <dbl [5]>   
+         6 2015  <dbl [5]>   
+         7 2016  <dbl [5]>   
+         8 2017  <dbl [5]>   
+         9 2018  <dbl [5]>   
+        10 2019  <dbl [5]>   
+        11 2020  <dbl [5]>   
 
         Year	SampledMeans
-        2010 	13,48, 12,72, 13,09, 13,32, 13,40
+        2010 	12,94, 13,12, 12,74, 13,03, 13,21
 
 Now we can calculate means for each of these bootstrapped means:
 
@@ -1327,12 +1344,12 @@ Now we can calculate means for each of these bootstrapped means:
     .. code-block:: R
 
         bootstrapped_means <- bootstrapped_means  %>%
-            mutate(Mean=map(SampledMeans, function(x) mean(x[['SampledMeans']])))
+            mutate(Mean=map(SampledMeans, mean))
 
         head(bootstrapped_means, 1)
 
         Year	SampledMeans	Mean
-        2010 	13,48, 12,72, 13,09, 13,32, 13,40	13,202 
+        2010 	12,94, 13,12, 12,74, 13,03, 13,21	13,008 
 
 Let's create a function for this procedure so that we can run it for multiple
 different columns:
@@ -1347,8 +1364,10 @@ different columns:
 
             bootstrapping_function = lambda x: get_bootstrapped_means(x, 'BytesLog2', target_variable, n_means=n_means)
 
-            bootstrapped_means = dataset.groupby(group_variable).apply(bootstrapping_function)
+            bootstrapped_means = dataset.groupby(target_variable).apply(lambda x: pd.Series({'data': x}))
+            bootstrapped_means['SampledMeans'] = bootstrapped_means['data'].apply(bootstrapping_function)
             bootstrapped_means['Mean'] = bootstrapped_means['SampledMeans'].apply(np.mean)
+            bootstrapped_means.drop('data', axis=1, inplace=True)
             return bootstrapped_means
 
         bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
@@ -1420,12 +1439,12 @@ For plotting we can unstack the ``SampledMeans``-dataframe.
         head(bootstrapped_yearly_means_distribution)
 
         Year	SampledMeans
-        2010 	12,32
-        2010 	13,30
-        2010 	12,51
-        2010 	12,72
-        2010 	12,89
-        2010 	13,08
+        2010 	12,93
+        2010 	12,80
+        2010 	13,20
+        2010 	12,53
+        2010 	12,95
+        2010 	13,49
 
 Now we can plot distributions for the data and for the sample mean.
 
