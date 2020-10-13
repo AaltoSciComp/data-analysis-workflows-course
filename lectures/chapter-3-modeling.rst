@@ -8,13 +8,12 @@ Types of modeling
 
 In this chapter we will focus on doing modeling on our datasets. In our case
 the term "modeling" refers to any activity that takes in our data and produces
-a result. We'll be doing four differing types of modeling:
+a result. We'll be doing three differing types of modeling:
 
 1. Creating summaries of our data by calculating statistics
    (e.g. mean, variance).
 2. Fitting a function into our data.
 3. Using bootstrapping methods to calculate statistical moments.
-4. Running a machine learning model with training and test steps.
 
 To accomplish these task, we'll be using various features of our frameworks:
 
