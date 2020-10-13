@@ -5,3 +5,5 @@
 _build
 r_exercises/*.svg
 python_exercises/*.svg
+r_exercises/*.png
+python_exercises/*.png

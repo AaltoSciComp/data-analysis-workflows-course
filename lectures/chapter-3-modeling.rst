@@ -320,7 +320,7 @@ Let's plot this data in a bar plot:
 
     .. code-block:: R
 
-        options(repr.plot.width=8, repr.plot.height=4)
+        options(repr.plot.width=6, repr.plot.height=4)
 
         newfiles_yearly_sum %>%
             ggplot(aes(x=Year, y=Files, fill=Year)) +
@@ -489,6 +489,442 @@ From these we can see the following:
     .. image:: images/newall2_r.svg
     .. image:: images/newall3_r.svg
     .. image:: images/newall4_r.svg
+
+
+*******************************************
+Curve fitting - Fitting functions into data
+*******************************************
+
+Determining the growth rate of file space usage
+===============================================
+
+A classic data analysis task is fitting a function to data. This is very common
+in situations where the relationship between two variables can be derived from
+a mathematical model (e.g physic) or when the data seems to come from a
+distribution with an easily writable distribution function or cumulative
+distribution function (e.g. gaussian).
+
+Let's consider the cumulative space usage of the file system. We can calculate
+these values from our previously calculated summaries:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        yearly_cumsum = yearly_sum.copy()
+        yearly_cumsum.loc[:,['Files','SpaceUsage']] = yearly_cumsum[['Files','SpaceUsage']].cumsum()
+        yearly_cumsum.head()
+
+        Year 	Files 	SpaceUsage
+        0 	2010 	5590287 	2260716407068
+        1 	2011 	18787325 	9261448518531
+        2 	2012 	35887225 	24737023889111
+        3 	2013 	50642376 	40182399191878
+        4 	2014 	76971697 	82712763516200
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        yearly_cumsum <- yearly_sum %>%
+            mutate(
+                Files=cumsum(Files),
+                SpaceUsage=cumsum(SpaceUsage)
+            )
+
+        head(yearly_cumsum)
+        
+        Year	Files	SpaceUsage
+        2010 	5590287 	2,260716e+12
+        2011 	18787325 	9,261449e+12
+        2012 	35887225 	2,473702e+13
+        2013 	50642376 	4,018240e+13
+        2014 	76971697 	8,271276e+13
+        2015 	101868028 	1,136781e+14
+
+Let's plot the space usage as a a bar chart.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        fig, ax = plt.subplots(figsize=(8,8))
+        sb.barplot(x='Year', y='SpaceUsage', data=yearly_cumsum, ci=None, ax=ax)
+
+    .. image:: images/cumulative-space-usage_python.svg
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        options(repr.plot.width=6, repr.plot.height=4)
+
+        yearly_cumsum %>%
+            ggplot(aes(x=Year, y=SpaceUsage, fill=Year)) +
+            geom_col()
+            
+    .. image:: images/cumulative-space-usage_r.svg
+            
+Based on this graph the growth looks exponential. If this is the case, taking
+a logarithm of our data should result in a linear plot. Let's do just that:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        yearly_cumsum['SpaceUsageLog2'] = yearly_cumsum['SpaceUsage'].apply(np.log2)
+
+        fig, ax = plt.subplots(figsize=(6,4))
+        sb.lineplot(x='Year', y='SpaceUsageLog2', data=yearly_cumsum, ci=None, ax=ax)
+
+    .. image:: images/cumulative-logspace-usage_python.svg
+    
+  .. tab:: R
+
+    .. code-block:: R
+
+        options(repr.plot.width=6, repr.plot.height=4)
+
+        yearly_cumsum <- yearly_cumsum %>%
+            mutate(SpaceUsageLog2=log2(SpaceUsage))
+
+        yearly_cumsum %>%
+            mutate(Year=as.numeric(as.character(Year))) %>%
+            ggplot(aes(x=Year, y=SpaceUsageLog2)) +
+            geom_line()
+
+    .. image:: images/cumulative-logspace-usage_r.svg
+
+Here we have used logarithm with base 2 as that gives us a simple way of
+interpreting our y-axis: each time the y-axis grows by one, our data doubles.
+Looking at the plot it looks like the growth in last seven years (2014-2020)
+has been steady. Let's use those years for our fit.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        fit_dataset = yearly_cumsum.copy()
+        fit_dataset['Year'] = fit_dataset['Year'].astype(int)
+        fit_dataset = fit_dataset[fit_dataset['Year'] > 2013]
+
+        fig, ax = plt.subplots(figsize=(6,4))
+        sb.scatterplot(x='Year', y='SpaceUsageLog2', data=fit_dataset, ci=None, ax=ax)
+
+    .. image:: images/cumulative-logspace-usage-fitrange_python.svg
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        fit_dataset <- yearly_cumsum %>%
+            mutate(Year=as.numeric(as.character(Year))) %>%
+            filter(Year > 2013)
+
+        options(repr.plot.width=6, repr.plot.height=4)
+
+        fit_dataset %>%
+            ggplot(aes(x=Year, y=SpaceUsageLog2, color=Year)) +
+            geom_point()
+
+    .. image:: images/cumulative-logspace-usage-fitrange_r.svg
+
+
+Fitting a linear model
+======================
+
+Linear models (or linear regressions) are commonly used in statistics to
+explain relationships between different numerical variables. In our case,
+as the data was linear, we can also use them as fitting models into our
+data.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        from sklearn import linear_model
+
+        # Set up a linear model
+        model1 = linear_model.LinearRegression()
+        # Fit to the linear model. Notice that first argument needs to be 2D.
+        model1.fit(fit_dataset[['Year']],fit_dataset['SpaceUsageLog2'])
+        # Print model coefs
+        print(model1.coef_, model1.intercept_)
+        
+        [0.52740083] -1015.9746062919537
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        library(modelr)
+        library(broom)
+
+        options(repr.plot.width=12, repr.plot.height=4)
+
+        # Set up a linear model
+        lm_formula <- formula(SpaceUsageLog2 ~ Year)
+
+        # Fit to the linear model. Notice that first argument needs to be 2D.
+        model1 <- lm(lm_formula, data=fit_dataset)
+
+        # Print model coefs
+        print(model1)
+
+        # Get tidy version the coefficients
+        coefs <- model1 %>%
+            tidy() %>%
+            print()
+            
+        
+        Call:
+        lm(formula = lm_formula, data = fit_dataset)
+
+        Coefficients:
+        (Intercept)         Year  
+         -1015,9746       0,5274  
+
+        # A tibble: 2 x 5
+          term         estimate std.error statistic     p.value
+          <chr>           <dbl>     <dbl>     <dbl>       <dbl>
+        1 (Intercept) -1016.      34.5        -29.5 0.000000843
+        2 Year            0.527    0.0171      30.9 0.000000671
+
+Let's create predictions based on our model and plot the data with our
+predictions.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        # Predict based on our model
+        fit_dataset['SpaceUsagePredictedLog2'] = model1.predict(fit_dataset[['Year']])
+
+        # Plot the data and our model
+        sb.scatterplot(x='Year', y='SpaceUsageLog2', data=fit_dataset, ci=None)
+        sb.lineplot(x='Year', y='SpaceUsagePredictedLog2', data=fit_dataset, color='tomato', label='Fit with slope: %f' % model1.coef_)
+
+    .. image:: images/fit-logspace-model1_python.svg
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        options(repr.plot.width=12, repr.plot.height=4)
+
+        # Predict based on our model
+        fit_dataset <- fit_dataset %>%
+            add_predictions(model1, var='SpaceUsagePredictedLog2')
+
+        slope <- coefs %>%
+            filter(term == 'Year') %>%
+            select(estimate) %>%
+            as.numeric()
+
+        slope_legend <- sprintf('Fit with slope: %.3f',slope)
+
+        # Plot the data and our model
+        fit_dataset %>%
+            ggplot(aes(x=Year, y=SpaceUsageLog2)) +
+                geom_point(aes(color='Data')) +
+                geom_line(aes(y=SpaceUsagePredictedLog2, color=slope_legend)) +
+                scale_color_discrete(name='')
+        
+    .. image:: images/fit-logspace-model1_r.svg
+
+We could have also used a simple least squares curve fitting with a function we
+have defined ourselves.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        from scipy.optimize import curve_fit
+
+        # Set up a linear model
+        def model2(x, a, b):
+            return a*x + b
+
+        # Fit to the linear model
+        coefs,_ = curve_fit(model2, fit_dataset['Year'], fit_dataset['SpaceUsageLog2'])
+
+        # Print model coefs
+        print(coefs)
+
+        # Predict based on our model
+        fit_dataset['SpaceUsagePredictedLog2'] = model2(fit_dataset['Year'], *coefs)
+
+        # Plot the data and our model
+        sb.scatterplot(x='Year', y='SpaceUsageLog2', data=fit_dataset, ci=None)
+        sb.lineplot(x='Year', y='SpaceUsagePredictedLog2', data=fit_dataset, color='tomato', label='Fit with slope: %f' % coefs[0])
+        
+        [ 5.27400831e-01 -1.01597461e+03]
+
+    .. image:: images/fit-logspace-model2_python.svg
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        # Set up a linear model
+        formula2 <- SpaceUsageLog2 ~ a * Year + b
+
+        # Fit to the linear model
+        model2 <- nls(formula2, data=fit_dataset)
+
+        # Predict based on our model
+        fit_dataset <- fit_dataset %>%
+            add_predictions(model2, var='SpaceUsagePredictedLog2')
+
+        # Get tidy version the coefficients
+        coefs <- model2 %>%
+            tidy() %>%
+            print()
+
+        # Predict based on our model
+        fit_dataset <- fit_dataset %>%
+            add_predictions(model1, var='SpaceUsagePredictedLog2')
+
+        # Format legend text
+        slope <- coefs %>%
+            filter(term == 'a') %>%
+            select(estimate) %>%
+            as.numeric()
+        slope_legend <- sprintf('Fit with slope: %.3f', slope)
+
+        # Plot the data and our model
+        fit_dataset %>%
+            ggplot(aes(x=Year, y=SpaceUsageLog2)) +
+                geom_point(aes(color='Data')) +
+                geom_line(aes(y=SpaceUsagePredictedLog2, color=slope_legend)) +
+                scale_color_discrete(name='')
+                
+         Warning message in nls(formula2, data = fit_dataset):
+        “No starting values specified for some parameters.
+        Initializing ‘a’, ‘b’ to '1.'.
+        Consider specifying 'start' or using a selfStart model”
+
+        # A tibble: 2 x 5
+          term   estimate std.error statistic     p.value
+          <chr>     <dbl>     <dbl>     <dbl>       <dbl>
+        1 a         0.527    0.0171      30.9 0.000000671
+        2 b     -1016.      34.5        -29.5 0.000000843
+
+    .. image:: images/fit-logspace-model2_r.svg
+
+
+Both of these models produced identical coefficients. Let's create a function
+that can do the fitting for us.
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+    
+        fit_dataset = yearly_cumsum.copy()
+        fit_dataset['Year'] = fit_dataset['Year'].astype(int)
+
+        def fit_exponential(dataset, x_column, y_column, fit_range=None):
+
+            fit_dataset = dataset
+
+            # If fit_range is defined, limit fit to that range
+            if fit_range is not None:
+                fit_dataset = fit_dataset.loc[fit_range, :]
+
+            # Set up a linear model
+            def linear_model(x, a, b):
+                return a*x + b
+
+            y_log = np.log2(fit_dataset[y_column])
+
+            # Fit to the linear model
+            coefs,_ = curve_fit(linear_model, fit_dataset[x_column], y_log)
+
+            # Predict based on our model
+            dataset['Predicted'] = 2 ** linear_model(dataset[x_column], *coefs)
+
+            return dataset, coefs
+
+        fit_dataset_final, coefs = fit_exponential(fit_dataset, 'Year', 'SpaceUsage', fit_dataset['Year'] > 2013)
+
+        sb.scatterplot(x='Year', y='SpaceUsage', data=fit_dataset_final, ci=None)
+        sb.lineplot(x='Year', y='Predicted', data=fit_dataset_final, color='tomato', label='Fit with exponent: %f' % coefs[0])
+    
+    .. image:: images/fit-space-function_python.svg
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        fit_exponential <- function(dataset, x_column, y_column, fit_range=NULL) {
+    
+            fit_dataset <- dataset
+
+            # If fit_range is defined, limit fit to that range
+            if (!is.null(fit_range)) {
+                fit_dataset <- fit_dataset[fit_range,]
+            }
+            # Set up a linear model
+            linear_formula <- as.formula(paste0(y_column, ' ~ a * ', x_column,' + b'))
+
+            fit_dataset[y_column] <- log2(fit_dataset[y_column])
+
+            # Fit to the linear model
+            linear_model <- nls(linear_formula, data=fit_dataset)
+
+            # Get tidy version the coefficients
+            coefs <- linear_model %>%
+                tidy()
+
+            # Predict based on our model
+            return_dataset <- dataset %>%
+                add_predictions(linear_model, var='Predicted') %>%
+                mutate(Predicted=2 ^ Predicted)
+
+            return(list(data=return_dataset, coefs=coefs)) 
+        }
+
+        fit_dataset <- yearly_cumsum %>%
+            mutate(Year=as.numeric(as.character(Year)))
+
+        # Fit exponential using our function
+        output <- fit_exponential(fit_dataset, 'Year', 'SpaceUsage', fit_range=fit_dataset['Year']>2013)
+        fit_dataset_final <- output$data
+        coefs <- output$coefs
+
+        # Format legend text
+        slope <- coefs %>%
+            filter(term == 'a') %>%
+            select(estimate) %>%
+            as.numeric()
+        slope_legend <- sprintf('Fit with exponent: %.3f',slope)
+
+        options(repr.plot.width=12, repr.plot.height=4)
+
+        # Plot the data and our model
+        fit_dataset_final %>%
+            ggplot(aes(x=Year, y=SpaceUsage)) +
+                geom_point(aes(color='Data')) +
+                geom_line(aes(y=Predicted, color=slope_legend)) +
+                scale_color_discrete(name='')
+
+    .. image:: images/fit-space-function_r.svg
 
 *********************************************************************************
 Using bootstrapping/resampling methods for the calculation of statistical moments
@@ -822,22 +1258,51 @@ for all of the years using nested dataframes.
         print(glimpse(yearly_bytes_sum_nested))
 
         bootstrapped_means <- yearly_bytes_sum_nested %>%
-            mutate(SampledMeans=map(data, function(x) get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=100))) %>%
+            mutate(SampledMeans=map(data, function(x) get_bootstrapped_means(x, 'BytesLog2', 'Files', n_means=5))) %>%
             select(-data)
 
         print(glimpse(bootstrapped_means))
         head(bootstrapped_means,1)
         
-        # A tibble: 6 x 1
-          SampledMeans
-                 <dbl>
-        1         14.0
-        2         12.9
-        3         13.5
-        4         12.9
-        5         13.2
-        6         12.9
-        [1] "Estimated sample mean: 13,2043"
+        Observations: 11
+        Variables: 2
+        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
+        $ data <list> [<tbl_df[37 x 3]>, <tbl_df[37 x 3]>, <tbl_df[38 x 3]>, <tbl_df[…
+        # A tibble: 11 x 2
+           Year  data             
+           <fct> <list>           
+         1 2010  <tibble [37 × 3]>
+         2 2011  <tibble [37 × 3]>
+         3 2012  <tibble [38 × 3]>
+         4 2013  <tibble [38 × 3]>
+         5 2014  <tibble [40 × 3]>
+         6 2015  <tibble [40 × 3]>
+         7 2016  <tibble [40 × 3]>
+         8 2017  <tibble [40 × 3]>
+         9 2018  <tibble [42 × 3]>
+        10 2019  <tibble [40 × 3]>
+        11 2020  <tibble [42 × 3]>
+        Observations: 11
+        Variables: 2
+        $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
+        $ SampledMeans <list> [<tbl_df[5 x 1]>, <tbl_df[5 x 1]>, <tbl_df[5 x 1]>, <tb…
+        # A tibble: 11 x 2
+           Year  SampledMeans    
+           <fct> <list>          
+         1 2010  <tibble [5 × 1]>
+         2 2011  <tibble [5 × 1]>
+         3 2012  <tibble [5 × 1]>
+         4 2013  <tibble [5 × 1]>
+         5 2014  <tibble [5 × 1]>
+         6 2015  <tibble [5 × 1]>
+         7 2016  <tibble [5 × 1]>
+         8 2017  <tibble [5 × 1]>
+         9 2018  <tibble [5 × 1]>
+        10 2019  <tibble [5 × 1]>
+        11 2020  <tibble [5 × 1]>
+
+        Year	SampledMeans
+        2010 	13,48, 12,72, 13,09, 13,32, 13,40
 
 Now we can calculate means for each of these bootstrapped means:
 
@@ -863,50 +1328,12 @@ Now we can calculate means for each of these bootstrapped means:
     .. code-block:: R
 
         bootstrapped_means <- bootstrapped_means  %>%
-            mutate(Means=map(SampledMeans, function(x) mean(x[['SampledMeans']])))
+            mutate(Mean=map(SampledMeans, function(x) mean(x[['SampledMeans']])))
 
-        print(glimpse(bootstrapped_means))
         head(bootstrapped_means, 1)
-        
-        Observations: 11
-        Variables: 2
-        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
-        $ data <list> [<tbl_df[37 x 3]>, <tbl_df[37 x 3]>, <tbl_df[38 x 3]>, <tbl_df[…
-        # A tibble: 11 x 2
-           Year  data             
-           <fct> <list>           
-         1 2010  <tibble [37 × 3]>
-         2 2011  <tibble [37 × 3]>
-         3 2012  <tibble [38 × 3]>
-         4 2013  <tibble [38 × 3]>
-         5 2014  <tibble [40 × 3]>
-         6 2015  <tibble [40 × 3]>
-         7 2016  <tibble [40 × 3]>
-         8 2017  <tibble [40 × 3]>
-         9 2018  <tibble [42 × 3]>
-        10 2019  <tibble [40 × 3]>
-        11 2020  <tibble [42 × 3]>
-        Observations: 11
-        Variables: 2
-        $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
-        $ SampledMeans <list> [<tbl_df[100 x 1]>, <tbl_df[100 x 1]>, <tbl_df[100 x 1]…
-        # A tibble: 11 x 2
-           Year  SampledMeans      
-           <fct> <list>            
-         1 2010  <tibble [100 × 1]>
-         2 2011  <tibble [100 × 1]>
-         3 2012  <tibble [100 × 1]>
-         4 2013  <tibble [100 × 1]>
-         5 2014  <tibble [100 × 1]>
-         6 2015  <tibble [100 × 1]>
-         7 2016  <tibble [100 × 1]>
-         8 2017  <tibble [100 × 1]>
-         9 2018  <tibble [100 × 1]>
-        10 2019  <tibble [100 × 1]>
-        11 2020  <tibble [100 × 1]>
 
-        Year	SampledMeans
-        2010 	13,06, 13,10, 13,90, 13,23, 12,39, 13,28, 12,81, 12,86, 12,96, 12,66, 13,48, 12,94, 12,81, 13,49, 13,32, 12,55, 13,28, 11,99, 13,17, 13,04, 12,63, 12,92, 13,11, 13,30, 13,33, 12,99, 12,88, 13,23, 13,54, 14,06, 13,26, 13,36, 13,10, 13,26, 13,80, 12,83, 13,29, 12,87, 12,48, 12,81, 12,37, 12,20, 12,52, 12,21, 13,26, 12,14, 13,31, 13,38, 13,13, 13,19, 12,68, 13,16, 13,34, 12,65, 13,16, 13,36, 13,29, 13,00, 13,48, 12,89, 12,51, 12,64, 12,78, 12,72, 12,51, 12,81, 13,54, 12,85, 13,24, 13,23, 12,98, 13,38, 12,12, 13,31, 13,09, 13,17, 13,32, 13,21, 13,23, 13,51, 13,73, 13,56, 12,72, 12,77, 12,84, 12,33, 12,20, 13,12, 12,05, 12,15, 13,20, 14,03, 13,19, 13,05, 13,08, 13,31, 12,93, 13,25, 13,48, 12,77
+        Year	SampledMeans	Mean
+        2010 	13,48, 12,72, 13,09, 13,32, 13,40	13,202 
 
 Let's create a function for this procedure so that we can run it for multiple
 different columns:
@@ -949,7 +1376,7 @@ different columns:
                 nest() %>%
                 mutate(
                     SampledMeans=map(data, bootstrapping_function),
-                    Means=map(SampledMeans, function(x) mean(x[['SampledMeans']]))) %>%
+                    Mean=map(SampledMeans, function(x) mean(x[['SampledMeans']]))) %>%
                 select(-data)
 
             return(bootstrapped_means)
@@ -957,12 +1384,12 @@ different columns:
 
         bootstrapped_yearly_means = bootstrap_byteslog2_mean(yearly_bytes_sum, 'Year', 'Files', n_means=1000)
         glimpse(bootstrapped_yearly_means)
-        
+   
         Observations: 11
         Variables: 3
         $ Year         <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 20…
         $ SampledMeans <list> [<tbl_df[1000 x 1]>, <tbl_df[1000 x 1]>, <tbl_df[1000 x…
-        $ Means        <list> [12,96696, 14,04812, 10,67652, 13,39827, 14,02425, 11,7…
+        $ Mean         <list> [12,97675, 14,0463, 10,65216, 13,38878, 14,04548, 11,73…     
 
 For plotting we can unstack the ``SampledMeans``-dataframe.
 
@@ -988,18 +1415,18 @@ For plotting we can unstack the ``SampledMeans``-dataframe.
     .. code-block:: R
 
         bootstrapped_yearly_means_distribution <- bootstrapped_yearly_means %>%
-            select(-Means) %>%
+            select(-Mean) %>%
             unnest()
 
         head(bootstrapped_yearly_means_distribution)
 
         Year	SampledMeans
-        2010 	13,29
-        2010 	13,01
-        2010 	13,28
-        2010 	12,40
-        2010 	13,26
-        2010 	12,76
+        2010 	12,32
+        2010 	13,30
+        2010 	12,51
+        2010 	12,72
+        2010 	12,89
+        2010 	13,08
 
 Now we can plot distributions for the data and for the sample mean.
 
