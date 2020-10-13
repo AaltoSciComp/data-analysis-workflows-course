@@ -1525,7 +1525,7 @@ Let's use our new functions for monthly data as well:
         monthly_bytes_sum <- aggregate_filesize_data(filesizes, c('Month','BytesLog2'), c('Files', 'SpaceUsage'), sum)
         bootstrapped_monthly_means = bootstrap_byteslog2_mean(monthly_bytes_sum, 'Month', 'Files', n_means=1000)
         bootstrapped_monthly_means_distribution <- bootstrapped_monthly_means %>%
-            select(-Means) %>%
+            select(-Mean) %>%
             unnest()
 
         options(repr.plot.width=10, repr.plot.height=16)
