@@ -70,12 +70,12 @@ that adds to a zero array.
     .. code-block:: python
 
         n_zeros = 10000
-        times = 1000
+        ntimes = 1000
 
         z = np.zeros(n_zeros)
 
         time_for_1 = time.time()
-        for t in range(times):
+        for t in range(ntimes):
             for i in range(n_zeros):
                 z[i] = z[i] + 1
         time_for_2 = time.time()
@@ -85,7 +85,7 @@ that adds to a zero array.
         z = np.zeros(n_zeros)
 
         time_vec_1 = time.time()
-        for times in range(times):
+        for t in range(ntimes):
             z = z + 1
         time_vec_2 = time.time()
 
