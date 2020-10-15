@@ -588,24 +588,47 @@ Best practices
 ==============
 
 +------------+-----------------------+-----------------------------------+
-| Resource   | Best practice         | Simplest implementation           |
+| Resource   | Best practice         | Implementation strategies         |
 +============+=======================+===================================+
-| CPU        || Do not oversubscribe || Limit the number of processes to |
-|            || the CPU              || the amount that CPU can support. |
+| CPU        || Do not oversubscribe || Limit the number of processes /  |
+|            || the CPU.             || threads to the amount that CPU   |
+|            ||                      || can support.                     |
 +------------+-----------------------+-----------------------------------+
 | CPU        || Try to avoid cache   || Keep important data in           |
-|            || misses               || columns or numeric vectors       |
+|            || misses.              || columns or numeric vectors       |
 |            ||                      || (vector/array, ndarray).         |
 +------------+-----------------------+-----------------------------------+
-| CPU        || Use vectorization    || Operate on vectors using basic   |
+| CPU        || Use vectorization.   || Operate on vectors using basic   |
 |            ||                      || operators when possible. Use     |
 |            ||                      || existing functions from          |
 |            ||                      || libraries if possible.           |
 +------------+-----------------------+-----------------------------------+
-| RAM        || Use vectorization    || Operate on vectors using basic   |
-|            ||                      || operators when possible. Use     |
-|            ||                      || existing functions from          |
-|            ||                      || libraries if possible.           |
+| RAM        || Only keep data       || Select only relevant rows and    |
+|            || that will be used    || columns. Use storage to skip     |
+|            || later on by the      || unnecessary preprocessing steps. |
+|            || pipeline.            || Use nested dataframes if your    |
+|            ||                      || data doesn't fit to the tidy     |
+|            ||                      || data format. When dealing with   |
+|            ||                      || time series data resample it to  |
+|            ||                      || relevant time scale.             |
++------------+-----------------------+-----------------------------------+
+| RAM        || Keep data in good    || Use integers/floating point      |
+|            || data types.          || numbers for numeric data. Use    |
+|            ||                      || categories for columns where it  |
+|            ||                      || brings benefits. Turn dates to   |
+|            ||                      || proper date objects.             |
++------------+-----------------------+-----------------------------------+
+| RAM        || Release temporary    || Use functions to do              |
+|            || variables after they || calculations. Don't keep         |
+|            || are no longer        || unneeded variables in the global |
+|            || needed.              || scope.                           |
++------------+-----------------------+-----------------------------------+
+| RAM        || Enable garbage       || Use functions to do              |
+|            || collector.           || calculations. Explicitly delete  |
+|            ||                      || variables you no longer need.    |
+|            ||                      || Call garbage collector when      |
+|            ||                      || there's a good chance of         |
+|            ||                      || reclaiming used memory.          |
 +------------+-----------------------+-----------------------------------+
 | Storage    |                       |                                   |
 +------------+-----------------------+-----------------------------------+
