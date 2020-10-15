@@ -23,6 +23,7 @@ dependencies:
   - r-cairo
   - r-caret
   - r-e1071
+  - r-furrr
   - r-dbi
   - r-hdf5r
   - r-irkernel
