@@ -1087,6 +1087,8 @@ of top reigns, we see that we have captured many of these reigns in our dataset.
         2010-06-07 	1 	104745 	8700 	Nadal, Rafael 	L 	1986-06-03 	ESP 	103819 	392 days
         2011-07-04 	1 	104925 	13285 	Djokovic, Novak	R 	1987-05-22 	SRB 	104745 	371 days
 
+.. _chapter2-binary:
+
 **************************************************
 Using binary data formats to improve your pipeline
 **************************************************
