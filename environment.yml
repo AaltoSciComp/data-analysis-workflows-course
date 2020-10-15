@@ -43,6 +43,7 @@ dependencies:
   - sqlalchemy
   - xlrd
   - pip:
+    - memory_profiler
     - sphinx-tabs
     - sphinx_rtd_theme_ext_color_contrast
     - https://github.com/coderefinery/sphinx-lesson/archive/master.zip

@@ -936,6 +936,8 @@ that can do the fitting for us.
 
     .. image:: images/fit-space-function_r.svg
 
+.. _chapter-3-bootstrap:
+
 *********************************************************************************
 Using bootstrapping/resampling methods for the calculation of statistical moments
 *********************************************************************************
