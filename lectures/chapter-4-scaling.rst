@@ -25,7 +25,10 @@ Processor is the quintessential resource when it comes to data analysis. It
 is used throughout the pipeline from data loading to data analysis and thus
 it is important to know some features about them.
 
-Firstly, modern processors are built from multiple cores. Sometimes these
+Cores vs threads
+****************
+
+Modern processors are built from multiple cores. Sometimes these
 cores can house multiple threads. This is called hyperthreading.
 
 .. image:: images/processor.svg
@@ -37,9 +40,12 @@ launch on a given CPU is the number of threads/cores that are available. If you
 launch a larger number, you will oversubscribe the CPUs and the code will run
 slower as different threads/processes will have to swap in/out of the CPUs.
 
-Secondly, operations on data are done as
+Processor cache
+***************
+
+Operations on data are done with
 `instructions <https://en.wikipedia.org/wiki/Instruction_set_architecture>`_
-inside the cores. These instructions handle calculations such as addition,
+inside the cores. These instructions do calculations such as addition,
 multiplication etc.. However, in order to get maximum throughput of finished
 instructions, all modern CPU architectures have multiple layers of data caching
 and prefetching that try to keep the calculating parts of the CPU as busy as
@@ -59,6 +65,9 @@ so-called
 `row-major-ordering <https://en.wikipedia.org/wiki/Row-_and_column-major_order>`_.
 It is also important to keep this order in mind when doing operations with
 multidimensional arrays.
+
+Vectorized instructions
+***********************
 
 Another important feature of modern processors is that they support vectorized
 instructions (AVX, AVX2, AVX512). These dramatically improve the performance
@@ -165,22 +174,29 @@ RAM as a resource
 RAM stores the data and variables that you operate on during your data
 analysis workflow. From RAM the data is transferred to processor caches for
 operations. In data science pipelines the biggest problem is usually that
-one runs out of memory when dealing with big datasets. When thinking about
-memory one should always think about the ceiling of memory usage:
+one runs out of memory when dealing with big datasets.
 
-- Let's say we read dataset ``d_raw`` e.g. from a csv.
-- We convert columns/modify with the input reading part of our pipeline
-  ``I(x)`` and obtain a dataset ``d``.
+Memory ceiling
+**************
 
-Now the size of the memory we need is
-``size(I(d_raw)) = size(d) + size(d_raw)`` and we know that that is our
-memory ceiling for the data loading. Now if we keep the original dataset in
-memory the ceiling becomes a floor for the next part of our pipeline and we
-start to accumulate memory even though we no longer need some of our previous
-objects. This is visualized in the image below:
+When thinking about memory one should always think about the ceiling of memory
+usage. Let's say that during our input loading part ``I(x)`` of our pipeline
+we read dataset ``d_raw`` e.g. from a csv and we convert/modify our columns
+to obtain a dataset ``d``. Now the size of the memory we need is
+``size(I(d_raw)) = size(d) + size(d_raw)`` and we know that this is our
+memory ceiling for the data loading.
+
+Let's say that we keep the original dataset ``d_raw`` in memory through
+our full pipeline. Then the memory ceiling of ``I(x)`` becomes a floor
+for the next part of our pipeline and we start to accumulate memory even
+though we no longer need some of our previous objects. This is visualized
+in the image below:
 
 .. image:: images/ram-pipeline.svg
     :align: center
+
+Calculating memory usage
+************************
 
 Let's consider
 :ref:`boostrapping model <chapter-3-bootstrap>`
@@ -344,14 +360,17 @@ From the output we can see the following things:
 - Converting numerical data with many categories (``BytesLog2``) into
   categorical type can increase memory consumption.
 
-These past datasets become increasingly important when they are carried
-around throughout the pipeline. Both Python and R have a garbage collector
-that runs occationally and removes unneeded memory allocations. Each object
-has a reference counter that tells the garbage collector how many times
-the object is referenced. Each time you e.g. assign the object into a variable
-the reference counter is increased and each time you overwrite/delete a
-variable the reference counter is decreased. Once it reaches zero the
-garbage collector knows that the object can be removed.
+Garbage collector
+*****************
+
+As mentioned previously, these past datasets become increasingly important
+when they are carried around throughout the pipeline. Both Python and R have
+a garbage collector that runs occationally and removes unneeded memory
+allocations. Each object has a reference counter that tells the garbage
+collector how many times the object is referenced. Each time you e.g. assign
+the object into a variable the reference counter is increased and each time
+you overwrite/delete a variable the reference counter is decreased. Once it
+reaches zero the garbage collector knows that the object can be removed.
 
 To help garbage collector one can create parts of your pipeline as functions.
 By writing code as function all temporary variables are created to the
@@ -418,6 +437,8 @@ explicitly removed, etc.)
     `memory_profiler <https://github.com/pythonprofilers/memory_profiler>`_-package.
     It is included in the updated ``environment.yml``, but can also be installed
     with ``pip install memory_profiler`` while the environment is activated.
+    
+    `Python's gc.collect-function <https://docs.python.org/3/library/gc.html#gc.collect>`_
 
     .. code-block:: python
 
@@ -474,6 +495,8 @@ explicitly removed, etc.)
         peak memory: 435.05 MiB, increment: 206.00 MiB
 
   .. tab:: R
+  
+    `R's gc-function <https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/gc>`_
 
     .. code-block:: R
 
@@ -534,6 +557,13 @@ explicitly removed, etc.)
         206 MB
 
         1.00000000977889
+
+By using these strategies we make it possible for the garbage cleaner to
+release memory during pipeline's execution. This reduces our memory ceiling
+considerably.
+
+.. image:: images/ram-pipeline-gc.svg
+    :align: center
 
 Time as a resource
 ==================
