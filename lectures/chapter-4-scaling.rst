@@ -1312,56 +1312,56 @@ Lets profile the bootstrapping pipeline from chapter 3:
         print('Top methods by cumulative time:\n')
         print('\n'.join(method_lines[:20]))
         
-                17987532 function calls (17324700 primitive calls) in 17.942 seconds
+                    17987532 function calls (17324700 primitive calls) in 17.942 seconds
 
-       Ordered by: internal time
-       List reduced from 1380 to 20 due to restriction <20>
+           Ordered by: internal time
+           List reduced from 1380 to 20 due to restriction <20>
 
-       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
-       110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
-       330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
-    110123/110121    1.072    0.000    6.371    0.000 algorithms.py:1616(take_nd)
-    551172/331084    0.769    0.000    7.990    0.000 {built-in method numpy.array}
-       110121    0.545    0.000    1.822    0.000 algorithms.py:1487(_get_take_nd_function)
-       110011    0.518    0.000    1.555    0.000 _methods.py:143(_mean)
-      2553898    0.474    0.000    0.676    0.000 {built-in method builtins.isinstance}
-       110088    0.410    0.000    1.660    0.000 cast.py:442(maybe_promote)
-       110062    0.392    0.000    0.392    0.000 {pandas._libs.algos.take_1d_int64_int64}
-       440191    0.369    0.000    0.369    0.000 generic.py:5123(__getattr__)
-       220504    0.367    0.000    1.223    0.000 _dtype.py:321(_name_get)
-       551555    0.352    0.000    0.973    0.000 common.py:1460(is_extension_array_dtype)
-       110026    0.319    0.000    7.160    0.000 categorical.py:1241(__array__)
-       110040    0.313    0.000    0.973    0.000 fromnumeric.py:70(_wrapreduction)
-       551553    0.312    0.000    0.471    0.000 base.py:413(find)
-       110011    0.303    0.000    0.366    0.000 _methods.py:59(_count_reduce_items)
-       110144    0.285    0.000    0.285    0.000 {pandas._libs.algos.ensure_int64}
-      2096198    0.271    0.000    0.271    0.000 {built-in method builtins.issubclass}
-           11    0.236    0.021   17.819    1.620 <ipython-input-155-181f53677fac>:4(get_bootstrapped_means)
-       220004    0.231    0.000    8.881    0.000 series.py:750(__array__)
+           ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+           110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
+           330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+           110123/110121    1.072    0.000    6.371    0.000 algorithms.py:1616(take_nd)
+           551172/331084    0.769    0.000    7.990    0.000 {built-in method numpy.array}
+           110121    0.545    0.000    1.822    0.000 algorithms.py:1487(_get_take_nd_function)
+           110011    0.518    0.000    1.555    0.000 _methods.py:143(_mean)
+           2553898    0.474    0.000    0.676    0.000 {built-in method builtins.isinstance}
+           110088    0.410    0.000    1.660    0.000 cast.py:442(maybe_promote)
+           110062    0.392    0.000    0.392    0.000 {pandas._libs.algos.take_1d_int64_int64}
+           440191    0.369    0.000    0.369    0.000 generic.py:5123(__getattr__)
+           220504    0.367    0.000    1.223    0.000 _dtype.py:321(_name_get)
+           551555    0.352    0.000    0.973    0.000 common.py:1460(is_extension_array_dtype)
+           110026    0.319    0.000    7.160    0.000 categorical.py:1241(__array__)
+           110040    0.313    0.000    0.973    0.000 fromnumeric.py:70(_wrapreduction)
+           551553    0.312    0.000    0.471    0.000 base.py:413(find)
+           110011    0.303    0.000    0.366    0.000 _methods.py:59(_count_reduce_items)
+           110144    0.285    0.000    0.285    0.000 {pandas._libs.algos.ensure_int64}
+           2096198    0.271    0.000    0.271    0.000 {built-in method builtins.issubclass}
+               11    0.236    0.021   17.819    1.620 <ipython-input-155-181f53677fac>:4(get_bootstrapped_means)
+           220004    0.231    0.000    8.881    0.000 series.py:750(__array__)
 
 
-    Top methods by cumulative time:
+        Top methods by cumulative time:
 
-       110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
-       330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
-       110173    0.065    0.000    0.420    0.000 {method 'any' of 'numpy.ndarray' objects}
-       220315    0.104    0.000    0.104    0.000 {method 'format' of 'str' objects}
-       220266    0.080    0.000    0.080    0.000 {method 'get' of 'dict' objects}
-       110135    0.064    0.000    0.064    0.000 {method 'view' of 'numpy.ndarray' objects}
-       110070    0.022    0.000    0.022    0.000 {method 'items' of 'dict' objects}
-            1    0.000    0.000    0.008    0.008 {method 'get_indexer' of 'pandas._libs.index.BaseMultiIndexCodesEngine' objects}
-            2    0.003    0.002    0.004    0.002 {method 'get_indexer_non_unique' of 'pandas._libs.index.IndexEngine' objects}
-            1    0.002    0.002    0.002    0.002 {method 'read' of 'pandas._libs.parsers.TextReader' objects}
-           48    0.002    0.000    0.002    0.000 {method 'get_indexer' of 'pandas._libs.index.IndexEngine' objects}
-           29    0.000    0.000    0.000    0.000 {method 'sum' of 'numpy.ndarray' objects}
-           40    0.000    0.000    0.000    0.000 {method 'max' of 'numpy.ndarray' objects}
-           18    0.000    0.000    0.000    0.000 {method 'argsort' of 'numpy.ndarray' objects}
-           90    0.000    0.000    0.000    0.000 {method 'copy' of 'numpy.ndarray' objects}
-           80    0.000    0.000    0.000    0.000 {method 'astype' of 'numpy.ndarray' objects}
-           27    0.000    0.000    0.000    0.000 {method 'all' of 'numpy.ndarray' objects}
-         1419    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
-            4    0.000    0.000    0.000    0.000 {method 'get_labels_groupby' of 'pandas._libs.hashtable.Int64HashTable' objects}
-            3    0.000    0.000    0.000    0.000 {method 'factorize' of 'pandas._libs.hashtable.Int64HashTable' objects}
+           110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
+           330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+           110173    0.065    0.000    0.420    0.000 {method 'any' of 'numpy.ndarray' objects}
+           220315    0.104    0.000    0.104    0.000 {method 'format' of 'str' objects}
+           220266    0.080    0.000    0.080    0.000 {method 'get' of 'dict' objects}
+           110135    0.064    0.000    0.064    0.000 {method 'view' of 'numpy.ndarray' objects}
+           110070    0.022    0.000    0.022    0.000 {method 'items' of 'dict' objects}
+                1    0.000    0.000    0.008    0.008 {method 'get_indexer' of 'pandas._libs.index.BaseMultiIndexCodesEngine' objects}
+                2    0.003    0.002    0.004    0.002 {method 'get_indexer_non_unique' of 'pandas._libs.index.IndexEngine' objects}
+                1    0.002    0.002    0.002    0.002 {method 'read' of 'pandas._libs.parsers.TextReader' objects}
+               48    0.002    0.000    0.002    0.000 {method 'get_indexer' of 'pandas._libs.index.IndexEngine' objects}
+               29    0.000    0.000    0.000    0.000 {method 'sum' of 'numpy.ndarray' objects}
+               40    0.000    0.000    0.000    0.000 {method 'max' of 'numpy.ndarray' objects}
+               18    0.000    0.000    0.000    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+               90    0.000    0.000    0.000    0.000 {method 'copy' of 'numpy.ndarray' objects}
+               80    0.000    0.000    0.000    0.000 {method 'astype' of 'numpy.ndarray' objects}
+               27    0.000    0.000    0.000    0.000 {method 'all' of 'numpy.ndarray' objects}
+             1419    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+                4    0.000    0.000    0.000    0.000 {method 'get_labels_groupby' of 'pandas._libs.hashtable.Int64HashTable' objects}
+                3    0.000    0.000    0.000    0.000 {method 'factorize' of 'pandas._libs.hashtable.Int64HashTable' objects}
 
   .. tab:: R
 
@@ -1410,6 +1410,7 @@ Here we can see an possible improvement on our calculation:
 - Our current version of the code creates an array of zeros for the means.
 - Afterwards it populates the array by going through a for loop of size
   ``n_means`` and on each iteration it does the following:
+
     - It picks 100 values from a distribution defined by the file sizes.
     - It calculates the means of the 100 values.
     - It places the mean to the array.
@@ -1417,7 +1418,7 @@ Here we can see an possible improvement on our calculation:
 This results in a huge number of function calls that is visible in our
 profiling data. If instead of that we would do:
 
-- Pick 100*``n_means`` values from the distribution defined by the file size.
+- Pick 100 x ``n_means`` values from the distribution defined by the file size.
 - Reshape the values to a 2D-array with shape (100, ``n_means``)
 - Calculate means of this array along the first axis. This provides us an
   array of size ``n_means`` with means from 100 random values.
@@ -1429,6 +1430,8 @@ this:
 .. tabs::
 
   .. tab:: Python
+  
+    Old version:
 
     .. code-block:: python
 
@@ -1437,18 +1440,24 @@ this:
         # Calculate resampled mean
             means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
 
+    Optimized version:
+
     .. code-block:: python
     
         means = np.mean(np.random.choice(target_data, 100*n_means, replace=True, p=weight_data).reshape(100,n_means), axis=0)
 
   .. tab:: R
 
+    Old version:
+    
     .. code-block:: R
 
         for (i in seq(n_means)) {
             # Calculate resampled mean
             means[[i]] <- mean(sample(target_data, 100, replace=TRUE, prob=weight_data))
         }
+
+    Optimized version:
 
     .. code-block:: R
     
