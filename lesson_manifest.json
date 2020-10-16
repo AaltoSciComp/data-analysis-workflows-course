@@ -27,5 +27,9 @@
     { "filename": "ch3-r-lecture.ipynb", "directory": "r_exercises" },
     { "filename": "ch3-r-ex1.ipynb", "directory": "r_exercises" },
     { "filename": "ch3-r-ex1-solution.ipynb", "directory": "r_exercises" }
+  ],
+  "lesson 4": [
+    { "filename": "ch4-python-lecture.ipynb", "directory": "python_exercises" },
+    { "filename": "ch4-r-lecture.ipynb", "directory": "r_exercises" },
   ]
 }
