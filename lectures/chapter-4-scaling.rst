@@ -1268,9 +1268,9 @@ than any potential speedup. For example, the R version of our bootstrapping
 code was so fast and the initialization of the pool so slow, that speedup
 could only be observed after the number of means calculated was nearing 100000.
 
-==============================
+******************************
 Optimizing code with profilers
-==============================
+******************************
 
 For both Python and R there exists many good profiling suites, but both also
 come with a good profiler that can describe where the code uses most of its
@@ -1533,9 +1533,9 @@ So this simple observation provided by the profiler gave us a performance
 benefits that completely overshadow any benefits that could be gained from the
 multiprocessing implementation.
 
-==============================
+******************************
 Collecting everything together
-==============================
+******************************
 
 When doing data analysis it is important to get a firm grasp of the basic
 questions: What am I doing? What is my ultimate goal?
