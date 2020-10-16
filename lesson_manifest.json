@@ -30,6 +30,6 @@
   ],
   "lesson 4": [
     { "filename": "ch4-python-lecture.ipynb", "directory": "python_exercises" },
-    { "filename": "ch4-r-lecture.ipynb", "directory": "r_exercises" },
+    { "filename": "ch4-r-lecture.ipynb", "directory": "r_exercises" }
   ]
 }
