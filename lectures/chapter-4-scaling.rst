@@ -844,14 +844,15 @@ If your data code does a lot of matrix operations or frequency analysis it
 might be a good idea to check that your code uses multiple threads during
 its calculations.
 
-Below we 
+Below is an example that does a simple matrix inversion for a symmetrical
+matrix of size 4000 by 4000 with 1 and 4 threads.
 
 .. tabs::
 
   .. tab:: Python
   
     This example uses
-    `mkl <https://docs.anaconda.com/mkl-service/>`-module provided by Anaconda
+    `mkl <https://docs.anaconda.com/mkl-service/>`_-module provided by Anaconda
     to change the number of threads during runtime. In normal use it is better
     to set the ``OMP_NUM_THREADS``-environment variable as that works with
     various different libraries.
@@ -989,7 +990,13 @@ Doing parallel maps with multiprocessing
 
 One of the easiest ways of parallelization besides the data parallelization
 is to use parallel mappings. In parallel mappings a pool of workers is created
-with a number of workers. Afterwards a function is run on each 
+with a number of workers. Afterwards, when the parallel map functions is
+called with a function and a iterable list-like object, the parallel map splits
+elements from the list to the workers and each worker operates the function on
+its element.
+
+Below is a minimal working example. Using parallelization in this case provides
+no speed benefits, but this example shows how the parallel pool works.
 
 .. tabs::
 
@@ -1083,7 +1090,8 @@ with a number of workers. Afterwards a function is run on each
         $ y <int> 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225, 256,…
 
 If the data has been formatted as nested dataframes an analysis function can be
-be run on all of the split pieces of the dataset.
+run on the split pieces of the dataset. These are the situations where the
+parallel pool can provided a significant speedup.
 
 Let's use parallel mappings to parallelize the pipeline from chapter 3.
 
@@ -1246,3 +1254,299 @@ Let's use parallel mappings to parallelize the pipeline from chapter 3.
         [1] "Maximum difference between calculated means: 0.005813"
         [1] "Time taken by 4 workers: 5.47 Speedup was: 2.18"
         [1] "Maximum difference between calculated means: 0.005813"
+
+There are some downsides to using parallel pools. Firstly, because the
+processing is done in a separate process, the data given to the processing
+function needs to be serialized and given to the other process. This means
+that the data that is already in memory is copied multiple times across the
+parallel pool. This can be somewhat mitigated by giving each process the bare
+minimum of data that they need to complete their task.
+
+Second problem is related to the initialization of the parallel pool. For
+small tasks the time that is required to initialize the pool can be much larger
+than any potential speedup. For example, the R version of our bootstrapping
+code was so fast and the initialization of the pool so slow, that speedup
+could only be observed after the number of means calculated was nearing 100000.
+
+==============================
+Optimizing code with profilers
+==============================
+
+For both Python and R there exists many good profiling suites, but both also
+come with a good profiler that can describe where the code uses most of its
+time.
+
+Lets profile the bootstrapping pipeline from chapter 3:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        import cProfile
+        import pstats
+        import io
+
+        # Initiate profiler
+        pr = cProfile.Profile(subcalls=False)
+        pr.enable()
+
+        # Run the pipeline
+        chapter3_pipeline(n_means=10000)
+
+        # Stop profiling
+        pr.disable()
+
+        # Print stats by total time used (top 20)
+        ps = pstats.Stats(pr).strip_dirs().sort_stats('tottime')
+        ps.print_stats(20)
+
+        # Print into a StringIO buffer and find top 20 function calls by cumulative time
+        io_stream = io.StringIO()
+        ps_methods = pstats.Stats(pr, stream=io_stream).strip_dirs().sort_stats('cumulative')
+        ps_methods.print_stats()
+
+        method_lines = [ line for line in io_stream.getvalue().split('\n') if ' {method' in line ]
+
+        print('Top methods by cumulative time:\n')
+        print('\n'.join(method_lines[:20]))
+        
+                17987532 function calls (17324700 primitive calls) in 17.942 seconds
+
+       Ordered by: internal time
+       List reduced from 1380 to 20 due to restriction <20>
+
+       ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
+       330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+    110123/110121    1.072    0.000    6.371    0.000 algorithms.py:1616(take_nd)
+    551172/331084    0.769    0.000    7.990    0.000 {built-in method numpy.array}
+       110121    0.545    0.000    1.822    0.000 algorithms.py:1487(_get_take_nd_function)
+       110011    0.518    0.000    1.555    0.000 _methods.py:143(_mean)
+      2553898    0.474    0.000    0.676    0.000 {built-in method builtins.isinstance}
+       110088    0.410    0.000    1.660    0.000 cast.py:442(maybe_promote)
+       110062    0.392    0.000    0.392    0.000 {pandas._libs.algos.take_1d_int64_int64}
+       440191    0.369    0.000    0.369    0.000 generic.py:5123(__getattr__)
+       220504    0.367    0.000    1.223    0.000 _dtype.py:321(_name_get)
+       551555    0.352    0.000    0.973    0.000 common.py:1460(is_extension_array_dtype)
+       110026    0.319    0.000    7.160    0.000 categorical.py:1241(__array__)
+       110040    0.313    0.000    0.973    0.000 fromnumeric.py:70(_wrapreduction)
+       551553    0.312    0.000    0.471    0.000 base.py:413(find)
+       110011    0.303    0.000    0.366    0.000 _methods.py:59(_count_reduce_items)
+       110144    0.285    0.000    0.285    0.000 {pandas._libs.algos.ensure_int64}
+      2096198    0.271    0.000    0.271    0.000 {built-in method builtins.issubclass}
+           11    0.236    0.021   17.819    1.620 <ipython-input-155-181f53677fac>:4(get_bootstrapped_means)
+       220004    0.231    0.000    8.881    0.000 series.py:750(__array__)
+
+
+    Top methods by cumulative time:
+
+       110000    4.657    0.000   15.621    0.000 {method 'choice' of 'numpy.random.mtrand.RandomState' objects}
+       330370    1.327    0.000    1.327    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+       110173    0.065    0.000    0.420    0.000 {method 'any' of 'numpy.ndarray' objects}
+       220315    0.104    0.000    0.104    0.000 {method 'format' of 'str' objects}
+       220266    0.080    0.000    0.080    0.000 {method 'get' of 'dict' objects}
+       110135    0.064    0.000    0.064    0.000 {method 'view' of 'numpy.ndarray' objects}
+       110070    0.022    0.000    0.022    0.000 {method 'items' of 'dict' objects}
+            1    0.000    0.000    0.008    0.008 {method 'get_indexer' of 'pandas._libs.index.BaseMultiIndexCodesEngine' objects}
+            2    0.003    0.002    0.004    0.002 {method 'get_indexer_non_unique' of 'pandas._libs.index.IndexEngine' objects}
+            1    0.002    0.002    0.002    0.002 {method 'read' of 'pandas._libs.parsers.TextReader' objects}
+           48    0.002    0.000    0.002    0.000 {method 'get_indexer' of 'pandas._libs.index.IndexEngine' objects}
+           29    0.000    0.000    0.000    0.000 {method 'sum' of 'numpy.ndarray' objects}
+           40    0.000    0.000    0.000    0.000 {method 'max' of 'numpy.ndarray' objects}
+           18    0.000    0.000    0.000    0.000 {method 'argsort' of 'numpy.ndarray' objects}
+           90    0.000    0.000    0.000    0.000 {method 'copy' of 'numpy.ndarray' objects}
+           80    0.000    0.000    0.000    0.000 {method 'astype' of 'numpy.ndarray' objects}
+           27    0.000    0.000    0.000    0.000 {method 'all' of 'numpy.ndarray' objects}
+         1419    0.000    0.000    0.000    0.000 {method 'replace' of 'str' objects}
+            4    0.000    0.000    0.000    0.000 {method 'get_labels_groupby' of 'pandas._libs.hashtable.Int64HashTable' objects}
+            3    0.000    0.000    0.000    0.000 {method 'factorize' of 'pandas._libs.hashtable.Int64HashTable' objects}
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        # Initiate profiler
+        profile_tempfile <- tempfile()
+        Rprof(profile_tempfile, memory.profiling=TRUE)
+
+        # Run the pipeline
+        glimpse(chapter3_pipeline(10000))
+
+        # Stop profiling
+        Rprof()
+
+        # Print top 20 function calls by cumulative time
+        summaryRprof(profile_tempfile, memory='both')['by.self']
+
+        # Remove profiling file
+        unlink(profile_tempfile)
+
+        Observations: 11
+        Variables: 2
+        $ Year <fct> 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020
+        $ Mean <list> [12.97377, 14.04683, 10.66846, 13.41066, 14.05093, 11.75272, 13…
+
+        $by.self =
+            self.time	self.pct	total.time	total.pct	mem.total
+        "sample.int"	0.70 	52.24	0.70 	52.24	300.6
+        "mean"	0.30 	22.39	1.30 	97.01	561.0
+        "sample"	0.18 	13.43	0.90 	67.16	367.3
+        "mean.default"	0.08 	5.97	0.10 	7.46	44.5
+        "factor"	0.02 	1.49	0.02 	1.49	1.8
+        "is.numeric"	0.02 	1.49	0.02 	1.49	11.1
+        "length"	0.02 	1.49	0.02 	1.49	0.0
+        "NextMethod"	0.02 	1.49	0.02 	1.49	0.0
+
+When reading these profiling reports it is usually good idea to focus on the
+functions that use most of the time. Both profilers can also show the lines
+where the functions have been defined. In our case we do not need to look far:
+the sampling functions and mean calculation functions within the bootstrapping
+function were obviously the ones that used the most time.
+
+Here we can see an possible improvement on our calculation:
+
+- Our current version of the code creates an array of zeros for the means.
+- Afterwards it populates the array by going through a for loop of size
+  ``n_means`` and on each iteration it does the following:
+    - It picks 100 values from a distribution defined by the file sizes.
+    - It calculates the means of the 100 values.
+    - It places the mean to the array.
+
+This results in a huge number of function calls that is visible in our
+profiling data. If instead of that we would do:
+
+- Pick 100*``n_means`` values from the distribution defined by the file size.
+- Reshape the values to a 2D-array with shape (100, ``n_means``)
+- Calculate means of this array along the first axis. This provides us an
+  array of size ``n_means`` with means from 100 random values.
+
+We can do this because we were picking with replacement from the distribution
+and each choice is independent of the others. In code this change looks like
+this:
+
+.. tabs::
+
+  .. tab:: Python
+
+    .. code-block:: python
+
+        means = np.zeros(n_means, dtype=np.float64)
+        for i in range(n_means):
+        # Calculate resampled mean
+            means[i] = np.mean(np.random.choice(target_data, 100, replace=True, p=weight_data))
+
+    .. code-block:: python
+    
+        means = np.mean(np.random.choice(target_data, 100*n_means, replace=True, p=weight_data).reshape(100,n_means), axis=0)
+
+  .. tab:: R
+
+    .. code-block:: R
+
+        for (i in seq(n_means)) {
+            # Calculate resampled mean
+            means[[i]] <- mean(sample(target_data, 100, replace=TRUE, prob=weight_data))
+        }
+
+    .. code-block:: R
+    
+        # Calculate resampled means
+        choices <- sample(target_data, 100*n_means, replace=TRUE, prob=weight_data)
+        dim(choices) <- c(100, n_means)
+        means <- colMeans(choices)
+
+We can test if this sped up our work by running the multiprocessing example again. This time the outputs are as follows:
+
+
+.. tabs::
+
+  .. tab:: Python
+  
+    (10000 means)
+
+    .. code-block:: python
+
+        Original pipeline: 0.52
+              Year       Mean
+        0   2010.0  12.974113
+        1   2011.0  14.041508
+        2   2012.0  10.675136
+        3   2013.0  13.409025
+        4   2014.0  14.039268
+        5   2015.0  11.741009
+        6   2016.0  13.542446
+        7   2017.0  11.971165
+        8   2018.0  13.277415
+        9   2019.0  13.699354
+        10  2020.0  13.225932
+        Time taken by 1 workers: 0.60 Speedup was: 0.86
+        Maximum difference between calculated means: 0.013555000000000206
+        Time taken by 2 workers: 0.42 Speedup was: 1.23
+        Maximum difference between calculated means: 0.012925000000000963
+        Time taken by 3 workers: 0.45 Speedup was: 1.16
+        Maximum difference between calculated means: 0.012925000000000963
+        Time taken by 4 workers: 0.33 Speedup was: 1.57
+        Maximum difference between calculated means: 0.012925000000000963
+
+  .. tab:: R
+  
+    (100000 means)
+
+    .. code-block:: R
+
+        [1] "Original pipeline: 5.36"
+
+        Year	Mean
+        2010 	12.97988
+        2011 	14.04280
+        2012 	10.66727
+        2013 	13.41303
+        2014 	14.04364
+        2015 	11.74586
+        2016 	13.54195
+        2017 	11.97510
+        2018 	13.27952
+        2019 	13.70200
+        2020 	13.22529
+
+        [1] "Time taken by 1 workers: 5.52 Speedup was: 0.97"
+        [1] "Maximum difference between calculated means: 0.005160"
+        [1] "Time taken by 2 workers: 3.72 Speedup was: 1.44"
+        [1] "Maximum difference between calculated means: 0.003600"
+        [1] "Time taken by 3 workers: 3.58 Speedup was: 1.50"
+        [1] "Maximum difference between calculated means: 0.003597"
+        [1] "Time taken by 4 workers: 3.49 Speedup was: 1.54"
+        [1] "Maximum difference between calculated means: 0.003597"
+
+So this simple observation provided by the profiler gave us a performance
+benefits that completely overshadow any benefits that could be gained from the
+multiprocessing implementation.
+
+==============================
+Collecting everything together
+==============================
+
+When doing data analysis it is important to get a firm grasp of the basic
+questions: What am I doing? What is my ultimate goal?
+
+The road to solving data analysis problems can often be a winding one, and
+keeping concepts such as pipelines, understandable interfaces,
+functional modules and tidy format close at hand can reduce the risk of
+creating mazes of code that become hard to navigate out of.
+
+These processes are empowered by keeping in mind how the computer sees your
+work: as instructions for operations and binary data to be operated on. By
+recognizing the parts of your code that are most heavily involved with the
+machine: vectorized calculations and data transfer from storage to memory
+to cache, you can optimize that which does most of the work and leave the
+rest for the machine to handle.
+
+Throughout these workflows one should also revere the work created by other
+scientists around the world in the form of efficient libraries that allow
+us to do complex workflows with minimal work. Following the standards created
+by the communities and propagating the use of these libraries makes transferral
+of ideas easier.
+
+And transferring ideas is what science is all about.
