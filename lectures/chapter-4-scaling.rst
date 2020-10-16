@@ -71,7 +71,7 @@ Vectorized instructions
 Another important feature of modern processors is that they support vectorized
 instructions (AVX, AVX2, AVX512). These dramatically improve the performance
 when one does the same operation for multiple pieces of data e.g. elementwise
-addition. R, numpy and mathematical libraries that they use such as MKL, BLAS
+addition. R, numpy and mathematical libraries that they use such as MKL, BLAS,
 LAPACK, FFTW etc. use these operations straight out of the box, if the program
 is written to use functions from these packages.
 
@@ -269,8 +269,10 @@ One can calculate the size of a dataset in the following fashion:
 
         filesizes = load_filesizes('../data/filesizes_timestamps.txt')
         yearly_bytes_sum = aggregate_filesize_data(filesizes, ['Year','BytesLog2'], ['Files', 'SpaceUsage'], 'sum')
+        
         print(filesizes.memory_usage(deep=True))
         print(yearly_bytes_sum.memory_usage(deep=True))
+        
         filesizes_size = filesizes.memory_usage(deep=True).sum()
         summarized_size = yearly_bytes_sum.memory_usage(deep=True).sum()
         print("""
@@ -671,13 +673,16 @@ The following rules of thumb work for most cases:
 2. Avoid having lots of small files.
 3. Avoid huge files (over 100GB).
 4. Split your data so that each file can be analyzed independently.
-5. Read only relevant data.
-6. Use existing readers.
-7. Read data in big chunks.
+5. Use existing readers/writers.
+6. Read/write only relevant data.
+7. Read/write data in big chunks.
 8. Do not read randomly from a file. Shuffle data by shuffling indixing arrays,
    not the data itself.
-9. If you need to get random subsets of huge data (more than there's memory),
-   create a randomly shuffled file and read it chunk at a time.
+9. Do not write results in a constant stream if its not human-readable
+   status information. After the program has done something meaningful, 
+   collect output into chunks and write it as a whole.
+10. If you need to get random subsets of huge data (more than there's memory),
+    create a randomly shuffled file and read it chunk at a time.
 
 Storage as a balancing resource
 *******************************
@@ -790,14 +795,18 @@ Best practices
 |            || files.               || pieces that you can analyze      |
 |            ||                      || independently.                   |
 +------------+-----------------------+-----------------------------------+
-| Storage    || Read your data in    || Use good libraries and binary    |
+| Storage    || Access your data in  || Use good libraries and binary    |
 |            || big chunks.          || data formats.                    |
 +------------+-----------------------+-----------------------------------+
-| Storage    || Avoid random reads.  || Shuffle data in memory by        |
+| Storage    || Avoid random access. || Shuffle data in memory by        |
 |            ||                      || shuffling indexing arrays, not   |
 |            ||                      || the data. When working with huge |
 |            ||                      || data, do the shuffling           |
 |            ||                      || beforehand, if possible.         |
++------------+-----------------------+-----------------------------------+
+| Storage    || Avoid constant       || Write results in chunks after    |
+|            || stream of writes.    || the program has created          |
+|            ||                      || something of value.              |
 +------------+-----------------------+-----------------------------------+
 
 **************************
