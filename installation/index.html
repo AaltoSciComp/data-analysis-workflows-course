@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Software installation &mdash; Data analysis workflows with R and Python  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/tabs.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_lesson.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_rtd_theme_ext_color_contrast.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/togglebutton.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/minipres.js"></script>
+        <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="prev" title="Chapter 4: Scaling" href="../chapter-4-scaling/" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../" class="icon icon-home" alt="Documentation Home"> Data analysis workflows with R and Python
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Course lessons</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-1-understanding/">Chapter 1: Understanding data analysis workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-2-data/">Chapter 2: Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-3-modeling/">Chapter 3: Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-4-scaling/">Chapter 4: Scaling</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Software installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#conda-installation">Conda installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-course-environment">Installing course environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#linux-and-mac-osx-terminal">Linux and Mac OSX (terminal)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#windows-anaconda-navigator">Windows (Anaconda Navigator)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-your-installation">Testing your installation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">Data analysis workflows with R and Python</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Software installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/AaltoSciComp/data-analysis-workflows-course/blob/master/lectures/installation.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="software-installation">
+<h1>Software installation<a class="headerlink" href="#software-installation" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="conda-installation">
+<h2>Conda installation<a class="headerlink" href="#conda-installation" title="Permalink to this headline">¶</a></h2>
+<p>This course will use <a class="reference external" href="https://docs.continuum.io/anaconda/install/">Conda</a>
+as the base installation platform as it can provide both Python and R
+installations for multiple operating systems.</p>
+<p>We recommend using
+<a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda</a>,
+but Miniconda will work as well.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If you install Anaconda through your university’s software center,
+you might not be able to create environments!  At least this is the
+case with Aalto University on some operating systems.  It is safest
+to install it yourself, as your user.</p>
+</div>
+</div>
+<div class="section" id="installing-course-environment">
+<h2>Installing course environment<a class="headerlink" href="#installing-course-environment" title="Permalink to this headline">¶</a></h2>
+<p>All of the required software is included in the course’s
+<a class="reference external" href="https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml">environment.yml</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">dataanalysis</span>
+<span class="n">channels</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+  <span class="o">-</span> <span class="n">defaults</span>
+<span class="n">dependencies</span><span class="p">:</span>
+  <span class="o">-</span> <span class="n">colorama</span>
+  <span class="o">-</span> <span class="n">git</span>
+  <span class="o">-</span> <span class="n">gitdb</span>
+  <span class="o">-</span> <span class="n">gitpython</span>
+  <span class="o">-</span> <span class="n">h5py</span>
+  <span class="o">-</span> <span class="n">jupyter</span>
+  <span class="o">-</span> <span class="n">jupyterlab</span>
+  <span class="o">-</span> <span class="n">jupyterlab</span><span class="o">-</span><span class="n">git</span>
+  <span class="o">-</span> <span class="n">matplotlib</span>
+  <span class="o">-</span> <span class="n">numpy</span>
+  <span class="o">-</span> <span class="n">nodejs</span>
+  <span class="o">-</span> <span class="n">pandas</span>
+  <span class="o">-</span> <span class="n">pip</span>
+  <span class="o">-</span> <span class="n">pyarrow</span><span class="o">==</span><span class="mf">1.0</span><span class="o">.</span><span class="mi">1</span>
+  <span class="o">-</span> <span class="n">pytables</span>
+  <span class="o">-</span> <span class="n">pyyaml</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">arrow</span><span class="o">==</span><span class="mf">1.0</span><span class="o">.</span><span class="mi">1</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">cairo</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">caret</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">e1071</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">furrr</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">dbi</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">hdf5r</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">irkernel</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">pryr</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">randomforest</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">recommended</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">rsqlite</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">svglite</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">tidyverse</span>
+  <span class="o">-</span> <span class="n">r</span><span class="o">-</span><span class="n">vctrs</span>
+  <span class="o">-</span> <span class="n">scipy</span>
+  <span class="o">-</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
+  <span class="o">-</span> <span class="n">seaborn</span>
+  <span class="o">-</span> <span class="n">six</span>
+  <span class="o">-</span> <span class="n">smmap</span>
+  <span class="o">-</span> <span class="n">sphinx</span>
+  <span class="o">-</span> <span class="n">sphinx_rtd_theme</span>
+  <span class="o">-</span> <span class="n">sqlalchemy</span>
+  <span class="o">-</span> <span class="n">xlrd</span>
+  <span class="o">-</span> <span class="n">pip</span><span class="p">:</span>
+    <span class="o">-</span> <span class="n">memory_profiler</span>
+    <span class="o">-</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">tabs</span>
+    <span class="o">-</span> <span class="n">sphinx_rtd_theme_ext_color_contrast</span>
+    <span class="o">-</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">coderefinery</span><span class="o">/</span><span class="n">sphinx</span><span class="o">-</span><span class="n">lesson</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">master</span><span class="o">.</span><span class="n">zip</span>
+</pre></div>
+</div>
+<p>To install the environment, use the following instructions based on
+your operating system.  To learn more about environments in general,
+see <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">the conda environment docs</a>
+(but there is more here than you need to know), if you can do the
+steps below that is enough.</p>
+<div class="section" id="linux-and-mac-osx-terminal">
+<h3>Linux and Mac OSX (terminal)<a class="headerlink" href="#linux-and-mac-osx-terminal" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-video admonition">
+<p class="admonition-title">Video</p>
+<p>See the Linux / MacOS video version at <a class="reference external" href="https://youtu.be/mkkJnkouZ2o">https://youtu.be/mkkJnkouZ2o</a>
+(the Windows version from the Anaconda Navigator might work, too).</p>
+</div>
+<p>In terminal where the Anaconda installation is activated, clone the course repository with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AaltoSciComp</span><span class="o">/</span><span class="n">data</span><span class="o">-</span><span class="n">analysis</span><span class="o">-</span><span class="n">workflows</span><span class="o">-</span><span class="n">course</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">data</span><span class="o">-</span><span class="n">analysis</span><span class="o">-</span><span class="n">workflows</span><span class="o">-</span><span class="n">course</span>
+</pre></div>
+</div>
+<p>After this, in the course repository, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>If you wish to change the environment name from the default (<code class="docutils literal notranslate"><span class="pre">dataanalysis</span></code>), use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">env_name</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>Then activate the environment (if you didn’t call it <code class="docutils literal notranslate"><span class="pre">dataanalysis</span></code>,
+replace it with the name you used):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">dataanalysis</span>
+</pre></div>
+</div>
+<p>Now you can launch a jupyterlab instance for running the exercises:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupyter</span><span class="o">-</span><span class="n">lab</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="windows-anaconda-navigator">
+<h3>Windows (Anaconda Navigator)<a class="headerlink" href="#windows-anaconda-navigator" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-video admonition">
+<p class="admonition-title">Video</p>
+<p>See the Windows / Anaconda Navigator video version at <a class="reference external" href="https://youtu.be/mkkJnkouZ2o">https://youtu.be/mkkJnkouZ2o</a></p>
+</div>
+<p>Download the environment file
+<a class="reference external" href="https://raw.githubusercontent.com/AaltoSciComp/data-analysis-workflows-course/master/environment.yml">environment.yml</a>
+somewhere.</p>
+<p>Start Anaconda Navigator. From the navigator, go to <strong>Environments</strong>.</p>
+<p>From bottom, click <strong>Import</strong>. Choose <strong>Name</strong> - <em>dataanalysis</em> and
+for <strong>Specification File</strong> choose the downloaded environment file.</p>
+<p>The environment creation process can take a long time, as the
+environment is quite big.</p>
+<p>After installation, in the Anaconda Navigator <strong>Home</strong>-tab, next to
+<strong>Applications on</strong>, switch from <code class="docutils literal notranslate"><span class="pre">base</span> <span class="pre">(root)</span></code> environment to <code class="docutils literal notranslate"><span class="pre">dataanalysis</span></code>.
+Now you can launch a jupyterlab instance by clicking on <strong>JupyterLab</strong>.</p>
+<p>If your jupyterlab instance says something like “X needs to be added to
+the build”, just click <strong>Build</strong> and continue forward. If the build gives
+an error later on, just ignore it.</p>
+<p>Now press the <strong>+</strong>-button on the top left and under <strong>Console</strong>, choose
+<strong>Python 3</strong>.</p>
+<p>In the console at the botton, type the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">git</span>
+
+<span class="n">git</span><span class="o">.</span><span class="n">Git</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="s1">&#39;https://github.com/AaltoSciComp/data-analysis-workflows-course.git&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will download the course repository to folder <code class="docutils literal notranslate"><span class="pre">data-analysis-workflows-course</span></code>.
+You can now go the folder and commence the testing.</p>
+</div>
+<div class="section" id="testing-your-installation">
+<h3>Testing your installation<a class="headerlink" href="#testing-your-installation" title="Permalink to this headline">¶</a></h3>
+<p>You must activate the Anaconda environment each time you use it.  The
+steps above also activate it.</p>
+<p>This workshop requires that you are familiar with Jupyter notebooks and how to run
+them. In the git repository that you have downloaded for the installation, you will
+find a notebook called <code class="docutils literal notranslate"><span class="pre">download_datasets.ipynb</span></code>. Open it and run it. This will
+download multiple datasets into the subfolder <code class="docutils literal notranslate"><span class="pre">data/</span></code>. You can try loading some of
+these datasets to make sure the download went through. Next, open the notebook for
+the first exercise, you will find it under <code class="docutils literal notranslate"><span class="pre">X_exercises/ch1-X-ex1.ipynb</span></code>
+(replace <code class="docutils literal notranslate"><span class="pre">X</span></code> with <code class="docutils literal notranslate"><span class="pre">python</span></code> or <code class="docutils literal notranslate"><span class="pre">r</span></code>). Make sure you are able to fully run the
+notebook. In case of installation issues, join us in the pre-workshop meeting
+(you have received details via email).</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../chapter-4-scaling/" class="btn btn-neutral float-left" title="Chapter 4: Scaling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Aalto SciComp
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

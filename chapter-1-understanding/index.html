@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Chapter 1: Understanding data analysis workflows &mdash; Data analysis workflows with R and Python  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/tabs.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_lesson.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_rtd_theme_ext_color_contrast.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/togglebutton.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/minipres.js"></script>
+        <script src="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script src="../_static/sphinx_tabs/tabs.js"></script>
+        <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Chapter 2: Data preparation" href="../chapter-2-data/" />
+    <link rel="prev" title="Data analysis workflows with R and Python" href="../" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../" class="icon icon-home" alt="Documentation Home"> Data analysis workflows with R and Python
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Course lessons</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Chapter 1: Understanding data analysis workflows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-analysis-pipeline">Data analysis pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-preparation-and-loading">Data preparation and loading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modeling">Modeling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#evaluation">Evaluation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#presentation">Presentation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#modularity-interfacing-why-pipeline-design-is-important">Modularity &amp; Interfacing - Why pipeline design is important</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#modularity">Modularity</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#modularity-in-the-wild">Modularity in the wild</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interfacing">Interfacing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interfacing-in-the-wild">Interfacing in the wild</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#creating-modules-for-a-pipeline">Creating modules for a pipeline</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-a-bigger-picture-of-data-analysis-pipelines">Getting a bigger picture of data analysis pipelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#split-pipelines">Split pipelines</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-analysis-workflow-as-a-pipeline">Data analysis workflow as a pipeline</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-2-data/">Chapter 2: Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-3-modeling/">Chapter 3: Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-4-scaling/">Chapter 4: Scaling</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation/">Software installation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">Data analysis workflows with R and Python</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Chapter 1: Understanding data analysis workflows</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/AaltoSciComp/data-analysis-workflows-course/blob/master/lectures/chapter-1-understanding.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="chapter-1-understanding-data-analysis-workflows">
+<h1>Chapter 1: Understanding data analysis workflows<a class="headerlink" href="#chapter-1-understanding-data-analysis-workflows" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="data-analysis-pipeline">
+<h2>Data analysis pipeline<a class="headerlink" href="#data-analysis-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>Data analysis workflows are commonly split to four steps:</p>
+<ol class="arabic simple">
+<li><p>Data perparation and loading</p></li>
+<li><p>Modeling</p></li>
+<li><p>Evaluation</p></li>
+<li><p>Presentation</p></li>
+</ol>
+<p>From now on will call this the <strong>data analysis pipeline</strong>.</p>
+<div class="section" id="data-preparation-and-loading">
+<h3>Data preparation and loading<a class="headerlink" href="#data-preparation-and-loading" title="Permalink to this headline">¶</a></h3>
+<p>Data preparation and loading represents the process of preparing your
+data into a format that is usable for analysis. One might think that
+this is a very simple procedure, but in reality it is usually the most
+time intensive part. Without proper data there can be no data analysis
+and data is rarely provided in a format that is perfect to the task at
+hand.</p>
+<p>Cleaning up data, combining it with other data and creating a
+efficient data pipeline depends heavily on the task at hand and thus
+it requires a lot of manual effort. Badly done data preparation will
+also propagate throughout the data analysis pipeline.</p>
+<p>Let’s call the input data <code class="docutils literal notranslate"><span class="pre">d_raw</span></code> and let’s denote our input data
+processing steps as <code class="docutils literal notranslate"><span class="pre">I(x)</span></code>. After we have run the data processing we
+will obtain a clean version of data called <code class="docutils literal notranslate"><span class="pre">d</span></code>. So basically,
+<code class="docutils literal notranslate"><span class="pre">d</span> <span class="pre">=</span> <span class="pre">I(d_raw)</span></code>.</p>
+<img alt="../_images/pipeline-1.svg" src="../_images/pipeline-1.svg" /></div>
+<div class="section" id="modeling">
+<h3>Modeling<a class="headerlink" href="#modeling" title="Permalink to this headline">¶</a></h3>
+<p>Modeling in this context refers to applying some algorithm, model or
+statistics calculation to the data. So based on the data <code class="docutils literal notranslate"><span class="pre">d</span></code>, we
+apply some model <code class="docutils literal notranslate"><span class="pre">M(x)</span></code> to the data and we obtain an output parameters
+<code class="docutils literal notranslate"><span class="pre">p</span></code>. Here output <code class="docutils literal notranslate"><span class="pre">p</span></code> can mean anything from statistics (e.g. mean, var)
+to fit coefficients. So basically, <code class="docutils literal notranslate"><span class="pre">p=M(d)</span></code>.</p>
+<img alt="../_images/pipeline-2.svg" src="../_images/pipeline-2.svg" /><p>The process of choosing a suitable model based on our problem and
+obtaining the output <code class="docutils literal notranslate"><span class="pre">p</span></code> is what is usually thought of being the whole
+data analysis, but the whole data analysis pipeline contains other
+steps as well.</p>
+</div>
+<div class="section" id="evaluation">
+<h3>Evaluation<a class="headerlink" href="#evaluation" title="Permalink to this headline">¶</a></h3>
+<p>After we have obtained the output <code class="docutils literal notranslate"><span class="pre">p</span></code> from our model we need to
+evaluate whether our model suits the task at hand. This step can be
+automatic (we choose best performing model based on fit performance,
+we test model on test data) or manual (we look at the parameters, we look
+at a plot of fit). Let’s call this step as <code class="docutils literal notranslate"><span class="pre">E(x)</span></code> and its output
+values as <code class="docutils literal notranslate"><span class="pre">v</span></code>. So again, <code class="docutils literal notranslate"><span class="pre">v=E(p)</span></code>.</p>
+<img alt="../_images/pipeline-3.svg" src="../_images/pipeline-3.svg" /></div>
+<div class="section" id="presentation">
+<h3>Presentation<a class="headerlink" href="#presentation" title="Permalink to this headline">¶</a></h3>
+<p>The last step of our pipeline is to present our results in a suitable
+format. This might include the creation of tables, plots or even interactive
+widgets. Let’s call this step <code class="docutils literal notranslate"><span class="pre">P(data,</span> <span class="pre">parameters,</span> <span class="pre">evaluation)</span></code> and
+just for clarity let’s use all of our collected knowledge of the problem
+as an input. The output result <code class="docutils literal notranslate"><span class="pre">r</span></code> is now our finished product that
+we’ll show to our colleagues, put into our paper etc. So basically,
+<code class="docutils literal notranslate"><span class="pre">r=P(d,p,v)</span></code>.</p>
+<img alt="../_images/pipeline-4.svg" src="../_images/pipeline-4.svg" /><p>Now we have our finished pipeline. Now let’s investigate why this is
+important.</p>
+<div class="admonition-understanding-data-analysis-pipelines challenge admonition">
+<p class="admonition-title">Understanding data analysis pipelines</p>
+<p>A example pipeline is provided in <code class="docutils literal notranslate"><span class="pre">X_exercises/ch1-X-ex1.ipynb</span></code>.</p>
+<ol class="arabic simple">
+<li><p>Look through the example pipeline. Mark which cells belong to which categories in this categorization:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Data perparation and loading</p></li>
+<li><p>Modeling</p></li>
+<li><p>Evaluation</p></li>
+<li><p>Presentation</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Try to determine the pieces of the code that are <strong>unique</strong> to this specific dataset. Discuss how you would generalize this pipeline to other datasets.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="modularity-interfacing-why-pipeline-design-is-important">
+<h2>Modularity &amp; Interfacing - Why pipeline design is important<a class="headerlink" href="#modularity-interfacing-why-pipeline-design-is-important" title="Permalink to this headline">¶</a></h2>
+<p>Thinking about a data science problem in a pipeline form is important
+because it highlights two important features:</p>
+<ol class="arabic simple">
+<li><p>Modularity</p></li>
+<li><p>Interfacing</p></li>
+</ol>
+<div class="section" id="modularity">
+<h3>Modularity<a class="headerlink" href="#modularity" title="Permalink to this headline">¶</a></h3>
+<p>Modularity means that instead of having one big function or script to
+handle the whole pipeline you have multiple independent pieces. In our
+example pipeline we had functions <code class="docutils literal notranslate"><span class="pre">I(x)</span></code>, <code class="docutils literal notranslate"><span class="pre">M(x)</span></code>, <code class="docutils literal notranslate"><span class="pre">E(x)</span></code> and
+<code class="docutils literal notranslate"><span class="pre">P(d,p,v)</span></code> that independently handled specific parts of the pipeline.</p>
+<p>For example, consider the situation where we have a multiple similar, but
+separate, datasets that we want to analyze independently. Now if our
+input parsing function <code class="docutils literal notranslate"><span class="pre">I(x)</span></code> can take any of these datasets the pipeline
+can easily data-parallelized (more on this later).</p>
+<img alt="../_images/pipeline-modularity-1.svg" src="../_images/pipeline-modularity-1.svg" /><p>Of course we could write an input parser that works on all of the
+datasets at the same time and in some cases this might be preferable.</p>
+<p>As another example let’s consider a problem where we would like to first
+test the analysis modules of our pipeline on a subset of our original data
+(e.g. stored in a file), but the actual data we want to analyze is stored
+in a data store (e.g. SQL, Hadoop, data lake). This kind of a situation
+is very common in industry.</p>
+<img alt="../_images/pipeline-modularity-2.svg" src="../_images/pipeline-modularity-2.svg" /><p>Another place where modularity will show its imporance is a case where
+there’s multiple models that needs to be evaluated (e.g. ensemble modeling).
+By creating independent models that each accept the input data and produce
+an output that can be evaluated by the evaluation module we can reuse
+most of our pipeline with minimal changes.</p>
+<img alt="../_images/pipeline-modularity-3.svg" src="../_images/pipeline-modularity-3.svg" /><p>Modularity is important as it allows us to re-use pieces of our pipeline
+on various different tasks. It also makes testing and verifying our results
+easier as we can test individual pieces of our program independently.</p>
+</div>
+<div class="section" id="modularity-in-the-wild">
+<h3>Modularity in the wild<a class="headerlink" href="#modularity-in-the-wild" title="Permalink to this headline">¶</a></h3>
+<p>Pandas as a library has been designed with modularity in mind right from
+the start. Each function in it has a specific task they need to accomplish
+and the output is usually of the same type as the input. Functions are short
+and the API tries to be as clean as possible. See slides 9, 13, 17 and 18 from
+Wes McKinney’s (pandas creator)
+<a class="reference external" href="https://wesmckinney.com/blog/nycpython-1102012-a-look-inside-pandas-design-and-development/">presentation in NYCPython conference in 2012</a> for more information.</p>
+<p>Same can be said about R’s tidyverse ecosystem. The ecosystem is designed
+to use simple functions with human-readable names. See Hadley Wickham’s
+(tidyverse creator)
+<a class="reference external" href="https://tidyverse.tidyverse.org/articles/manifesto.html">tidy tools manifesto</a>
+for more information.</p>
+</div>
+<div class="section" id="interfacing">
+<h3>Interfacing<a class="headerlink" href="#interfacing" title="Permalink to this headline">¶</a></h3>
+<p>Modularity as a design principle is all fine and good, but for it to be really
+effective, there needs to be good communication between the modules. This means
+that there should be well defined interfaces between modules or, in other words,
+for each module the output of the module should be in a format that can be
+used as an input for the next module.</p>
+<p>In the previous example of a pipeline with two models <code class="docutils literal notranslate"><span class="pre">M1(x)</span></code> and <code class="docutils literal notranslate"><span class="pre">M2(x)</span></code>
+we implicitly assumed that the model evaluation function <code class="docutils literal notranslate"><span class="pre">E(x)</span></code> could
+read in the output of the models.</p>
+<img alt="../_images/pipeline-modularity-3.svg" src="../_images/pipeline-modularity-3.svg" /><p>As an example, in R the
+<a class="reference external" href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/residuals">residuals-function</a>
+is defined for all model fitting functions and it will provide model
+residuals. Thus if our evaluation function were to use
+<a class="reference external" href="https://en.wikipedia.org/wiki/Residual_sum_of_squares">residual sum of squares</a>
+as a criterion of model evaluation, it would work with <strong>all models that have a
+residuals-function</strong>. This is an example of a good interface.</p>
+</div>
+<div class="section" id="interfacing-in-the-wild">
+<h3>Interfacing in the wild<a class="headerlink" href="#interfacing-in-the-wild" title="Permalink to this headline">¶</a></h3>
+<p>Both pandas and R’s tidyverse try to utilize a consistent strategy with data
+structures. In pandas functions usually taka a <code class="docutils literal notranslate"><span class="pre">Series</span></code>- or
+<code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>-objects and as their output they usually provide a similar
+object. In R’s tidyverse tries to do the same with <code class="docutils literal notranslate"><span class="pre">tibble</span></code>-structures. By
+having a consistent data type throughout the data analysis pipeline coding
+becomes much easier: the API’s just work.</p>
+<p>This is also extremely important in the industry. Analyzing big data requires
+good interfaces. For a good example, see
+<a class="reference external" href="https://gist.github.com/chitchcock/1281611">Steve Yegge’s rant on Google’s platforms and on Jeff Bezos’ 2002 interface mandate</a>.</p>
+</div>
+<div class="section" id="creating-modules-for-a-pipeline">
+<h3>Creating modules for a pipeline<a class="headerlink" href="#creating-modules-for-a-pipeline" title="Permalink to this headline">¶</a></h3>
+<p>Many complete pipelines have modules written as functions. In many deep
+learning frameworks these modules are also written as Python classes. For now
+let’s re-write the modules in exercise 1 pipeline as functions.</p>
+<p>For example, the data loading for <code class="docutils literal notranslate"><span class="pre">iris.data</span></code> could be written in
+the following way:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-0-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-0-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define iris data loading function</span>
+<span class="k">def</span> <span class="nf">load_iris</span><span class="p">(</span><span class="n">iris_data_file</span><span class="p">):</span>
+    <span class="n">iris_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+        <span class="n">iris_data_file</span><span class="p">,</span>
+        <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Species&#39;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;Species&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">iris_data</span><span class="p">[</span><span class="s1">&#39;Species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Iris-&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="n">iris_data</span> <span class="o">=</span> <span class="n">iris_data</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Species&#39;</span><span class="p">:</span><span class="s1">&#39;Target&#39;</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">iris_data</span>
+
+<span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="s1">&#39;../data/iris.data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-1 docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define iris data loading function</span>
+<span class="n">load_iris</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">iris_data_file</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">iris_data</span> <span class="o">&lt;-</span> <span class="nf">read_csv</span><span class="p">(</span><span class="n">iris_data_file</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;Sepal.Length&#39;</span><span class="p">,</span> <span class="s">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s">&#39;Petal.Length&#39;</span><span class="p">,</span> <span class="s">&#39;Petal.Width&#39;</span><span class="p">,</span> <span class="s">&#39;Species&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span><span class="n">Species</span><span class="o">=</span><span class="nf">str_remove</span><span class="p">(</span><span class="n">Species</span><span class="p">,</span> <span class="s">&#39;Iris-&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span><span class="n">Species</span><span class="o">=</span><span class="nf">as.factor</span><span class="p">(</span><span class="n">Species</span><span class="p">))</span> <span class="o">%&gt;%</span>
+        <span class="nf">rename</span><span class="p">(</span><span class="n">Target</span><span class="o">=</span><span class="n">Species</span><span class="p">)</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">iris_data</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">iris_data</span> <span class="o">=</span> <span class="nf">load_iris</span><span class="p">(</span><span class="s">&#39;../data/iris.data&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It might look like this approach just increases the amount of code needed and
+would not provide any benefits, but after we create a function for the row
+shuffling functionality, we can start to see the advantage of our approach.
+The <code class="docutils literal notranslate"><span class="pre">shuffle_rows</span></code>-function might look something like this:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-1-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-1-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-1-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define function for dataset row shuffling</span>
+<span class="k">def</span> <span class="nf">shuffle_rows</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">shuffled_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">shuffled_data</span>
+
+<span class="n">random_state</span> <span class="o">=</span> <span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">=</span> <span class="n">shuffle_rows</span><span class="p">(</span><span class="n">iris_data</span><span class="p">,</span> <span class="n">random_state</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-1-1 docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define function for dataset row shuffling</span>
+<span class="n">shuffle_rows</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">sample_ix</span> <span class="o">&lt;-</span> <span class="nf">sample</span><span class="p">(</span><span class="nf">nrow</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">shuffled_data</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="p">[</span><span class="n">sample_ix</span><span class="p">,]</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">shuffled_data</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">&lt;-</span> <span class="nf">shuffle_rows</span><span class="p">(</span><span class="n">iris_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>At this point it is important to notice that our <cite>shuffle_rows</cite>-function
+works with <strong>any</strong> dataset that is similar to our original <code class="docutils literal notranslate"><span class="pre">iris</span></code>-dataset.</p>
+<p>Let’s finish off the whole pipeline with functions for dataset splitting,
+modeling, model evaluation and result plotting:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-2-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-2-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-2-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define function for dataset splitting</span>
+<span class="k">def</span> <span class="nf">split_dataset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train_fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">train_split</span><span class="p">,</span> <span class="n">test_split</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train_size</span><span class="o">=</span><span class="n">train_fraction</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Train split proportions:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">train_split</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Target&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Test split proportions:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">test_split</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Target&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">train_split</span><span class="p">,</span> <span class="n">test_split</span><span class="p">)</span>
+
+<span class="c1"># Define function for decision tree classification</span>
+<span class="k">def</span> <span class="nf">decision_tree_classifier</span><span class="p">(</span><span class="n">train_split</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">train_data</span> <span class="o">=</span> <span class="n">train_split</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">train_target</span> <span class="o">=</span> <span class="n">train_split</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]</span>
+    <span class="n">fitted_tree</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">train_target</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">export_text</span><span class="p">(</span><span class="n">fitted_tree</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">train_data</span><span class="o">.</span><span class="n">columns</span><span class="p">)))</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">fitted_tree</span><span class="p">)</span>
+
+<span class="c1"># Define function for model evaluation</span>
+<span class="k">def</span> <span class="nf">prediction_evaluation</span><span class="p">(</span><span class="n">test_split</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="n">test_data</span> <span class="o">=</span> <span class="n">test_split</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;Target&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">test_target</span> <span class="o">=</span> <span class="n">test_split</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]</span>
+    <span class="n">result_data</span> <span class="o">=</span> <span class="n">test_split</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;PredictedValue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
+    <span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;Prediction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result_data</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;PredictedValue&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;Classification failure&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Confusion matrix:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;PredictedValue&#39;</span><span class="p">],</span> <span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Accuracy: &#39;</span><span class="p">,</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;PredictedValue&#39;</span><span class="p">],</span> <span class="n">result_data</span><span class="p">[</span><span class="s1">&#39;Target&#39;</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">result_data</span>
+
+<span class="c1"># Define function for prediction plotting</span>
+<span class="k">def</span> <span class="nf">plot_predictions</span><span class="p">(</span><span class="n">fitted_data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">petal_plot</span><span class="p">,</span> <span class="n">petal_plot_ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">6.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">))</span>
+    <span class="n">sb</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">fitted_data</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">fitted_data</span><span class="p">[</span><span class="s1">&#39;Prediction&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-2-1 docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define function for dataset splitting</span>
+<span class="n">split_dataset</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">train_fraction</span><span class="o">=</span><span class="m">0.8</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dataset_split</span> <span class="o">&lt;-</span> <span class="n">data</span> <span class="o">%&gt;%</span>
+        <span class="nf">resample_partition</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">train</span><span class="o">=</span><span class="n">train_fraction</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="m">1</span><span class="o">-</span><span class="n">train_fraction</span><span class="p">))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">&#39;Train split proportions:&#39;</span><span class="p">)</span>
+    <span class="n">dataset_split</span><span class="o">$</span><span class="n">train</span> <span class="o">%&gt;%</span>
+        <span class="nf">as_tibble</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">group_by</span><span class="p">(</span><span class="n">Target</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">tally</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">show</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">&#39;Test split proportions:&#39;</span><span class="p">)</span>
+    <span class="n">dataset_split</span><span class="o">$</span><span class="n">test</span> <span class="o">%&gt;%</span>
+        <span class="nf">as_tibble</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">group_by</span><span class="p">(</span><span class="n">Target</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">tally</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">show</span><span class="p">()</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">dataset_split</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># Define function for decision tree classification</span>
+<span class="n">decision_tree_classifier</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fitted_tree</span> <span class="o">&lt;-</span> <span class="n">train_data</span> <span class="o">%&gt;%</span>
+        <span class="nf">as_tibble</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">rpart</span><span class="p">(</span><span class="n">Target</span> <span class="o">~</span> <span class="n">.</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">.</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">&#39;class&#39;</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">fitted_tree</span><span class="p">)</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">fitted_tree</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># Define function for model evaluation</span>
+<span class="n">prediction_evaluation</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">prediction_data</span> <span class="o">&lt;-</span> <span class="n">test_data</span> <span class="o">%&gt;%</span>
+        <span class="nf">as_tibble</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span><span class="n">PredictedValue</span> <span class="o">=</span> <span class="nf">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="n">.</span><span class="p">,</span> <span class="n">type</span><span class="o">=</span><span class="s">&#39;class&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span><span class="n">Prediction</span><span class="o">=</span><span class="nf">ifelse</span><span class="p">(</span><span class="n">Target</span> <span class="o">==</span> <span class="n">PredictedValue</span><span class="p">,</span> <span class="nf">str_to_title</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">Target</span><span class="p">)),</span> <span class="s">&#39;Classification failure&#39;</span><span class="p">))</span>
+    <span class="nf">show</span><span class="p">(</span><span class="nf">confusionMatrix</span><span class="p">(</span><span class="n">prediction_data</span><span class="o">$</span><span class="n">Target</span><span class="p">,</span> <span class="n">prediction_data</span><span class="o">$</span><span class="n">PredictedValue</span><span class="p">))</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">prediction_data</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># Define function for prediction plotting</span>
+<span class="n">plot_predictions</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">fitted_data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">options</span><span class="p">(</span><span class="n">repr.plot.width</span><span class="o">=</span><span class="m">13</span><span class="p">,</span> <span class="n">repr.plot.height</span><span class="o">=</span><span class="m">7</span><span class="p">)</span>
+    <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">fitted_data</span><span class="p">,</span> <span class="nf">aes_string</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;Prediction&#39;</span><span class="p">))</span> <span class="o">+</span>
+        <span class="nf">geom_point</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now we can run the whole pipeline with:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-3-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-3-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-3-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">random_state</span> <span class="o">=</span> <span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">(</span><span class="s1">&#39;../data/iris.data&#39;</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">=</span> <span class="n">shuffle_rows</span><span class="p">(</span><span class="n">iris_data</span><span class="p">,</span> <span class="n">random_state</span><span class="p">)</span>
+<span class="n">iris_train</span><span class="p">,</span> <span class="n">iris_test</span> <span class="o">=</span> <span class="n">split_dataset</span><span class="p">(</span><span class="n">iris_data</span><span class="p">,</span> <span class="n">train_fraction</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+<span class="n">iris_fitted_tree</span> <span class="o">=</span> <span class="n">decision_tree_classifier</span><span class="p">(</span><span class="n">iris_train</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span>
+<span class="n">iris_predicted</span> <span class="o">=</span> <span class="n">prediction_evaluation</span><span class="p">(</span><span class="n">iris_test</span><span class="p">,</span> <span class="n">iris_fitted_tree</span><span class="p">)</span>
+<span class="n">plot_predictions</span><span class="p">(</span><span class="n">iris_predicted</span><span class="p">,</span> <span class="s1">&#39;Petal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Petal.Length&#39;</span><span class="p">)</span>
+<span class="n">plot_predictions</span><span class="p">(</span><span class="n">iris_predicted</span><span class="p">,</span> <span class="s1">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="s1">&#39;Sepal.Length&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-3-1 docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">&lt;-</span> <span class="nf">load_iris</span><span class="p">(</span><span class="s">&#39;../data/iris.data&#39;</span><span class="p">)</span>
+<span class="n">iris_data</span> <span class="o">&lt;-</span> <span class="nf">shuffle_rows</span><span class="p">(</span><span class="n">iris_data</span><span class="p">)</span>
+<span class="n">iris_split</span> <span class="o">&lt;-</span> <span class="nf">split_dataset</span><span class="p">(</span><span class="n">iris_data</span><span class="p">,</span> <span class="n">train_fraction</span><span class="o">=</span><span class="m">0.8</span><span class="p">)</span>
+<span class="n">iris_fitted_tree</span> <span class="o">&lt;-</span> <span class="nf">decision_tree_classifier</span><span class="p">(</span><span class="n">iris_split</span><span class="o">$</span><span class="n">train</span><span class="p">)</span>
+<span class="n">iris_predicted</span> <span class="o">&lt;-</span> <span class="nf">prediction_evaluation</span><span class="p">(</span><span class="n">iris_split</span><span class="o">$</span><span class="n">test</span><span class="p">,</span> <span class="n">iris_fitted_tree</span><span class="p">)</span>
+<span class="nf">plot_predictions</span><span class="p">(</span><span class="n">iris_predicted</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s">&#39;Petal.Width&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;Petal.Length&#39;</span><span class="p">)</span>
+<span class="nf">plot_predictions</span><span class="p">(</span><span class="n">iris_predicted</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s">&#39;Sepal.Width&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;Sepal.Length&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Writing our pipeline in this way provides many benefits:</p>
+<ul class="simple">
+<li><p>We can see our whole pipeline with a single glance.</p></li>
+<li><p>We can easily modify our pipeline e.g. disable shuffling.</p></li>
+<li><p>We can easily see and change our pipeline’s hyperparameters (e.g. test
+different values of <cite>train_fraction</cite>).</p></li>
+<li><p>By swapping <cite>load_iris</cite>-function to some other function that provides
+its output in similar format, we can run the same pipeline on a different
+dataset.</p></li>
+<li><p>By swapping <cite>decision_tree_classifier</cite>-function to some other function that
+provides its output in similar format, we can run the same pipeline on a
+different model.</p></li>
+</ul>
+<p>However, it is also important to know that by writing our pipeline in this way
+we have created interfaces. Thus reliability of our pipeline relies on the fact
+that various hidden requirements are being fulfilled:</p>
+<ul class="simple">
+<li><p>Using our chosen model makes sense in the context.</p></li>
+<li><p>Data is in tidy format (<cite>DataFrame</cite>/<cite>tibble</cite>).</p></li>
+<li><p>Target variable is in <cite>Target</cite>-column and there are no unnecessary variables.</p></li>
+<li><p>The fitted model supports the <cite>predict</cite>-function for obtaining predictions.</p></li>
+<li><p>Prediction names are stored in ‘Prediction’-column.</p></li>
+<li><p>etc.</p></li>
+</ul>
+<p>It might look like the amount of requirements would grow very rapidly and thus
+there would not be any generality to our pipeline. However, in Python and R the
+community is very good at using standards. E.g. in
+<a class="reference external" href="https://scikit-learn.org/stable/glossary.html#term-predict">scikit-learn</a>
+and in
+<a class="reference external" href="https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/predict">R</a>
+the predict-methods are well defined. By adhering to the same standards that
+everybody else uses you will immediately get the benefits: hundreds of
+different models and libraries.</p>
+<p>In the next exercise we try to extend our pipeline.</p>
+<div class="admonition-extending-our-data-analysis-pipeline challenge admonition">
+<p class="admonition-title">Extending our data analysis pipeline</p>
+<p>A example pipeline is provided in <code class="docutils literal notranslate"><span class="pre">X_exercises/ch1-X-ex2.ipynb</span></code>.</p>
+<p>Let’s modify our simple data analysis pipeline so that it can handle another
+classifications task: classifying breast cancers from a
+<a class="reference external" href="http://archive.ics.uci.edu/ml/datasets/breast+cancer+wisconsin+%28diagnostic%29">another famous dataset</a>.
+This problem is bit trickier for a simple model such as decision tree, so
+let’s try out
+<a class="reference external" href="https://en.wikipedia.org/wiki/Random_forest">random forest classifier</a>,
+which uses an ensemble of decision trees and let’s compare the results.</p>
+<p>Problems are described in more detail in the example notebooks:</p>
+<ol class="arabic simple">
+<li><p>Create a data loading function for our new dataset.</p></li>
+<li><p>Test the data loading function by running a pipeline with decision
+tree classifier. Analyze results.</p></li>
+<li><p>Create a function for random forest classifier. Use the function in
+the place of our decision tree classifier to classify cancer
+diagnoses.</p></li>
+<li><p>Use the random forest classifier in our iris pipeline. Analyze results.</p></li>
+</ol>
+</div>
+</div>
+</div>
+<div class="section" id="getting-a-bigger-picture-of-data-analysis-pipelines">
+<h2>Getting a bigger picture of data analysis pipelines<a class="headerlink" href="#getting-a-bigger-picture-of-data-analysis-pipelines" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="split-pipelines">
+<h3>Split pipelines<a class="headerlink" href="#split-pipelines" title="Permalink to this headline">¶</a></h3>
+<p>So far we’ve been looking at a pipelines that consist of single notebook.
+This is often not possible with bigger pipelines. For example, the initial data
+might be too big to fit into laptop’s memory and plotting might be something
+that would be easier to do with the laptop.</p>
+<p>In cases such as this the pipeline would need to be split into multiple pieces.
+These pieces would then be connected by data transfer: output of the pipeline
+at certain step is saved and transfered to another system where the pipeline
+is continued.</p>
+<img alt="../_images/pipeline-split-1.svg" src="../_images/pipeline-split-1.svg" /><p>Another example would be a pipeline where one part of the pipeline has
+higher resource requirements than other parts. If modeling takes multiple days,
+one rarely wants to connect plotting to it.</p>
+<img alt="../_images/pipeline-split-2.svg" src="../_images/pipeline-split-2.svg" /><p>In pipelines such as these it is important to know when to do the splitting.
+The questions to ask are usually:</p>
+<ul class="simple">
+<li><p>Do I need to repeat some part of my pipeline more often than another?</p></li>
+<li><p>Is some part of my pipeline more costly with respect to its resource
+requirements?</p></li>
+<li><p>Will I modify some part more often than another?</p></li>
+<li><p>Is the pipeline data-parallel? Could it be split in a way that would
+make scaling easier?</p></li>
+</ul>
+</div>
+<div class="section" id="data-analysis-workflow-as-a-pipeline">
+<h3>Data analysis workflow as a pipeline<a class="headerlink" href="#data-analysis-workflow-as-a-pipeline" title="Permalink to this headline">¶</a></h3>
+<p>It is usually good idea to think of the data analysis pipeline in a larger
+context. A full workflow of creating a paper might consist of data gathering,
+pipeline creation, pipeline result evaluation and iteration on the pipeline,
+and finally the actual writing process. Thus there is a correspondence
+between the idea of a pipeline and the whole workflow.</p>
+<img alt="../_images/pipeline-workflow.svg" src="../_images/pipeline-workflow.svg" /><p>For example, it is often the case that when one tries various
+models and model hyperparameters, the search is done iteratively and
+only the final values are recorded. By keeping track of different models,
+hyperparameters etc. in a .csv file one can use the same data analysis tools
+to help with the process of searching the values. This will help with
+justifying the chosen parameters and getting a better understanding on
+how sensitive the model is to said parameters.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../chapter-2-data/" class="btn btn-neutral float-right" title="Chapter 2: Data preparation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../" class="btn btn-neutral float-left" title="Data analysis workflows with R and Python" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Aalto SciComp
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

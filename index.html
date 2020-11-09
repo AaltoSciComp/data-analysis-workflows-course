@@ -1,0 +1,330 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data analysis workflows with R and Python &mdash; Data analysis workflows with R and Python  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/mystnb.css" type="text/css" />
+  <link rel="stylesheet" href="_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_lesson.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_rtd_theme_ext_color_contrast.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="#" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/togglebutton.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script src="_static/minipres.js"></script>
+        <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex/" />
+    <link rel="search" title="Search" href="search/" />
+    <link rel="next" title="Chapter 1: Understanding data analysis workflows" href="chapter-1-understanding/" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home" alt="Documentation Home"> Data analysis workflows with R and Python
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Course lessons</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="chapter-1-understanding/">Chapter 1: Understanding data analysis workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter-2-data/">Chapter 2: Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter-3-modeling/">Chapter 3: Modeling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chapter-4-scaling/">Chapter 4: Scaling</a></li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation/">Software installation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Data analysis workflows with R and Python</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Data analysis workflows with R and Python</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/AaltoSciComp/data-analysis-workflows-course/blob/master/lectures/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-analysis-workflows-with-r-and-python">
+<h1>Data analysis workflows with R and Python<a class="headerlink" href="#data-analysis-workflows-with-r-and-python" title="Permalink to this headline">¶</a></h1>
+<div class="admonition-attending-the-course-5-14-10 admonition">
+<p class="admonition-title">Attending the course 5.-14.10.?</p>
+<p><a class="reference external" href="https://scicomp.aalto.fi/training/scip/data-analysis/">See the course page here</a>,
+below is the course material.</p>
+</div>
+<p>Data analysis is nowadays at the center of almost all scientific fields.
+Whether a researcher is doing experiments, running simulations or analyzing
+datasets, at some point of their career they will be required to do data
+analysis.</p>
+<p>R and Python are two languages that have a rich and powerful data
+analysis libraries and many researchers use them to build their data analysis
+workflows. However, these libraries have been designed to work optimally
+in certain types of workflows. Thus if one wants to create reproducible,
+scalable and efficient data analysis workflows it is important to understand
+how to design a good workflow from the get-go.</p>
+<p>This course contains four chapters:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>First chapter is about understanding how data analysis workflows
+are commonly designed and how one should go about designing a new
+data analysis pipeline.</p></li>
+<li><p>Second chapter is about data ingestion, tidy data format, and efficient
+data formats for input and output.</p></li>
+<li><p>Third chapter is about calculating statistics, doing modeling and
+utilizing data analysis libraries.</p></li>
+<li><p>Fourth chapter is about how one should think about scaling and how
+it can achieved.</p></li>
+</ul>
+</div></blockquote>
+<p>Throughout this course the material has an underlying theme of three
+principles that one should keep in mind throughout the course:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Recognizing a pattern - Different languages, libraries, workflows etc.
+have common features. We will try to find these patterns so that we
+familiarize ourselves with them.</p></li>
+<li><p>Replicating a pattern - After we have recognized some patterns it is a good
+idea to copy said pattern and see if it works as we assumed.</p></li>
+<li><p>Generalizing a pattern - Once we have a grasp of a how our pattern works
+we can think about how we could use it in a different context. That is,
+how we can generalize it.</p></li>
+</ul>
+</div></blockquote>
+<div class="admonition-prerequisites prereq admonition">
+<p class="admonition-title">Prerequisites</p>
+<ul class="simple">
+<li><p>Knowledge of Python or R in the context of scientific computing.
+If you’re unsure, our
+<a class="reference external" href="https://aaltoscicomp.github.io/python-for-scicomp">Python for Scientific computing-course</a>
+is a good starting point.</p></li>
+<li><p>Software installed via conda as described in <a class="reference internal" href="installation/"><span class="doc">installation
+instructions</span></a>.</p></li>
+<li><p>It will help if you know some Jupyter, since that’s how we do our
+exercises.  You can study some in the <a class="reference external" href="https://coderefinery.github.io/jupyter/">CodeRefinery lesson</a>.</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Materials are still being worked on and the current state is not reflective
+of the eventual state.</p>
+</div>
+<table class="colwidths-auto docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p>120 min</p></td>
+<td><p><a class="reference internal" href="chapter-1-understanding/"><span class="doc">Chapter 1: Understanding data analysis workflows</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>120 min</p></td>
+<td><p><a class="reference internal" href="chapter-2-data/"><span class="doc">Chapter 2: Data preparation</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>120 min</p></td>
+<td><p><a class="reference internal" href="chapter-3-modeling/"><span class="doc">Chapter 3: Modeling</span></a></p></td>
+</tr>
+<tr class="row-even"><td><p>120 min</p></td>
+<td><p><a class="reference internal" href="chapter-4-scaling/"><span class="doc">Chapter 4: Scaling</span></a></p></td>
+</tr>
+</tbody>
+</table>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="who-is-the-course-for">
+<span id="learner-personas"></span><h2>Who is the course for?<a class="headerlink" href="#who-is-the-course-for" title="Permalink to this headline">¶</a></h2>
+<p>Researchers who are using or will soon be using R and Python
+for data analysis, who know how to program with these languages, but do not
+necessarily know what are the best practices for data analysis.</p>
+<p>The course material is available in both R and Python, but this
+is not a course on the basics of scientific programming. If you wish to
+prep up your scientific programming skills, we recommend taking our
+<a class="reference external" href="https://aaltoscicomp.github.io/python-for-scicomp/">Python for Scientific Computing</a>-course.</p>
+</div>
+<div class="section" id="credits">
+<h2>Credits<a class="headerlink" href="#credits" title="Permalink to this headline">¶</a></h2>
+<p>Author: Simo Tuomisto</p>
+<p>Technical help: Richard Darst</p>
+<p>Testing: Enrico Glerean</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="chapter-1-understanding/" class="btn btn-neutral float-right" title="Chapter 1: Understanding data analysis workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Aalto SciComp
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

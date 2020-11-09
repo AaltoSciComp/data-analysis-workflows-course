@@ -1,0 +1,2071 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Chapter 4: Scaling &mdash; Data analysis workflows with R and Python  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/togglebutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/mystnb.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_tabs/tabs.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_lesson.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/sphinx_rtd_theme_ext_color_contrast.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script src="../_static/togglebutton.js"></script>
+        <script src="../_static/clipboard.min.js"></script>
+        <script src="../_static/copybutton.js"></script>
+        <script src="../_static/minipres.js"></script>
+        <script src="../_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script src="../_static/sphinx_tabs/tabs.js"></script>
+        <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex/" />
+    <link rel="search" title="Search" href="../search/" />
+    <link rel="next" title="Software installation" href="../installation/" />
+    <link rel="prev" title="Chapter 3: Modeling" href="../chapter-3-modeling/" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../" class="icon icon-home" alt="Documentation Home"> Data analysis workflows with R and Python
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search/" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Course lessons</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../chapter-1-understanding/">Chapter 1: Understanding data analysis workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-2-data/">Chapter 2: Data preparation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../chapter-3-modeling/">Chapter 3: Modeling</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Chapter 4: Scaling</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#different-resources-involved-in-data-analysis-pipelines">Different resources involved in data analysis pipelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#processors-as-a-resource">Processors as a resource</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cores-vs-threads">Cores vs threads</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#processor-cache">Processor cache</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#vectorized-instructions">Vectorized instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#ram-as-a-resource">RAM as a resource</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#memory-ceiling">Memory ceiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#calculating-memory-usage">Calculating memory usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#garbage-collector">Garbage collector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#storage-as-a-resource">Storage as a resource</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#differences-in-different-storage-solutions">Differences in different storage solutions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-storage-space-efficiently">Using storage space efficiently</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accessing-storage-effectively">Accessing storage effectively</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#storage-as-a-balancing-resource">Storage as a balancing resource</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#best-practices">Best practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#parallelization-strategies">Parallelization strategies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-parallelism">Data parallelism</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-internal-parallelization-provided-by-libraries">Using internal parallelization provided by libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multiprocessing">Multiprocessing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#is-multiprocessing-worth-it">Is multiprocessing worth it?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#doing-parallel-maps-with-multiprocessing">Doing parallel maps with multiprocessing</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#optimizing-code-with-profilers">Optimizing code with profilers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collecting-everything-together">Collecting everything together</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation/">Software installation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../">Data analysis workflows with R and Python</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Chapter 4: Scaling</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/AaltoSciComp/data-analysis-workflows-course/blob/master/lectures/chapter-4-scaling.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="chapter-4-scaling">
+<h1>Chapter 4: Scaling<a class="headerlink" href="#chapter-4-scaling" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="different-resources-involved-in-data-analysis-pipelines">
+<h2>Different resources involved in data analysis pipelines<a class="headerlink" href="#different-resources-involved-in-data-analysis-pipelines" title="Permalink to this headline">¶</a></h2>
+<p>Modern data analysis pipelines can be very expensive computationally. In order
+to scale these pipelines up, we’ll need to first understand the resources that
+these pipelines require. These resources are:</p>
+<ol class="arabic simple">
+<li><p>Processors (CPUs)</p></li>
+<li><p>Memory (RAM)</p></li>
+<li><p>Storage space</p></li>
+</ol>
+<p>Let’s look at them one by one. At the end we’ll collect the best practices into
+a table.</p>
+<div class="section" id="processors-as-a-resource">
+<h3>Processors as a resource<a class="headerlink" href="#processors-as-a-resource" title="Permalink to this headline">¶</a></h3>
+<p>Processor is the quintessential resource when it comes to data analysis. It
+is used throughout the pipeline from data loading to data analysis and thus
+it is important to know some features about them.</p>
+<div class="section" id="cores-vs-threads">
+<h4>Cores vs threads<a class="headerlink" href="#cores-vs-threads" title="Permalink to this headline">¶</a></h4>
+<p>Modern processors are built from multiple cores. Sometimes these
+cores can house multiple threads. This is called hyperthreading.</p>
+<img alt="../_images/processor.svg" class="align-center" src="../_images/processor.svg" /><p>We’ll look at CPU parallelization techniques later on, but for now it’s
+important to know that the maximum number of threads/processes you should
+launch on a given CPU is the number of threads/cores that are available. If you
+launch a larger number, you will oversubscribe the CPUs and the code will run
+slower as different threads/processes will have to swap in/out of the CPUs.</p>
+</div>
+<div class="section" id="processor-cache">
+<h4>Processor cache<a class="headerlink" href="#processor-cache" title="Permalink to this headline">¶</a></h4>
+<p>Operations on data are done with
+<a class="reference external" href="https://en.wikipedia.org/wiki/Instruction_set_architecture">instructions</a>
+inside the cores. These instructions do calculations such as addition,
+multiplication etc.. However, in order to get maximum throughput of finished
+instructions, all modern CPU architectures have multiple layers of data caching
+and prefetching that try to keep the calculating parts of the CPU as busy as
+possible.</p>
+<p>Data is read to the cache in blocks of data called cache lines. If required data
+is not found in the cache, the data needs to be loaded from the system RAM,
+which results in a significant performance penalty. This is called a
+<a class="reference external" href="https://en.wikipedia.org/wiki/CPU_cache#Cache_miss">cache miss</a>.</p>
+<img alt="../_images/processor-cache.svg" class="align-center" src="../_images/processor-cache.svg" /><p>This caching procedure can be helped by keeping the data in memory as a
+contiguous array. Both R vectors and numpy ndarrays are contiguous. They have
+so-called
+<a class="reference external" href="https://en.wikipedia.org/wiki/Row-_and_column-major_order">row-major-ordering</a>.
+It is also important to keep this order in mind when doing operations with
+multidimensional arrays.</p>
+</div>
+<div class="section" id="vectorized-instructions">
+<h4>Vectorized instructions<a class="headerlink" href="#vectorized-instructions" title="Permalink to this headline">¶</a></h4>
+<p>Another important feature of modern processors is that they support vectorized
+instructions (AVX, AVX2, AVX512). These dramatically improve the performance
+when one does the same operation for multiple pieces of data e.g. elementwise
+addition. R, numpy and mathematical libraries that they use such as MKL, BLAS,
+LAPACK, FFTW etc. use these operations straight out of the box, if the program
+is written to use functions from these packages.</p>
+<img alt="../_images/processor-avx.svg" class="align-center" src="../_images/processor-avx.svg" /><p>We can test the effect of vectorization by looking at the following example
+that adds to a zero array.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-0-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-0-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">n_zeros</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">ntimes</span> <span class="o">=</span> <span class="mi">1000</span>
+
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_zeros</span><span class="p">)</span>
+
+<span class="n">time_for_1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntimes</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_zeros</span><span class="p">):</span>
+        <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">time_for_2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">time_for</span> <span class="o">=</span> <span class="n">time_for_2</span><span class="o">-</span><span class="n">time_for_1</span>
+
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_zeros</span><span class="p">)</span>
+
+<span class="n">time_vec_1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ntimes</span><span class="p">):</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">time_vec_2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">time_vec</span> <span class="o">=</span> <span class="n">time_vec_2</span><span class="o">-</span><span class="n">time_vec_1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Time taken:</span>
+
+<span class="s2">For loop: </span><span class="si">%.2g</span><span class="s2"></span>
+<span class="s2">Vectorized operation: </span><span class="si">%.2g</span><span class="s2"></span>
+
+<span class="s2">Speedup: </span><span class="si">%.0f</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_for</span><span class="p">,</span> <span class="n">time_vec</span><span class="p">,</span> <span class="n">time_for</span><span class="o">/</span><span class="n">time_vec</span><span class="p">))</span>
+
+
+<span class="n">Time</span> <span class="n">taken</span><span class="p">:</span>
+
+<span class="n">For</span> <span class="n">loop</span><span class="p">:</span> <span class="mf">4.5</span>
+<span class="n">Vectorized</span> <span class="n">operation</span><span class="p">:</span> <span class="mf">0.0056</span>
+
+<span class="n">Speedup</span><span class="p">:</span> <span class="mi">801</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-0-1 docutils container">
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">n_zeros</span> <span class="o">&lt;-</span> <span class="m">10000</span>
+<span class="n">ntimes</span> <span class="o">&lt;-</span> <span class="m">1000</span>
+
+<span class="n">z</span> <span class="o">&lt;-</span> <span class="nf">numeric</span><span class="p">(</span><span class="n">n_zeros</span><span class="p">)</span>
+
+<span class="n">time_for_1</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">t</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="n">ntimes</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="n">n_zeros</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="m">1</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">time_for_2</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+
+<span class="n">time_for</span> <span class="o">&lt;-</span> <span class="n">time_for_2</span> <span class="o">-</span> <span class="n">time_for_1</span>
+
+<span class="n">z</span> <span class="o">&lt;-</span> <span class="nf">numeric</span><span class="p">(</span><span class="n">n_zeros</span><span class="p">)</span>
+
+<span class="n">time_vec_1</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">t</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="n">ntimes</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">z</span> <span class="o">&lt;-</span> <span class="n">z</span> <span class="o">+</span> <span class="m">1</span>
+<span class="p">}</span>
+<span class="n">time_vec_2</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+
+<span class="n">time_vec</span> <span class="o">&lt;-</span> <span class="n">time_vec_2</span> <span class="o">-</span> <span class="n">time_vec_1</span>
+
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;Time taken:\n\nFor loop: %.2g\nVectorized operation: %.2g\n\nSpeedup: %.2f&quot;</span><span class="p">,</span> <span class="n">time_for</span><span class="p">,</span> <span class="n">time_vec</span><span class="p">,</span> <span class="n">time_for</span><span class="o">/</span><span class="nf">as.double</span><span class="p">(</span><span class="n">time_vec</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s">&#39;secs&#39;</span><span class="p">)))</span>
+
+
+<span class="n">Time</span> <span class="n">taken</span><span class="o">:</span>
+
+<span class="n">For</span> <span class="n">loop</span><span class="o">:</span> <span class="m">0.61</span>
+<span class="n">Vectorized</span> <span class="n">operation</span><span class="o">:</span> <span class="m">0.018</span>
+
+<span class="n">Speedup</span><span class="o">:</span> <span class="m">33.61</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="ram-as-a-resource">
+<h3>RAM as a resource<a class="headerlink" href="#ram-as-a-resource" title="Permalink to this headline">¶</a></h3>
+<p>RAM stores the data and variables that you operate on during your data
+analysis workflow. From RAM the data is transferred to processor caches for
+operations. In data science pipelines the biggest problem is usually that
+one runs out of memory when dealing with big datasets.</p>
+<div class="section" id="memory-ceiling">
+<h4>Memory ceiling<a class="headerlink" href="#memory-ceiling" title="Permalink to this headline">¶</a></h4>
+<p>When thinking about memory one should always think about the ceiling of memory
+usage. Let’s say that during our input loading part <code class="docutils literal notranslate"><span class="pre">I(x)</span></code> of our pipeline
+we read dataset <code class="docutils literal notranslate"><span class="pre">d_raw</span></code> e.g. from a csv and we convert/modify our columns
+to obtain a dataset <code class="docutils literal notranslate"><span class="pre">d</span></code>. Now the size of the memory we need is
+<code class="docutils literal notranslate"><span class="pre">size(I(d_raw))</span> <span class="pre">=</span> <span class="pre">size(d)</span> <span class="pre">+</span> <span class="pre">size(d_raw)</span></code> and we know that this is our
+memory ceiling for the data loading.</p>
+<p>Let’s say that we keep the original dataset <code class="docutils literal notranslate"><span class="pre">d_raw</span></code> in memory through
+our full pipeline. Then the memory ceiling of <code class="docutils literal notranslate"><span class="pre">I(x)</span></code> becomes a floor
+for the next part of our pipeline and we start to accumulate memory even
+though we no longer need some of our previous objects. This is visualized
+in the image below:</p>
+<img alt="../_images/ram-pipeline.svg" class="align-center" src="../_images/ram-pipeline.svg" /></div>
+<div class="section" id="calculating-memory-usage">
+<h4>Calculating memory usage<a class="headerlink" href="#calculating-memory-usage" title="Permalink to this headline">¶</a></h4>
+<p>Let’s consider
+<a class="reference internal" href="../chapter-3-modeling/#chapter-3-bootstrap"><span class="std std-ref">boostrapping model</span></a>
+that the we had in chapter 3. We read our data into dataset
+<code class="docutils literal notranslate"><span class="pre">filesizes</span></code> and then used aggregation functions to create another dataset
+<code class="docutils literal notranslate"><span class="pre">yearly_bytes_sum</span></code> that we used for our bootstrapping procedure.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-1-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-1-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-1-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">10000</span><span class="p">):</span>
+
+    <span class="n">filesizes</span> <span class="o">=</span> <span class="n">load_filesizes</span><span class="p">(</span><span class="s1">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">yearly_bytes_sum</span> <span class="o">=</span> <span class="n">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span><span class="s1">&#39;BytesLog2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Files&#39;</span><span class="p">,</span> <span class="s1">&#39;SpaceUsage&#39;</span><span class="p">],</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_yearly_means</span> <span class="o">=</span> <span class="n">bootstrap_byteslog2_mean</span><span class="p">(</span><span class="n">yearly_bytes_sum</span><span class="p">,</span> <span class="s1">&#39;Year&#39;</span><span class="p">,</span> <span class="s1">&#39;Files&#39;</span><span class="p">,</span> <span class="n">n_means</span><span class="o">=</span><span class="n">n_means</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_yearly_means</span> <span class="o">=</span> <span class="n">bootstrapped_yearly_means</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span><span class="s1">&#39;Mean&#39;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">bootstrapped_yearly_means</span>
+
+<span class="n">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="n">Year</span>    <span class="n">Mean</span>
+<span class="mi">0</span>       <span class="mf">2010.0</span>  <span class="mf">12.9242</span>
+<span class="mi">1</span>       <span class="mf">2011.0</span>  <span class="mf">14.0712</span>
+<span class="mi">2</span>       <span class="mf">2012.0</span>  <span class="mf">10.6465</span>
+<span class="mi">3</span>       <span class="mf">2013.0</span>  <span class="mf">13.3474</span>
+<span class="mi">4</span>       <span class="mf">2014.0</span>  <span class="mf">14.0410</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-1-1 docutils container">
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">chapter3_pipeline</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="m">10000</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">filesizes</span> <span class="o">&lt;-</span> <span class="nf">load_filesizes</span><span class="p">(</span><span class="s">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">yearly_bytes_sum</span> <span class="o">&lt;-</span> <span class="nf">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Year&#39;</span><span class="p">,</span><span class="s">&#39;BytesLog2&#39;</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Files&#39;</span><span class="p">,</span> <span class="s">&#39;SpaceUsage&#39;</span><span class="p">),</span> <span class="n">sum</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_yearly_means</span> <span class="o">&lt;-</span> <span class="n">yearly_bytes_sum</span> <span class="o">%&gt;%</span>
+        <span class="nf">bootstrap_byteslog2_mean</span><span class="p">(</span><span class="s">&#39;Year&#39;</span><span class="p">,</span> <span class="s">&#39;Files&#39;</span><span class="p">,</span> <span class="n">n_means</span><span class="o">=</span><span class="n">n_means</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">select</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Mean</span><span class="p">)</span>
+
+    <span class="nf">return</span><span class="p">(</span><span class="n">bootstrapped_yearly_means</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="nf">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="m">100</span><span class="p">))</span>
+
+<span class="n">Year</span>    <span class="n">Mean</span>
+<span class="m">2010</span>    <span class="m">12.9871</span>
+<span class="m">2011</span>    <span class="m">14.1068</span>
+<span class="m">2012</span>    <span class="m">10.7926</span>
+<span class="m">2013</span>    <span class="m">13.3482</span>
+<span class="m">2014</span>    <span class="m">13.9873</span>
+<span class="m">2015</span>    <span class="m">11.7709</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>One can calculate the size of a dataset in the following fashion:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-2-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-2-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-2-0 active docutils container">
+<p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.memory_usage.html">pandas.DataFrame.memory_usage</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filesizes</span> <span class="o">=</span> <span class="n">load_filesizes</span><span class="p">(</span><span class="s1">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+<span class="n">yearly_bytes_sum</span> <span class="o">=</span> <span class="n">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span><span class="s1">&#39;BytesLog2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Files&#39;</span><span class="p">,</span> <span class="s1">&#39;SpaceUsage&#39;</span><span class="p">],</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">filesizes</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">yearly_bytes_sum</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+<span class="n">filesizes_size</span> <span class="o">=</span> <span class="n">filesizes</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">summarized_size</span> <span class="o">=</span> <span class="n">yearly_bytes_sum</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Original data: </span><span class="si">%d</span><span class="s2"> bytes</span>
+<span class="s2">Summarized data: </span><span class="si">%d</span><span class="s2"> bytes</span>
+
+<span class="s2">Reduction ratio: </span><span class="si">%.2f</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filesizes_size</span><span class="p">,</span> <span class="n">summarized_size</span><span class="p">,</span> <span class="n">filesizes_size</span><span class="o">/</span><span class="n">summarized_size</span><span class="p">))</span>
+
+<span class="n">Index</span>         <span class="mi">69520</span>
+<span class="n">Bytes</span>         <span class="mi">69520</span>
+<span class="n">Files</span>         <span class="mi">69520</span>
+<span class="n">BytesLog2</span>     <span class="mi">69520</span>
+<span class="n">SpaceUsage</span>    <span class="mi">69520</span>
+<span class="n">Year</span>          <span class="mi">69520</span>
+<span class="n">Month</span>          <span class="mi">9768</span>
+<span class="n">Date</span>          <span class="mi">69520</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+<span class="n">Index</span>          <span class="mi">128</span>
+<span class="n">Year</span>           <span class="mi">881</span>
+<span class="n">BytesLog2</span>     <span class="mi">2097</span>
+<span class="n">Files</span>         <span class="mi">3784</span>
+<span class="n">SpaceUsage</span>    <span class="mi">3784</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+
+<span class="n">Original</span> <span class="n">data</span><span class="p">:</span> <span class="mi">496408</span> <span class="nb">bytes</span>
+<span class="n">Summarized</span> <span class="n">data</span><span class="p">:</span> <span class="mi">10674</span> <span class="nb">bytes</span>
+
+<span class="n">Reduction</span> <span class="n">ratio</span><span class="p">:</span> <span class="mf">46.51</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-2-1 docutils container">
+<p><a class="reference external" href="https://www.rdocumentation.org/packages/utils/versions/3.6.2/topics/object.size">object.size</a></p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">filesizes</span> <span class="o">&lt;-</span> <span class="nf">load_filesizes</span><span class="p">(</span><span class="s">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+<span class="n">yearly_bytes_sum</span> <span class="o">&lt;-</span> <span class="nf">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Year&#39;</span><span class="p">,</span><span class="s">&#39;BytesLog2&#39;</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Files&#39;</span><span class="p">,</span> <span class="s">&#39;SpaceUsage&#39;</span><span class="p">),</span> <span class="n">sum</span><span class="p">)</span>
+
+<span class="n">print_column_sizes</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">map</span><span class="p">(</span><span class="nf">colnames</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">print</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&#39;column: %12s size: %d&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="nf">object.size</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">x</span><span class="p">]))))</span>
+    <span class="nf">invisible</span><span class="p">(</span><span class="kc">NULL</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="s">&#39;filesizes:&#39;</span><span class="p">)</span>
+<span class="nf">print_column_sizes</span><span class="p">(</span><span class="n">filesizes</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="s">&#39;yearly_bytes_sum:&#39;</span><span class="p">)</span>
+<span class="nf">print_column_sizes</span><span class="p">(</span><span class="n">yearly_bytes_sum</span><span class="p">)</span>
+
+<span class="n">filesizes_size</span> <span class="o">&lt;-</span> <span class="nf">object.size</span><span class="p">(</span><span class="n">filesizes</span><span class="p">)</span>
+<span class="n">summarized_size</span> <span class="o">&lt;-</span> <span class="nf">object.size</span><span class="p">(</span><span class="n">yearly_bytes_sum</span><span class="p">)</span>
+
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;</span>
+<span class="s">Original data: %d bytes</span>
+<span class="s">Summarized data: %d bytes</span>
+
+<span class="s">Reduction ratio: %.2f</span>
+<span class="s">&quot;</span><span class="p">,</span> <span class="n">filesizes_size</span><span class="p">,</span> <span class="n">summarized_size</span><span class="p">,</span> <span class="n">filesizes_size</span><span class="o">/</span><span class="n">summarized_size</span><span class="p">))</span>
+
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;filesizes:&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:        Bytes size: 70384&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:        Files size: 70384&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:    BytesLog2 size: 70392&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:   SpaceUsage size: 70392&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:         Year size: 70384&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:        Month size: 36872&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:         Date size: 70896&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;yearly_bytes_sum:&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:         Year size: 3728&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:    BytesLog2 size: 5744&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:        Files size: 4336&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;column:   SpaceUsage size: 4344&quot;</span>
+
+<span class="n">Original</span> <span class="n">data</span><span class="o">:</span> <span class="m">455320</span> <span class="n">bytes</span>
+<span class="n">Summarized</span> <span class="n">data</span><span class="o">:</span> <span class="m">15920</span> <span class="n">bytes</span>
+
+<span class="n">Reduction</span> <span class="n">ratio</span><span class="o">:</span> <span class="m">28.60</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>From the output we can see the following things:</p>
+<ul class="simple">
+<li><p>We can reduce the memory consumption by taking only those columns we’re
+interested in.</p></li>
+<li><p>We can reduce the memory consumption by converting data with repeating
+values into categorical type (<code class="docutils literal notranslate"><span class="pre">Year</span></code>).</p></li>
+<li><p>Converting numerical data with many categories (<code class="docutils literal notranslate"><span class="pre">BytesLog2</span></code>) into
+categorical type can increase memory consumption.</p></li>
+</ul>
+</div>
+<div class="section" id="garbage-collector">
+<h4>Garbage collector<a class="headerlink" href="#garbage-collector" title="Permalink to this headline">¶</a></h4>
+<p>As mentioned previously, these past datasets become increasingly important
+when they are carried around throughout the pipeline. Both Python and R have
+a garbage collector that runs occationally and removes unneeded memory
+allocations. Each object has a reference counter that tells the garbage
+collector how many times the object is referenced. Each time you e.g. assign
+the object into a variable the reference counter is increased and each time
+you overwrite/delete a variable the reference counter is decreased. Once it
+reaches zero the garbage collector knows that the object can be removed.</p>
+<p>To help garbage collector one can create parts of your pipeline as functions.
+By writing code as function all temporary variables are created to the
+function’s scope (aka. environment). After the function finishes they are
+no longer defined outside of the function and thus they are good for garbage
+collecting.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-3-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-3-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-3-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">memory_scope_test</span><span class="p">():</span>
+
+    <span class="n">memory_scope_variable</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+
+<span class="n">memory_scope_test</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+
+<span class="mi">8000</span>
+
+<span class="o">---------------------------------------------------------------------------</span>
+<span class="ne">NameError</span>                                 <span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">41</span><span class="o">-</span><span class="mi">6</span><span class="n">d1e9e06eb99</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+      <span class="mi">5</span>
+      <span class="mi">6</span> <span class="n">memory_scope_test</span><span class="p">()</span>
+<span class="o">----&gt;</span> <span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="o">.</span><span class="n">nbytes</span><span class="p">)</span>
+
+<span class="ne">NameError</span><span class="p">:</span> <span class="n">name</span> <span class="s1">&#39;memory_scope_variable&#39;</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">defined</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-3-1 docutils container">
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">memory_scope_test</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(){</span>
+    <span class="n">memory_scope_variable</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="m">1000</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="nf">object.size</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="p">))</span>
+<span class="p">}</span>
+<span class="nf">memory_scope_test</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">object.size</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="p">))</span>
+
+<span class="m">8048</span> <span class="n">bytes</span>
+
+<span class="n">Error</span> <span class="n">in</span> <span class="nf">structure</span><span class="p">(</span><span class="nf">.Call</span><span class="p">(</span><span class="n">C_objectSize</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">class</span> <span class="o">=</span> <span class="s">&quot;object_size&quot;</span><span class="p">)</span><span class="o">:</span> <span class="n">object</span> <span class="s">&#39;memory_scope_variable&#39;</span> <span class="n">not</span> <span class="n">found</span>
+<span class="n">Traceback</span><span class="o">:</span>
+
+<span class="m">1</span><span class="n">.</span> <span class="nf">print</span><span class="p">(</span><span class="nf">object.size</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="p">))</span>
+<span class="m">2</span><span class="n">.</span> <span class="nf">object.size</span><span class="p">(</span><span class="n">memory_scope_variable</span><span class="p">)</span>
+<span class="m">3</span><span class="n">.</span> <span class="nf">structure</span><span class="p">(</span><span class="nf">.Call</span><span class="p">(</span><span class="n">C_objectSize</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">class</span> <span class="o">=</span> <span class="s">&quot;object_size&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>One can also call the garbage collector explicitly after removing a variable.
+However, this should be thought as a band-aid to memory problems and should
+only be used when there’s an obvious target for garbage collection (e.g. some
+subroutine was called and the memory used by it could be freed, a variable was
+explicitly removed, etc.)</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-4-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-4-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-4-0 active docutils container">
+<p>This example requires the
+<a class="reference external" href="https://github.com/pythonprofilers/memory_profiler">memory_profiler</a>-package.
+It is included in the updated <code class="docutils literal notranslate"><span class="pre">environment.yml</span></code>, but can also be installed
+by running <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">memory_profiler</span></code> in a shell where the environment
+is activated.</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/gc.html#gc.collect">Python’s gc.collect-function</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gc</span>
+
+<span class="k">def</span> <span class="nf">memtest_nocollect</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">A_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span> <span class="o">+</span> <span class="n">A_mean</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">B</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">B_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">B_inv</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">memtest_collect</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">A_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">A</span>
+    <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span> <span class="o">+</span> <span class="n">A_mean</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">B</span> <span class="o">+</span> <span class="n">B</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">B_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">B_inv</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">memtest_nocollect</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">memtest_collect</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>
+
+<span class="mf">1.0000000000000036</span> <span class="mf">1.0000000000000249</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">load_ext</span> <span class="n">memory_profiler</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">memit</span> <span class="n">memtest_nocollect</span><span class="p">(</span><span class="mi">3000</span><span class="p">)</span>
+
+<span class="n">peak</span> <span class="n">memory</span><span class="p">:</span> <span class="mf">572.32</span> <span class="n">MiB</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="mf">343.27</span> <span class="n">MiB</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">memit</span> <span class="n">memtest_collect</span><span class="p">(</span><span class="mi">3000</span><span class="p">)</span>
+<span class="n">peak</span> <span class="n">memory</span><span class="p">:</span> <span class="mf">435.05</span> <span class="n">MiB</span><span class="p">,</span> <span class="n">increment</span><span class="p">:</span> <span class="mf">206.00</span> <span class="n">MiB</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-4-1 docutils container">
+<p><a class="reference external" href="https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/gc">R’s gc-function</a></p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">pryr</span><span class="p">)</span>
+
+<span class="n">memtest_nocollect</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">1000</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="nf">mem_used</span><span class="p">())</span>
+
+    <span class="n">A</span> <span class="o">&lt;-</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">A_mean</span> <span class="o">&lt;-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="s">&#39;No garbage collection done.&#39;</span><span class="p">)</span>
+    <span class="nf">Sys.sleep</span><span class="p">(</span><span class="m">5</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">&lt;-</span> <span class="n">B</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">B_inv</span> <span class="o">&lt;-</span> <span class="nf">solve</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="nf">mem_used</span><span class="p">())</span>
+
+    <span class="nf">return</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">B</span> <span class="o">%*%</span> <span class="n">B_inv</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="n">memtest_collect</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="m">1000</span><span class="p">){</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="nf">mem_used</span><span class="p">())</span>
+
+    <span class="n">A</span> <span class="o">&lt;-</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">A_mean</span> <span class="o">&lt;-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+    <span class="nf">rm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="nf">gc</span><span class="p">())</span>
+    <span class="nf">Sys.sleep</span><span class="p">(</span><span class="m">5</span><span class="p">)</span>
+
+    <span class="n">B</span> <span class="o">&lt;-</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">n</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">&lt;-</span> <span class="n">B</span> <span class="o">%*%</span> <span class="nf">t</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+    <span class="n">B_inv</span> <span class="o">&lt;-</span> <span class="nf">solve</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="nf">mem_used</span><span class="p">())</span>
+
+    <span class="nf">return</span><span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">B</span> <span class="o">%*%</span> <span class="n">B_inv</span><span class="p">))</span>
+<span class="p">}</span>
+
+<span class="nf">memtest_nocollect</span><span class="p">(</span><span class="m">3000</span><span class="p">)</span>
+<span class="nf">memtest_collect</span><span class="p">(</span><span class="m">3000</span><span class="p">)</span>
+
+<span class="m">62.4</span> <span class="n">MB</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;No garbage collection done.&quot;</span>
+<span class="m">278</span> <span class="n">MB</span>
+
+<span class="m">1.00000010849908</span>
+
+<span class="m">62.4</span> <span class="n">MB</span>
+          <span class="nf">used </span><span class="p">(</span><span class="n">Mb</span><span class="p">)</span> <span class="n">gc</span> <span class="nf">trigger  </span><span class="p">(</span><span class="n">Mb</span><span class="p">)</span> <span class="n">max</span> <span class="nf">used  </span><span class="p">(</span><span class="n">Mb</span><span class="p">)</span>
+<span class="n">Ncells</span>  <span class="m">881669</span> <span class="m">47.1</span>    <span class="m">1773930</span>  <span class="m">94.8</span>  <span class="m">1214762</span>  <span class="m">64.9</span>
+<span class="n">Vcells</span> <span class="m">1626091</span> <span class="m">12.5</span>   <span class="m">37149668</span> <span class="m">283.5</span> <span class="m">46639578</span> <span class="m">355.9</span>
+<span class="m">206</span> <span class="n">MB</span>
+
+<span class="m">1.00000000977889</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>By using these strategies we make it possible for the garbage cleaner to
+release memory during pipeline’s execution. This reduces our memory ceiling
+considerably.</p>
+<img alt="../_images/ram-pipeline-gc.svg" class="align-center" src="../_images/ram-pipeline-gc.svg" /></div>
+</div>
+<div class="section" id="storage-as-a-resource">
+<h3>Storage as a resource<a class="headerlink" href="#storage-as-a-resource" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="differences-in-different-storage-solutions">
+<h4>Differences in different storage solutions<a class="headerlink" href="#differences-in-different-storage-solutions" title="Permalink to this headline">¶</a></h4>
+<p>Storage solutions are often compared using the following metrics:</p>
+<ul class="simple">
+<li><p>Capacity - The amount of data that can be stored. This is of course important
+for data analysis problems as more capacity allows for more datasets.</p></li>
+<li><p>Random read/write speed - The speed of small read/write operations the
+storage system can do to at random. This is especially important when reading
+randomly from a file or when reading lots of small files.</p></li>
+<li><p>Sequential read/write speed - The speed of reading large chunks of data at
+once. This is very important when reading/writing datasets that are stored in
+binary data formats.</p></li>
+<li><p>Reliability - The reliability of the filesystem. Nothing is worse for data
+scientist than losing data.</p></li>
+</ul>
+<p>There are multiple different types of storage systems and all of them have
+different strengths and weaknesses. Some important systems are:</p>
+<ul class="simple">
+<li><p>Local SSDs - Most laptop and desktop computers nowadays have SSDs in them as
+their hard drives. These are very fast when it comes to disk access, but they
+usually do not have a big capacity and they are usually not backed up or
+duplicated.</p></li>
+<li><p>Network file system (NFS) - Commonly used as <code class="docutils literal notranslate"><span class="pre">/home</span></code>-directory for
+universities’ desktop machines. They are not the fastest when it comes to
+random or sequential access, but they usually have more capacity than
+hard drives and are backed up.</p></li>
+<li><p>Storage in high-performance computing (HPC) systems (Lustre etc.) - Work
+storage in HPC systems is usually designed for maximum capacity and
+maximum performance so they are ideal for large work data. They are best when
+accessed sequentially.</p></li>
+<li><p>Object storage systems (OpenStack, cloud) - These systems are widely used to
+store big datasets/models for cloud computing and archive data. When using
+cloud computing the compute instances usually have local SSDs and object
+storage is used for long term storage. Due to the nature of the storage
+system there is rarely any random access so all access is to complete
+objects.</p></li>
+</ul>
+<p>Table below tries to collect some of this information:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 10%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Storage system</p></th>
+<th class="head"><p>Capacity
+Capacity</p></th>
+<th class="head"><div class="line-block">
+<div class="line">Random</div>
+<div class="line">speed</div>
+</div>
+</th>
+<th class="head"><div class="line-block">
+<div class="line">Sequential</div>
+<div class="line">speed</div>
+</div>
+</th>
+<th class="head"><p>Reliability</p></th>
+<th class="head"><p>Best usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Local SSDs</p></td>
+<td><p>Small</p></td>
+<td><p>Great</p></td>
+<td><p>Good</p></td>
+<td><p>Low</p></td>
+<td><p>Temporary work disk</p></td>
+</tr>
+<tr class="row-odd"><td><p>NFS</p></td>
+<td><p>Medium</p></td>
+<td><p>Slow-Medium</p></td>
+<td><p>Slow-Medium</p></td>
+<td><p>High</p></td>
+<td><p>Storing initial datasets</p></td>
+</tr>
+<tr class="row-even"><td><p>HPC storage</p></td>
+<td><p>Huge</p></td>
+<td><p>Medium</p></td>
+<td><p>Great</p></td>
+<td><p>Medium</p></td>
+<td><p>Work disk for big data</p></td>
+</tr>
+<tr class="row-odd"><td><p>Object storage</p></td>
+<td><p>Huge</p></td>
+<td><p>Low</p></td>
+<td><p>Good</p></td>
+<td><p>High</p></td>
+<td><div class="line-block">
+<div class="line">Storing initial datasets,</div>
+<div class="line">completed models and results</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="using-storage-space-efficiently">
+<h4>Using storage space efficiently<a class="headerlink" href="#using-storage-space-efficiently" title="Permalink to this headline">¶</a></h4>
+<p>Storage is often thought of in trivial terms: do I have sufficient storage
+space to house my initial data and my results. This kind of a pipeline is
+visualized below:</p>
+<img alt="../_images/storage-pipeline-trivial.svg" class="align-center" src="../_images/storage-pipeline-trivial.svg" /><p>When working with a pipeline such as this one the main problem is to minimize
+the storage ceiling of the pipeline. This can be achieved by utilizing binary
+formats such as those <a class="reference internal" href="../chapter-2-data/#chapter2-binary"><span class="std std-ref">described in chapter 2</span></a>. Many
+advanced formats can utilize compression algorithms that reduce the amount
+of storage space needed. Choice of storage format usually depends on the
+structure of the data, support for the storage format in the frameworks and the
+access pattern to the data.</p>
+</div>
+<div class="section" id="accessing-storage-effectively">
+<h4>Accessing storage effectively<a class="headerlink" href="#accessing-storage-effectively" title="Permalink to this headline">¶</a></h4>
+<p>When working with big datasets one needs to be mindful of the data access
+pattern that the code uses. This is especially important when using an access
+pattern on a file systems that is not designed to handle that type of an
+access pattern.</p>
+<p>Access pattern here means the following:</p>
+<ul class="simple">
+<li><p>How many files need to be read/written?</p></li>
+<li><p>What is the size of a chunk that is read/written by data access operations?</p></li>
+<li><p>How often are read/write operations done?</p></li>
+</ul>
+<p>As an example, working with large CSV files can cause problems as most text
+reading/writing backends use small buffers (4-64kB). This means that to
+read/write a big file, a huge number of filesystem operations needs to be done.
+This can be mitigated by switching to a better reading library or to binary
+data formats that usually use buffer sizes of multiple MBs.</p>
+<p>Another case is deep learning, where data is usually provided in huge number
+of small files (images, text files). Storing pre-shuffled datasets in e.g.
+Parquet format and accessing them chunk at a time can greatly improve data
+loading and training performance.</p>
+<p>The following rules of thumb work for most cases:</p>
+<ol class="arabic simple">
+<li><p>Once you have loaded data, do as much as you can with it.</p></li>
+<li><p>Avoid having lots of small files.</p></li>
+<li><p>Avoid huge files (over 100GB).</p></li>
+<li><p>Split your data so that each file can be analyzed independently.</p></li>
+<li><p>Use existing readers/writers.</p></li>
+<li><p>Read/write only relevant data.</p></li>
+<li><p>Read/write data in big chunks.</p></li>
+<li><p>Do not read randomly from a file. Shuffle data by shuffling indixing arrays,
+not the data itself.</p></li>
+<li><p>Do not write results in a constant stream if its not human-readable
+status information. After the program has done something meaningful,
+collect output into chunks and write it as a whole.</p></li>
+<li><p>If you need to get random subsets of huge data (more than there’s memory),
+create a randomly shuffled file and read it chunk at a time.</p></li>
+</ol>
+</div>
+<div class="section" id="storage-as-a-balancing-resource">
+<h4>Storage as a balancing resource<a class="headerlink" href="#storage-as-a-balancing-resource" title="Permalink to this headline">¶</a></h4>
+<p>Storage can also be used to reduce the resource costs of other parts
+of the pipeline. Let’s consider the pipeline presented below:</p>
+<img alt="../_images/storage-pipeline-largeram.svg" class="align-center" src="../_images/storage-pipeline-largeram.svg" /><p>In the example pipeline the data loading part requires huge amounts of
+temporary memory. This increases the memory ceiling of the pipeline. When
+running pipelines such as this in HPC cluster or cloud infrastructure this
+extra memory requirement can reduce pipeline’s job priority or increase
+the cost of the required cloud instance. This is especially problematic
+if the data pre-processing is identical in every run of this pipeline.</p>
+<p>In situations like the one described before storage can be used as a balancing
+tool. If after preprocessing the preprocessed dataset is stored into storage
+we will reduce the required memory ceiling by increasing our storage
+ceiling.</p>
+<img alt="../_images/storage-pipeline-smallram.svg" class="align-center" src="../_images/storage-pipeline-smallram.svg" /><p>This is by no means the only situation where temporary storage is important.
+Temporary storage can be useful in any of the following situations:</p>
+<ul class="simple">
+<li><p>Splitting data preparation and data modeling to two different parts that can
+be run independently.</p></li>
+<li><p>Creating subsets from huge initial dataset.</p></li>
+<li><p>Saving model parameters after training your model / running your analysis.</p></li>
+</ul>
+<p>As a generic rule one can use the following: Did my program just do something
+that is either</p>
+<ol class="arabic simple">
+<li><p>Costly to replicate (time- or resourcewise)</p></li>
+<li><p>Unnecessary to do more than once and its results can be used more than once.</p></li>
+</ol>
+<p>If answer to either of the results is yes, you might have a case for using
+temporary storage to split your pipeline.</p>
+</div>
+</div>
+<div class="section" id="best-practices">
+<h3>Best practices<a class="headerlink" href="#best-practices" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 33%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Best practice</p></th>
+<th class="head"><p>Implementation strategies</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CPU</p></td>
+<td><div class="line-block">
+<div class="line">Do not oversubscribe</div>
+<div class="line">the CPU.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Limit the number of processes /</div>
+<div class="line">threads to the amount that CPU</div>
+<div class="line">can support.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>CPU</p></td>
+<td><div class="line-block">
+<div class="line">Try to avoid cache</div>
+<div class="line">misses.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Keep important data in</div>
+<div class="line">columns or numeric vectors</div>
+<div class="line">(vector/array, ndarray).</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>CPU</p></td>
+<td><div class="line-block">
+<div class="line">Use vectorization.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Operate on vectors using basic</div>
+<div class="line">operators when possible. Use</div>
+<div class="line">existing functions from</div>
+<div class="line">libraries if possible.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>RAM</p></td>
+<td><div class="line-block">
+<div class="line">Only keep data</div>
+<div class="line">that will be used</div>
+<div class="line">later on by the</div>
+<div class="line">pipeline.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Select only relevant rows and</div>
+<div class="line">columns. Use storage to skip</div>
+<div class="line">unnecessary preprocessing steps.</div>
+<div class="line">Use nested dataframes if your</div>
+<div class="line">data doesn’t fit to the tidy</div>
+<div class="line">data format. When dealing with</div>
+<div class="line">time series data resample it to</div>
+<div class="line">relevant time scale. Minimize</div>
+<div class="line">data concatenation operations.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>RAM</p></td>
+<td><div class="line-block">
+<div class="line">Keep data in good</div>
+<div class="line">data types.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Use integers/floating point</div>
+<div class="line">numbers for numeric data. Use</div>
+<div class="line">categories for columns where it</div>
+<div class="line">brings benefits. Turn dates to</div>
+<div class="line">proper date objects.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>RAM</p></td>
+<td><div class="line-block">
+<div class="line">Release temporary</div>
+<div class="line">variables after they</div>
+<div class="line">are no longer</div>
+<div class="line">needed.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Use functions to do</div>
+<div class="line">calculations. Don’t keep</div>
+<div class="line">unneeded variables in the global</div>
+<div class="line">scope.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>RAM</p></td>
+<td><div class="line-block">
+<div class="line">Enable garbage</div>
+<div class="line">collector.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Use functions to do</div>
+<div class="line">calculations. Explicitly delete</div>
+<div class="line">variables you no longer need.</div>
+<div class="line">Call garbage collector when</div>
+<div class="line">there’s a good chance of</div>
+<div class="line">reclaiming used memory.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Once you have loaded</div>
+<div class="line">a dataset, use it as</div>
+<div class="line">much as you can.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Load data at the start of your</div>
+<div class="line">pipeline and try to modify it as</div>
+<div class="line">little as possible. If you loop</div>
+<div class="line">over data files, have the file</div>
+<div class="line">loop be the outermost loop.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Avoid small files.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Preprocess small files and join</div>
+<div class="line">them together.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Avoid really huge</div>
+<div class="line">files.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Try to split your data to</div>
+<div class="line">pieces that you can analyze</div>
+<div class="line">independently.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Read only relevant</div>
+<div class="line">data.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Try to split your data to</div>
+<div class="line">pieces that you can analyze</div>
+<div class="line">independently. Use data formats</div>
+<div class="line">that support reading partial</div>
+<div class="line">chunks (Parquet, HDF5).</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Avoid really huge</div>
+<div class="line">files.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Try to split your data to</div>
+<div class="line">pieces that you can analyze</div>
+<div class="line">independently.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Access your data in</div>
+<div class="line">big chunks.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Use good libraries and binary</div>
+<div class="line">data formats.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Avoid random access.</div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Shuffle data in memory by</div>
+<div class="line">shuffling indexing arrays, not</div>
+<div class="line">the data. When working with huge</div>
+<div class="line">data, do the shuffling</div>
+<div class="line">beforehand, if possible.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Storage</p></td>
+<td><div class="line-block">
+<div class="line">Avoid constant</div>
+<div class="line">stream of writes.</div>
+<div class="line"><br /></div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">Write results in chunks after</div>
+<div class="line">the program has created</div>
+<div class="line">something of value.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="parallelization-strategies">
+<h2>Parallelization strategies<a class="headerlink" href="#parallelization-strategies" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="data-parallelism">
+<h3>Data parallelism<a class="headerlink" href="#data-parallelism" title="Permalink to this headline">¶</a></h3>
+<p>Huge number of data analysis workflows can be parallelized with data
+parallelism (also known as embarassingly parallel). In embarassingly
+parallel pipelines the data and/or model hyperparameters are divided into
+separate identical pipelines. Each pipeline then does the analysis for its
+piece of the data. This is visualized below.</p>
+<img alt="../_images/pipeline-data-parallel.svg" class="align-center" src="../_images/pipeline-data-parallel.svg" /><p>This is especially effective if you have access to HPC/cloud resources that can
+be used to run the pipelines. Lots of big data analysis works in
+split-apply-combine-type pipelines where computing tasks are spread across
+multiple nodes with their own part of the data and results are combined after
+the calculations are finished.</p>
+<p>Even if you have identical dataset for each pipeline, you can still do an
+embarassingly parallel pipeline if you think about what changes between
+pipelines. The following questions might be helpful at recognizing how you can
+split your pipeline:</p>
+<ul class="simple">
+<li><p>Do I run the same pipeline, but each time with different data?</p></li>
+<li><p>Do I run the same pipeline, but with different random number seed/shuffling?</p></li>
+<li><p>Do I run the same pipeline, but each time with different model?</p></li>
+<li><p>Do I run the same pipeline, but with different hyperparameters?</p></li>
+</ul>
+</div>
+<div class="section" id="using-internal-parallelization-provided-by-libraries">
+<h3>Using internal parallelization provided by libraries<a class="headerlink" href="#using-internal-parallelization-provided-by-libraries" title="Permalink to this headline">¶</a></h3>
+<p>R and numpy, scipy etc. are built against libraries such as BLAS, FFTW
+and LAPACK that provide optimized routines for linear algebra, Fourier
+transforms etc.. These libraries are usually in turn built to support
+multihreading during the execution of their subroutines.</p>
+<p>If your data code does a lot of matrix operations or frequency analysis it
+might be a good idea to check that your code uses multiple threads during
+its calculations.</p>
+<p>Below is an example that does a simple matrix inversion for a symmetrical
+matrix of size 4000 by 4000 with 1 and 4 threads.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-5-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-5-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-5-0 active docutils container">
+<p>This example uses
+<a class="reference external" href="https://docs.anaconda.com/mkl-service/">mkl</a>-module provided by Anaconda
+to change the number of threads during runtime. In normal use it is better
+to set the <code class="docutils literal notranslate"><span class="pre">OMP_NUM_THREADS</span></code>-environment variable as that works with
+various different libraries.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">mkl</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="mi">4000</span><span class="p">,</span><span class="mi">4000</span><span class="p">))</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="n">A</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">mkl</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">time_1thread_1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">time_1thread_2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">time_1thread</span> <span class="o">=</span> <span class="n">time_1thread_2</span> <span class="o">-</span> <span class="n">time_1thread_1</span>
+
+<span class="n">mkl</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">time_4thread_1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">time_4thread_2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="n">time_4thread</span> <span class="o">=</span> <span class="n">time_4thread_2</span> <span class="o">-</span> <span class="n">time_4thread_1</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Time taken:</span>
+
+<span class="s2">1 thread: </span><span class="si">%.2f</span><span class="s2"></span>
+<span class="s2">4 threads: </span><span class="si">%.2f</span><span class="s2"></span>
+
+<span class="s2">Speedup: </span><span class="si">%.2f</span><span class="s2"></span>
+<span class="s2">&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">time_1thread</span><span class="p">,</span> <span class="n">time_4thread</span><span class="p">,</span> <span class="n">time_1thread</span><span class="o">/</span><span class="n">time_4thread</span><span class="p">))</span>
+
+
+<span class="n">Time</span> <span class="n">taken</span><span class="p">:</span>
+
+<span class="mi">1</span> <span class="n">thread</span><span class="p">:</span> <span class="mf">4.01</span>
+<span class="mi">4</span> <span class="n">threads</span><span class="p">:</span> <span class="mf">1.55</span>
+
+<span class="n">Speedup</span><span class="p">:</span> <span class="mf">2.59</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-5-1 docutils container">
+<p>This example creates a new <code class="docutils literal notranslate"><span class="pre">omp_test.R</span></code> file and runs it from the command
+line. It might not work on Windows.</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">cat</span><span class="p">(</span><span class="s">&quot;</span>
+<span class="s">A &lt;- matrix(runif(4000*4000), ncol=4000)</span>
+<span class="s">A &lt;- A %*% t(A)</span>
+
+<span class="s">time_1 &lt;- Sys.time()</span>
+<span class="s">A_inv &lt;- solve(A)</span>
+<span class="s">time_2 &lt;- Sys.time()</span>
+<span class="s">print(as.double(time_2 - time_1))</span>
+<span class="s">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="s">&quot;omp_test.R&quot;</span><span class="p">)</span>
+
+<span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">OMP_NUM_THREADS</span><span class="o">=</span><span class="s">&quot;1&quot;</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">&lt;-</span> <span class="nf">system</span><span class="p">(</span><span class="s">&#39;Rscript omp_test.R&#39;</span><span class="p">,</span> <span class="n">intern</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">time_1thread</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="nf">str_extract</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s">&#39;\\d.\\d+&#39;</span><span class="p">))</span>
+
+<span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">OMP_NUM_THREADS</span><span class="o">=</span><span class="s">&quot;4&quot;</span><span class="p">)</span>
+<span class="n">output</span> <span class="o">&lt;-</span> <span class="nf">system</span><span class="p">(</span><span class="s">&#39;Rscript omp_test.R&#39;</span><span class="p">,</span> <span class="n">intern</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">time_4thread</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="nf">str_extract</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s">&#39;\\d.\\d+&#39;</span><span class="p">))</span>
+
+<span class="nf">cat</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&quot;</span>
+<span class="s">Time taken:</span>
+
+<span class="s">1 thread: %.2f</span>
+<span class="s">4 threads: %.2f</span>
+
+<span class="s">Speedup: %.2f&quot;</span><span class="p">,</span> <span class="n">time_1thread</span><span class="p">,</span> <span class="n">time_4thread</span><span class="p">,</span> <span class="n">time_1thread</span><span class="o">/</span><span class="n">time_4thread</span><span class="p">))</span>
+
+<span class="n">Time</span> <span class="n">taken</span><span class="o">:</span>
+
+<span class="m">1</span> <span class="n">thread</span><span class="o">:</span> <span class="m">4.49</span>
+<span class="m">4</span> <span class="n">threads</span><span class="o">:</span> <span class="m">1.75</span>
+
+<span class="n">Speedup</span><span class="o">:</span> <span class="m">2.56</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="multiprocessing">
+<h3>Multiprocessing<a class="headerlink" href="#multiprocessing" title="Permalink to this headline">¶</a></h3>
+<p>In multiprocessing one starts multiple processes (hence multiprocessing) and
+gives each process an individual task to work through.</p>
+<div class="section" id="is-multiprocessing-worth-it">
+<h4>Is multiprocessing worth it?<a class="headerlink" href="#is-multiprocessing-worth-it" title="Permalink to this headline">¶</a></h4>
+<p>Normal serial code can’t just be run in parallel without modifications. In
+order to get the code to run in parallel, one needs to understand what
+parallalization implementation your code has, if any. A program doesn’t
+magically get faster when you have access to more processors if it’s not
+designed to use them.</p>
+<p>When deciding whether using parallel programming is worth the effort, one
+should be mindful of
+<a class="reference external" href="https://en.wikipedia.org/wiki/Amdahl%27s_law">Amdahl’s law</a> and
+<a class="reference external" href="https://en.wikipedia.org/wiki/Gustafson%27s_law">Gustafson’s law</a>.
+All programs have some parts that can only be executed in serial and
+thus the theoretical speedup that one can get from using parallel
+programming depends on two factors:</p>
+<ol class="arabic simple">
+<li><p>How much of programs’ execution could be done in parallel?</p></li>
+<li><p>What would be the speedup for that parallel part?</p></li>
+</ol>
+<p>Thus if your program runs mainly in serial but has a small parallel
+part, running it in parallel might not be worth it. Sometimes, doing
+data parallelism is much more fruitful approach.</p>
+<p>Another important note regarding parallelism is that all the applications
+scale good up to some upper limit which depends on application implementation,
+size and type of problem you solve and some other factors. The best practice
+is to benchmark your code on different number of CPU cores before
+you start actual production runs.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Python has a global interpreter lock (GIL), which forces some operations to
+be executed on only one thread and when these operations are occuring, other
+threads will be idle. These kinds of operations include reading files and
+doing print statements. Thus one should be extra careful with multithreaded
+code as it is easy to create seemingly parallel code that does not actually
+utilize multiple CPUs. Most Python parallelization implementations use
+multiprocessing instead of multithreading to bypass the GIL.</p>
+</div>
+</div>
+<div class="section" id="doing-parallel-maps-with-multiprocessing">
+<h4>Doing parallel maps with multiprocessing<a class="headerlink" href="#doing-parallel-maps-with-multiprocessing" title="Permalink to this headline">¶</a></h4>
+<p>One of the easiest ways of parallelization besides the data parallelization
+is to use parallel mappings. In parallel mappings a pool of workers is created
+with a number of workers. Afterwards, when the parallel map functions is
+called with a function and a iterable list-like object, the parallel map splits
+elements from the list to the workers and each worker operates the function on
+its element.</p>
+<p>Below is a minimal working example. Using parallelization in this case provides
+no speed benefits, but this example shows how the parallel pool works.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-6-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-6-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-6-0 active docutils container">
+<p><a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing.pool">Python’s multiprocessing.Pool</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+
+<span class="k">def</span> <span class="nf">x_squared</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">*</span><span class="n">x</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;x&#39;</span><span class="p">:</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">101</span><span class="p">)})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Run mapping with parallel pool</span>
+<span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="k">as</span> <span class="n">parallel_pool</span><span class="p">:</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">parallel_pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">x_squared</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+
+<span class="c1"># Convert resulting list into a Series</span>
+<span class="n">y_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add series to data</span>
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_series</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+
+   <span class="n">x</span>
+<span class="mi">0</span>  <span class="mi">1</span>
+<span class="mi">1</span>  <span class="mi">2</span>
+<span class="mi">2</span>  <span class="mi">3</span>
+<span class="mi">3</span>  <span class="mi">4</span>
+<span class="mi">4</span>  <span class="mi">5</span>
+   <span class="n">x</span>   <span class="n">y</span>
+<span class="mi">0</span>  <span class="mi">1</span>   <span class="mi">1</span>
+<span class="mi">1</span>  <span class="mi">2</span>   <span class="mi">4</span>
+<span class="mi">2</span>  <span class="mi">3</span>   <span class="mi">9</span>
+<span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">16</span>
+<span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">25</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-6-1 docutils container">
+<p>This example requires the
+<a class="reference external" href="https://davisvaughan.github.io/furrr/index.html">r-furrr</a>-library. It is
+included in the updated <code class="docutils literal notranslate"><span class="pre">environment.yml</span></code>, but can also be installed by
+running
+<code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">install</span> <span class="pre">--freeze-installed</span> <span class="pre">-c</span> <span class="pre">defaults</span> <span class="pre">-c</span> <span class="pre">r</span> <span class="pre">-c</span> <span class="pre">conda-forge</span> <span class="pre">r-listenv==0.8.0</span></code>
+in a shell while the environment is activated.</p>
+<p><a class="reference external" href="https://www.rdocumentation.org/packages/furrr/versions/0.1.0/topics/future_map">furrr’s future_map</a></p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">furrr</span><span class="p">)</span>
+
+<span class="n">x_squared</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nf">return</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">data</span> <span class="o">&lt;-</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nf">seq</span><span class="p">(</span><span class="m">100</span><span class="p">))</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+<span class="c1"># Set up our parallel pool</span>
+<span class="nf">plan</span><span class="p">(</span><span class="n">multisession</span><span class="p">,</span> <span class="n">workers</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">&lt;-</span> <span class="n">data</span> <span class="o">%&gt;%</span>
+    <span class="c1"># Run parallel map (future_map) from furrr</span>
+    <span class="nf">mutate</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="nf">future_map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_squared</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    <span class="c1"># Turn resulting list into a vector of integers</span>
+    <span class="nf">mutate</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="nf">flatten_int</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+<span class="nf">glimpse</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># A tibble: 6 x 1</span>
+      <span class="n">x</span>
+  <span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span>
+<span class="m">1</span>     <span class="m">1</span>
+<span class="m">2</span>     <span class="m">2</span>
+<span class="m">3</span>     <span class="m">3</span>
+<span class="m">4</span>     <span class="m">4</span>
+<span class="m">5</span>     <span class="m">5</span>
+<span class="m">6</span>     <span class="m">6</span>
+<span class="n">Observations</span><span class="o">:</span> <span class="m">100</span>
+<span class="n">Variables</span><span class="o">:</span> <span class="m">2</span>
+<span class="o">$</span> <span class="n">x</span> <span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">5</span><span class="p">,</span> <span class="m">6</span><span class="p">,</span> <span class="m">7</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">9</span><span class="p">,</span> <span class="m">10</span><span class="p">,</span> <span class="m">11</span><span class="p">,</span> <span class="m">12</span><span class="p">,</span> <span class="m">13</span><span class="p">,</span> <span class="m">14</span><span class="p">,</span> <span class="m">15</span><span class="p">,</span> <span class="m">16</span><span class="p">,</span> <span class="m">17</span><span class="p">,</span> <span class="m">18</span><span class="p">,</span> <span class="m">19</span><span class="p">,</span> …
+<span class="o">$</span> <span class="n">y</span> <span class="o">&lt;</span><span class="n">int</span><span class="o">&gt;</span> <span class="m">1</span><span class="p">,</span> <span class="m">4</span><span class="p">,</span> <span class="m">9</span><span class="p">,</span> <span class="m">16</span><span class="p">,</span> <span class="m">25</span><span class="p">,</span> <span class="m">36</span><span class="p">,</span> <span class="m">49</span><span class="p">,</span> <span class="m">64</span><span class="p">,</span> <span class="m">81</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="m">121</span><span class="p">,</span> <span class="m">144</span><span class="p">,</span> <span class="m">169</span><span class="p">,</span> <span class="m">196</span><span class="p">,</span> <span class="m">225</span><span class="p">,</span> <span class="m">256</span><span class="p">,</span>…
+</pre></div>
+</div>
+</div>
+</div>
+<p>If the data has been formatted as nested dataframes an analysis function can be
+run on the split pieces of the dataset. These are the situations where the
+parallel pool can provided a significant speedup.</p>
+<p>Let’s use parallel mappings to parallelize the pipeline from chapter 3.</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-7-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-7-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-7-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">functools</span>
+
+<span class="k">def</span> <span class="nf">chapter3_pipeline_parallel</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="n">filesizes</span> <span class="o">=</span> <span class="n">load_filesizes</span><span class="p">(</span><span class="s1">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+    <span class="n">yearly_bytes_sum</span> <span class="o">=</span> <span class="n">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span><span class="s1">&#39;BytesLog2&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Files&#39;</span><span class="p">,</span> <span class="s1">&#39;SpaceUsage&#39;</span><span class="p">],</span> <span class="s1">&#39;sum&#39;</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_means</span> <span class="o">=</span> <span class="n">yearly_bytes_sum</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Year&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">({</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">x</span><span class="p">}))</span>
+
+    <span class="c1"># Actual parallel part</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Here we use functools.partial to create a function with partially filled</span>
+<span class="sd">    arguments because multiprocessing.Pool.map does not work that well with</span>
+<span class="sd">    lambda-functions. get_bootstrapped_means was changed to allow target_col</span>
+<span class="sd">    and weight_col to be set with keyword arguments so that the arguments are</span>
+<span class="sd">    given in correct order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bootstrapping_function</span> <span class="o">=</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">get_bootstrapped_means</span><span class="p">,</span> <span class="n">target_col</span><span class="o">=</span><span class="s1">&#39;BytesLog2&#39;</span><span class="p">,</span> <span class="n">weight_col</span><span class="o">=</span><span class="s1">&#39;Files&#39;</span><span class="p">,</span> <span class="n">n_means</span><span class="o">=</span><span class="n">n_means</span><span class="p">)</span>
+
+    <span class="c1"># Initialize a parallel pool with n_workers workers</span>
+    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">n_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">parallel_pool</span><span class="p">:</span>
+        <span class="c1"># Map a function to each dataset. Output is a list of ndarrays.</span>
+        <span class="n">sampled_means</span> <span class="o">=</span> <span class="n">parallel_pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">bootstrapping_function</span><span class="p">,</span> <span class="n">bootstrapped_means</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Convert list of ndarrays into a Series of ndarrays</span>
+    <span class="n">sampled_means</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">sampled_means</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SampledMeans&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">bootstrapped_means</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="c1"># Place Series into our DataFrame</span>
+    <span class="n">bootstrapped_means</span><span class="p">[</span><span class="s1">&#39;SampledMeans&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sampled_means</span>
+    <span class="c1"># End of the parallel part</span>
+
+    <span class="n">bootstrapped_means</span><span class="p">[</span><span class="s1">&#39;Mean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bootstrapped_means</span><span class="p">[</span><span class="s1">&#39;SampledMeans&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_means</span> <span class="o">=</span> <span class="n">bootstrapped_means</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="s1">&#39;Year&#39;</span><span class="p">,</span><span class="s1">&#39;Mean&#39;</span><span class="p">]]</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">bootstrapped_means</span><span class="p">)</span>
+
+<span class="c1"># Measure performance and verify results</span>
+<span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">means_orig</span> <span class="o">=</span> <span class="n">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">orig_time</span> <span class="o">=</span> <span class="n">time2</span><span class="o">-</span><span class="n">time1</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Original pipeline: </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">orig_time</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">means_orig</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">n_workers</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">time1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">means</span> <span class="o">=</span> <span class="n">chapter3_pipeline_parallel</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="n">n_workers</span><span class="p">)</span>
+    <span class="n">time2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Time taken by </span><span class="si">%d</span><span class="s1"> workers: </span><span class="si">%.2f</span><span class="s1"> Speedup was: </span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">n_workers</span><span class="p">,</span> <span class="n">time2</span> <span class="o">-</span> <span class="n">time1</span><span class="p">,</span> <span class="n">orig_time</span><span class="o">/</span><span class="p">(</span><span class="n">time2</span><span class="o">-</span><span class="n">time1</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Maximum difference between calculated means:&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="s1">&#39;Mean&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">means_orig</span><span class="p">[</span><span class="s1">&#39;Mean&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+
+    <span class="n">Original</span> <span class="n">pipeline</span><span class="p">:</span> <span class="mf">14.09</span>
+      <span class="n">Year</span>       <span class="n">Mean</span>
+<span class="mi">0</span>   <span class="mf">2010.0</span>  <span class="mf">12.974306</span>
+<span class="mi">1</span>   <span class="mf">2011.0</span>  <span class="mf">14.041244</span>
+<span class="mi">2</span>   <span class="mf">2012.0</span>  <span class="mf">10.682697</span>
+<span class="mi">3</span>   <span class="mf">2013.0</span>  <span class="mf">13.406084</span>
+<span class="mi">4</span>   <span class="mf">2014.0</span>  <span class="mf">14.038426</span>
+<span class="mi">5</span>   <span class="mf">2015.0</span>  <span class="mf">11.746958</span>
+<span class="mi">6</span>   <span class="mf">2016.0</span>  <span class="mf">13.539932</span>
+<span class="mi">7</span>   <span class="mf">2017.0</span>  <span class="mf">11.979564</span>
+<span class="mi">8</span>   <span class="mf">2018.0</span>  <span class="mf">13.280734</span>
+<span class="mi">9</span>   <span class="mf">2019.0</span>  <span class="mf">13.699527</span>
+<span class="mi">10</span>  <span class="mf">2020.0</span>  <span class="mf">13.231302</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">12.62</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">1.12</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012442000000000064</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">6.94</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">2.03</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012442000000000064</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">3</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">4.82</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">2.92</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012442000000000064</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">4</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">4.03</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">3.50</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012591000000000463</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-7-1 docutils container">
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="n">chapter3_pipeline_parallel</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="m">10000</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="m">1</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">filesizes</span> <span class="o">&lt;-</span> <span class="nf">load_filesizes</span><span class="p">(</span><span class="s">&#39;../data/filesizes_timestamps.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">yearly_bytes_sum</span> <span class="o">&lt;-</span> <span class="nf">aggregate_filesize_data</span><span class="p">(</span><span class="n">filesizes</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Year&#39;</span><span class="p">,</span><span class="s">&#39;BytesLog2&#39;</span><span class="p">),</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#39;Files&#39;</span><span class="p">,</span> <span class="s">&#39;SpaceUsage&#39;</span><span class="p">),</span> <span class="n">sum</span><span class="p">)</span>
+
+    <span class="n">bootstrapping_function</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">get_bootstrapped_means</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s">&#39;BytesLog2&#39;</span><span class="p">,</span> <span class="s">&#39;Files&#39;</span><span class="p">,</span> <span class="n">n_means</span><span class="o">=</span><span class="n">n_means</span><span class="p">)</span>
+
+    <span class="c1"># Actual parallel part</span>
+
+    <span class="c1"># Initialize a parallel pool with n_workers workers</span>
+    <span class="nf">plan</span><span class="p">(</span><span class="n">multisession</span><span class="p">,</span> <span class="n">workers</span> <span class="o">=</span> <span class="n">n_workers</span><span class="p">)</span>
+
+    <span class="n">bootstrapped_yearly_means</span> <span class="o">&lt;-</span> <span class="n">yearly_bytes_sum</span> <span class="o">%&gt;%</span>
+        <span class="nf">group_by</span><span class="p">(</span><span class="n">Year</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">nest</span><span class="p">()</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span>
+            <span class="c1"># Map a function to each dataset. Output is a list of numeric vectors.</span>
+            <span class="n">SampledMeans</span><span class="o">=</span><span class="nf">future_map</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bootstrapping_function</span><span class="p">,</span> <span class="n">.options</span><span class="o">=</span><span class="nf">furrr_options</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)),</span>
+            <span class="n">Mean</span><span class="o">=</span><span class="nf">future_map</span><span class="p">(</span><span class="n">SampledMeans</span><span class="p">,</span> <span class="n">mean</span><span class="p">),</span>
+        <span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">data</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">select</span><span class="p">(</span><span class="n">Year</span><span class="p">,</span> <span class="n">Mean</span><span class="p">)</span>
+
+    <span class="nf">return</span><span class="p">(</span><span class="n">bootstrapped_yearly_means</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c1"># Measure performance and verify results</span>
+<span class="n">time1</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+<span class="n">means_orig</span> <span class="o">&lt;-</span> <span class="nf">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="m">100000</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="nf">mutate</span><span class="p">(</span><span class="n">Mean</span><span class="o">=</span><span class="nf">flatten_dbl</span><span class="p">(</span><span class="n">Mean</span><span class="p">))</span>
+<span class="n">means_orig_means</span> <span class="o">&lt;-</span> <span class="nf">flatten_dbl</span><span class="p">(</span><span class="n">means_orig</span><span class="p">)</span>
+<span class="n">time2</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+
+<span class="n">orig_time</span> <span class="o">&lt;-</span> <span class="n">time2</span><span class="o">-</span><span class="n">time1</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&#39;Original pipeline: %.2f&#39;</span><span class="p">,</span><span class="n">orig_time</span><span class="p">))</span>
+<span class="nf">head</span><span class="p">(</span><span class="n">means_orig</span><span class="p">,</span> <span class="m">20</span><span class="p">)</span>
+
+<span class="nf">for </span><span class="p">(</span><span class="n">n_workers</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="m">4</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">time1</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+    <span class="n">means</span> <span class="o">&lt;-</span> <span class="nf">chapter3_pipeline_parallel</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="m">100000</span><span class="p">,</span> <span class="n">n_workers</span><span class="o">=</span><span class="n">n_workers</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="nf">mutate</span><span class="p">(</span><span class="n">Mean</span><span class="o">=</span><span class="nf">flatten_dbl</span><span class="p">(</span><span class="n">Mean</span><span class="p">))</span>
+    <span class="n">time2</span> <span class="o">&lt;-</span> <span class="nf">Sys.time</span><span class="p">()</span>
+    <span class="nf">print</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&#39;Time taken by %d workers: %.2f Speedup was: %.2f&#39;</span><span class="p">,</span> <span class="n">n_workers</span><span class="p">,</span> <span class="n">time2</span> <span class="o">-</span> <span class="n">time1</span><span class="p">,</span> <span class="n">orig_time</span><span class="o">/</span><span class="nf">as.double</span><span class="p">(</span><span class="n">time2</span><span class="o">-</span><span class="n">time1</span><span class="p">)))</span>
+    <span class="nf">print</span><span class="p">(</span><span class="nf">sprintf</span><span class="p">(</span><span class="s">&#39;Maximum difference between calculated means: %f&#39;</span><span class="p">,</span> <span class="nf">max</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">means</span><span class="p">[</span><span class="s">&#39;Mean&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">means_orig</span><span class="p">[</span><span class="s">&#39;Mean&#39;</span><span class="p">]))))</span>
+<span class="p">}</span>
+
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Original pipeline: 11.92&quot;</span>
+
+<span class="n">Year</span>    <span class="n">Mean</span>
+<span class="m">2010</span>    <span class="m">12.97936</span>
+<span class="m">2011</span>    <span class="m">14.04265</span>
+<span class="m">2012</span>    <span class="m">10.66918</span>
+<span class="m">2013</span>    <span class="m">13.41251</span>
+<span class="m">2014</span>    <span class="m">14.03964</span>
+<span class="m">2015</span>    <span class="m">11.74544</span>
+<span class="m">2016</span>    <span class="m">13.54507</span>
+<span class="m">2017</span>    <span class="m">11.97751</span>
+<span class="m">2018</span>    <span class="m">13.27919</span>
+<span class="m">2019</span>    <span class="m">13.69971</span>
+<span class="m">2020</span>    <span class="m">13.22932</span>
+
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 1 workers: 12.42 Speedup was: 0.96&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.003174&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 2 workers: 7.49 Speedup was: 1.59&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.005813&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 3 workers: 6.04 Speedup was: 1.97&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.005813&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 4 workers: 5.47 Speedup was: 2.18&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.005813&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are some downsides to using parallel pools. Firstly, because the
+processing is done in a separate process, the data given to the processing
+function needs to be serialized and given to the other process. This means
+that the data that is already in memory is copied multiple times across the
+parallel pool. This can be somewhat mitigated by giving each process the bare
+minimum of data that they need to complete their task.</p>
+<p>Second problem is related to the initialization of the parallel pool. For
+small tasks the time that is required to initialize the pool can be much larger
+than any potential speedup. For example, the R version of our bootstrapping
+code was so fast and the initialization of the pool so slow, that speedup
+could only be observed after the number of means calculated was nearing 100000.</p>
+</div>
+</div>
+</div>
+<div class="section" id="optimizing-code-with-profilers">
+<h2>Optimizing code with profilers<a class="headerlink" href="#optimizing-code-with-profilers" title="Permalink to this headline">¶</a></h2>
+<p>For both Python and R there exists many good profiling suites, but both also
+come with a good profiler that can describe where the code uses most of its
+time.</p>
+<p>Lets profile the bootstrapping pipeline from chapter 3:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-8-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-8-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-8-0 active docutils container">
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">cProfile</span>
+<span class="kn">import</span> <span class="nn">pstats</span>
+<span class="kn">import</span> <span class="nn">io</span>
+
+<span class="c1"># Initiate profiler</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">cProfile</span><span class="o">.</span><span class="n">Profile</span><span class="p">(</span><span class="n">subcalls</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">enable</span><span class="p">()</span>
+
+<span class="c1"># Run the pipeline</span>
+<span class="n">chapter3_pipeline</span><span class="p">(</span><span class="n">n_means</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Stop profiling</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
+
+<span class="c1"># Print stats by total time used (top 20)</span>
+<span class="n">ps</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="n">pr</span><span class="p">)</span><span class="o">.</span><span class="n">strip_dirs</span><span class="p">()</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;tottime&#39;</span><span class="p">)</span>
+<span class="n">ps</span><span class="o">.</span><span class="n">print_stats</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Print into a StringIO buffer and find top 20 function calls by cumulative time</span>
+<span class="n">io_stream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+<span class="n">ps_methods</span> <span class="o">=</span> <span class="n">pstats</span><span class="o">.</span><span class="n">Stats</span><span class="p">(</span><span class="n">pr</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">io_stream</span><span class="p">)</span><span class="o">.</span><span class="n">strip_dirs</span><span class="p">()</span><span class="o">.</span><span class="n">sort_stats</span><span class="p">(</span><span class="s1">&#39;cumulative&#39;</span><span class="p">)</span>
+<span class="n">ps_methods</span><span class="o">.</span><span class="n">print_stats</span><span class="p">()</span>
+
+<span class="n">method_lines</span> <span class="o">=</span> <span class="p">[</span> <span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">io_stream</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="s1">&#39; {method&#39;</span> <span class="ow">in</span> <span class="n">line</span> <span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Top methods by cumulative time:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">method_lines</span><span class="p">[:</span><span class="mi">20</span><span class="p">]))</span>
+
+            <span class="mi">17987532</span> <span class="n">function</span> <span class="n">calls</span> <span class="p">(</span><span class="mi">17324700</span> <span class="n">primitive</span> <span class="n">calls</span><span class="p">)</span> <span class="ow">in</span> <span class="mf">17.942</span> <span class="n">seconds</span>
+
+   <span class="n">Ordered</span> <span class="n">by</span><span class="p">:</span> <span class="n">internal</span> <span class="n">time</span>
+   <span class="n">List</span> <span class="n">reduced</span> <span class="kn">from</span> <span class="mi">1380</span> <span class="n">to</span> <span class="mi">20</span> <span class="n">due</span> <span class="n">to</span> <span class="n">restriction</span> <span class="o">&lt;</span><span class="mi">20</span><span class="o">&gt;</span>
+
+   <span class="n">ncalls</span>  <span class="n">tottime</span>  <span class="n">percall</span>  <span class="n">cumtime</span>  <span class="n">percall</span> <span class="n">filename</span><span class="p">:</span><span class="n">lineno</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+   <span class="mi">110000</span>    <span class="mf">4.657</span>    <span class="mf">0.000</span>   <span class="mf">15.621</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;choice&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.random.mtrand.RandomState&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">330370</span>    <span class="mf">1.327</span>    <span class="mf">0.000</span>    <span class="mf">1.327</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;reduce&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ufunc&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">110123</span><span class="o">/</span><span class="mi">110121</span>    <span class="mf">1.072</span>    <span class="mf">0.000</span>    <span class="mf">6.371</span>    <span class="mf">0.000</span> <span class="n">algorithms</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1616</span><span class="p">(</span><span class="n">take_nd</span><span class="p">)</span>
+   <span class="mi">551172</span><span class="o">/</span><span class="mi">331084</span>    <span class="mf">0.769</span>    <span class="mf">0.000</span>    <span class="mf">7.990</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">}</span>
+   <span class="mi">110121</span>    <span class="mf">0.545</span>    <span class="mf">0.000</span>    <span class="mf">1.822</span>    <span class="mf">0.000</span> <span class="n">algorithms</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1487</span><span class="p">(</span><span class="n">_get_take_nd_function</span><span class="p">)</span>
+   <span class="mi">110011</span>    <span class="mf">0.518</span>    <span class="mf">0.000</span>    <span class="mf">1.555</span>    <span class="mf">0.000</span> <span class="n">_methods</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">143</span><span class="p">(</span><span class="n">_mean</span><span class="p">)</span>
+   <span class="mi">2553898</span>    <span class="mf">0.474</span>    <span class="mf">0.000</span>    <span class="mf">0.676</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">isinstance</span><span class="p">}</span>
+   <span class="mi">110088</span>    <span class="mf">0.410</span>    <span class="mf">0.000</span>    <span class="mf">1.660</span>    <span class="mf">0.000</span> <span class="n">cast</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">442</span><span class="p">(</span><span class="n">maybe_promote</span><span class="p">)</span>
+   <span class="mi">110062</span>    <span class="mf">0.392</span>    <span class="mf">0.000</span>    <span class="mf">0.392</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">pandas</span><span class="o">.</span><span class="n">_libs</span><span class="o">.</span><span class="n">algos</span><span class="o">.</span><span class="n">take_1d_int64_int64</span><span class="p">}</span>
+   <span class="mi">440191</span>    <span class="mf">0.369</span>    <span class="mf">0.000</span>    <span class="mf">0.369</span>    <span class="mf">0.000</span> <span class="n">generic</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">5123</span><span class="p">(</span><span class="fm">__getattr__</span><span class="p">)</span>
+   <span class="mi">220504</span>    <span class="mf">0.367</span>    <span class="mf">0.000</span>    <span class="mf">1.223</span>    <span class="mf">0.000</span> <span class="n">_dtype</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">321</span><span class="p">(</span><span class="n">_name_get</span><span class="p">)</span>
+   <span class="mi">551555</span>    <span class="mf">0.352</span>    <span class="mf">0.000</span>    <span class="mf">0.973</span>    <span class="mf">0.000</span> <span class="n">common</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1460</span><span class="p">(</span><span class="n">is_extension_array_dtype</span><span class="p">)</span>
+   <span class="mi">110026</span>    <span class="mf">0.319</span>    <span class="mf">0.000</span>    <span class="mf">7.160</span>    <span class="mf">0.000</span> <span class="n">categorical</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">1241</span><span class="p">(</span><span class="n">__array__</span><span class="p">)</span>
+   <span class="mi">110040</span>    <span class="mf">0.313</span>    <span class="mf">0.000</span>    <span class="mf">0.973</span>    <span class="mf">0.000</span> <span class="n">fromnumeric</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">70</span><span class="p">(</span><span class="n">_wrapreduction</span><span class="p">)</span>
+   <span class="mi">551553</span>    <span class="mf">0.312</span>    <span class="mf">0.000</span>    <span class="mf">0.471</span>    <span class="mf">0.000</span> <span class="n">base</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">413</span><span class="p">(</span><span class="n">find</span><span class="p">)</span>
+   <span class="mi">110011</span>    <span class="mf">0.303</span>    <span class="mf">0.000</span>    <span class="mf">0.366</span>    <span class="mf">0.000</span> <span class="n">_methods</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">59</span><span class="p">(</span><span class="n">_count_reduce_items</span><span class="p">)</span>
+   <span class="mi">110144</span>    <span class="mf">0.285</span>    <span class="mf">0.000</span>    <span class="mf">0.285</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">pandas</span><span class="o">.</span><span class="n">_libs</span><span class="o">.</span><span class="n">algos</span><span class="o">.</span><span class="n">ensure_int64</span><span class="p">}</span>
+   <span class="mi">2096198</span>    <span class="mf">0.271</span>    <span class="mf">0.000</span>    <span class="mf">0.271</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">built</span><span class="o">-</span><span class="ow">in</span> <span class="n">method</span> <span class="n">builtins</span><span class="o">.</span><span class="n">issubclass</span><span class="p">}</span>
+       <span class="mi">11</span>    <span class="mf">0.236</span>    <span class="mf">0.021</span>   <span class="mf">17.819</span>    <span class="mf">1.620</span> <span class="o">&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">155</span><span class="o">-</span><span class="mi">181</span><span class="n">f53677fac</span><span class="o">&gt;</span><span class="p">:</span><span class="mi">4</span><span class="p">(</span><span class="n">get_bootstrapped_means</span><span class="p">)</span>
+   <span class="mi">220004</span>    <span class="mf">0.231</span>    <span class="mf">0.000</span>    <span class="mf">8.881</span>    <span class="mf">0.000</span> <span class="n">series</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">750</span><span class="p">(</span><span class="n">__array__</span><span class="p">)</span>
+
+
+<span class="n">Top</span> <span class="n">methods</span> <span class="n">by</span> <span class="n">cumulative</span> <span class="n">time</span><span class="p">:</span>
+
+   <span class="mi">110000</span>    <span class="mf">4.657</span>    <span class="mf">0.000</span>   <span class="mf">15.621</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;choice&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.random.mtrand.RandomState&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">330370</span>    <span class="mf">1.327</span>    <span class="mf">0.000</span>    <span class="mf">1.327</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;reduce&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ufunc&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">110173</span>    <span class="mf">0.065</span>    <span class="mf">0.000</span>    <span class="mf">0.420</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;any&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">220315</span>    <span class="mf">0.104</span>    <span class="mf">0.000</span>    <span class="mf">0.104</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;format&#39;</span> <span class="n">of</span> <span class="s1">&#39;str&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">220266</span>    <span class="mf">0.080</span>    <span class="mf">0.000</span>    <span class="mf">0.080</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;get&#39;</span> <span class="n">of</span> <span class="s1">&#39;dict&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">110135</span>    <span class="mf">0.064</span>    <span class="mf">0.000</span>    <span class="mf">0.064</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;view&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+   <span class="mi">110070</span>    <span class="mf">0.022</span>    <span class="mf">0.000</span>    <span class="mf">0.022</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;items&#39;</span> <span class="n">of</span> <span class="s1">&#39;dict&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.008</span>    <span class="mf">0.008</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;get_indexer&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.index.BaseMultiIndexCodesEngine&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">2</span>    <span class="mf">0.003</span>    <span class="mf">0.002</span>    <span class="mf">0.004</span>    <span class="mf">0.002</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;get_indexer_non_unique&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.index.IndexEngine&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">1</span>    <span class="mf">0.002</span>    <span class="mf">0.002</span>    <span class="mf">0.002</span>    <span class="mf">0.002</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;read&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.parsers.TextReader&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">48</span>    <span class="mf">0.002</span>    <span class="mf">0.000</span>    <span class="mf">0.002</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;get_indexer&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.index.IndexEngine&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">29</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;sum&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">40</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;max&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">18</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;argsort&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">90</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;copy&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">80</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;astype&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+       <span class="mi">27</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;all&#39;</span> <span class="n">of</span> <span class="s1">&#39;numpy.ndarray&#39;</span> <span class="n">objects</span><span class="p">}</span>
+     <span class="mi">1419</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;replace&#39;</span> <span class="n">of</span> <span class="s1">&#39;str&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">4</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;get_labels_groupby&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.hashtable.Int64HashTable&#39;</span> <span class="n">objects</span><span class="p">}</span>
+        <span class="mi">3</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span>    <span class="mf">0.000</span> <span class="p">{</span><span class="n">method</span> <span class="s1">&#39;factorize&#39;</span> <span class="n">of</span> <span class="s1">&#39;pandas._libs.hashtable.Int64HashTable&#39;</span> <span class="n">objects</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-8-1 docutils container">
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initiate profiler</span>
+<span class="n">profile_tempfile</span> <span class="o">&lt;-</span> <span class="nf">tempfile</span><span class="p">()</span>
+<span class="nf">Rprof</span><span class="p">(</span><span class="n">profile_tempfile</span><span class="p">,</span> <span class="n">memory.profiling</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+
+<span class="c1"># Run the pipeline</span>
+<span class="nf">glimpse</span><span class="p">(</span><span class="nf">chapter3_pipeline</span><span class="p">(</span><span class="m">10000</span><span class="p">))</span>
+
+<span class="c1"># Stop profiling</span>
+<span class="nf">Rprof</span><span class="p">()</span>
+
+<span class="c1"># Print top 20 function calls by cumulative time</span>
+<span class="nf">summaryRprof</span><span class="p">(</span><span class="n">profile_tempfile</span><span class="p">,</span> <span class="n">memory</span><span class="o">=</span><span class="s">&#39;both&#39;</span><span class="p">)[</span><span class="s">&#39;by.self&#39;</span><span class="p">]</span>
+
+<span class="c1"># Remove profiling file</span>
+<span class="nf">unlink</span><span class="p">(</span><span class="n">profile_tempfile</span><span class="p">)</span>
+
+<span class="n">Observations</span><span class="o">:</span> <span class="m">11</span>
+<span class="n">Variables</span><span class="o">:</span> <span class="m">2</span>
+<span class="o">$</span> <span class="n">Year</span> <span class="o">&lt;</span><span class="n">fct</span><span class="o">&gt;</span> <span class="m">2010</span><span class="p">,</span> <span class="m">2011</span><span class="p">,</span> <span class="m">2012</span><span class="p">,</span> <span class="m">2013</span><span class="p">,</span> <span class="m">2014</span><span class="p">,</span> <span class="m">2015</span><span class="p">,</span> <span class="m">2016</span><span class="p">,</span> <span class="m">2017</span><span class="p">,</span> <span class="m">2018</span><span class="p">,</span> <span class="m">2019</span><span class="p">,</span> <span class="m">2020</span>
+<span class="o">$</span> <span class="n">Mean</span> <span class="o">&lt;</span><span class="n">list</span><span class="o">&gt;</span> <span class="p">[</span><span class="m">12.97377</span><span class="p">,</span> <span class="m">14.04683</span><span class="p">,</span> <span class="m">10.66846</span><span class="p">,</span> <span class="m">13.41066</span><span class="p">,</span> <span class="m">14.05093</span><span class="p">,</span> <span class="m">11.75272</span><span class="p">,</span> <span class="m">13</span>…
+
+<span class="o">$</span><span class="n">by.self</span> <span class="o">=</span>
+    <span class="n">self.time</span>   <span class="n">self.pct</span>        <span class="n">total.time</span>      <span class="n">total.pct</span>       <span class="n">mem.total</span>
+<span class="s">&quot;sample.int&quot;</span>    <span class="m">0.70</span>    <span class="m">52.24</span>   <span class="m">0.70</span>    <span class="m">52.24</span>   <span class="m">300.6</span>
+<span class="s">&quot;mean&quot;</span>  <span class="m">0.30</span>    <span class="m">22.39</span>   <span class="m">1.30</span>    <span class="m">97.01</span>   <span class="m">561.0</span>
+<span class="s">&quot;sample&quot;</span>        <span class="m">0.18</span>    <span class="m">13.43</span>   <span class="m">0.90</span>    <span class="m">67.16</span>   <span class="m">367.3</span>
+<span class="s">&quot;mean.default&quot;</span>  <span class="m">0.08</span>    <span class="m">5.97</span>    <span class="m">0.10</span>    <span class="m">7.46</span>    <span class="m">44.5</span>
+<span class="s">&quot;factor&quot;</span>        <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">1.8</span>
+<span class="s">&quot;is.numeric&quot;</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">11.1</span>
+<span class="s">&quot;length&quot;</span>        <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.0</span>
+<span class="s">&quot;NextMethod&quot;</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.02</span>    <span class="m">1.49</span>    <span class="m">0.0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>When reading these profiling reports it is usually good idea to focus on the
+functions that use most of the time. Both profilers can also show the lines
+where the functions have been defined. In our case we do not need to look far:
+the sampling functions and mean calculation functions within the bootstrapping
+function were obviously the ones that used the most time.</p>
+<p>Here we can see an possible improvement on our calculation:</p>
+<ul>
+<li><p>Our current version of the code creates an array of zeros for the means.</p></li>
+<li><p>Afterwards it populates the array by going through a for loop of size
+<code class="docutils literal notranslate"><span class="pre">n_means</span></code> and on each iteration it does the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>It picks 100 values from a distribution defined by the file sizes.</p></li>
+<li><p>It calculates the means of the 100 values.</p></li>
+<li><p>It places the mean to the array.</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+<p>This results in a huge number of function calls that is visible in our
+profiling data. If instead of that we would do:</p>
+<ul class="simple">
+<li><p>Pick 100 x <code class="docutils literal notranslate"><span class="pre">n_means</span></code> values from the distribution defined by the file size.</p></li>
+<li><p>Reshape the values to a 2D-array with shape (100, <code class="docutils literal notranslate"><span class="pre">n_means</span></code>)</p></li>
+<li><p>Calculate means of this array along the first axis. This provides us an
+array of size <code class="docutils literal notranslate"><span class="pre">n_means</span></code> with means from 100 random values.</p></li>
+</ul>
+<p>We can do this because we were picking with replacement from the distribution
+and each choice is independent of the others. In code this change looks like
+this:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-9-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-9-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-9-0 active docutils container">
+<p>Old version:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_means</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_means</span><span class="p">):</span>
+<span class="c1"># Calculate resampled mean</span>
+    <span class="n">means</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">weight_data</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Optimized version:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="mi">100</span><span class="o">*</span><span class="n">n_means</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">weight_data</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">n_means</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-9-1 docutils container">
+<p>Old version:</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="n">n_means</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1"># Calculate resampled mean</span>
+    <span class="n">means</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="nf">mean</span><span class="p">(</span><span class="nf">sample</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="n">weight_data</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Optimized version:</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="c1"># Calculate resampled means</span>
+<span class="n">choices</span> <span class="o">&lt;-</span> <span class="nf">sample</span><span class="p">(</span><span class="n">target_data</span><span class="p">,</span> <span class="m">100</span><span class="o">*</span><span class="n">n_means</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> <span class="n">prob</span><span class="o">=</span><span class="n">weight_data</span><span class="p">)</span>
+<span class="nf">dim</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="n">n_means</span><span class="p">)</span>
+<span class="n">means</span> <span class="o">&lt;-</span> <span class="nf">colMeans</span><span class="p">(</span><span class="n">choices</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can test if this sped up our work by running the multiprocessing example again. This time the outputs are as follows:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-10-0 docutils container">
+<div class="docutils container">
+<p>Python</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-10-1 docutils container">
+<div class="docutils container">
+<p>R</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-10-0 active docutils container">
+<p>(10000 means)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">Original</span> <span class="n">pipeline</span><span class="p">:</span> <span class="mf">0.52</span>
+      <span class="n">Year</span>       <span class="n">Mean</span>
+<span class="mi">0</span>   <span class="mf">2010.0</span>  <span class="mf">12.974113</span>
+<span class="mi">1</span>   <span class="mf">2011.0</span>  <span class="mf">14.041508</span>
+<span class="mi">2</span>   <span class="mf">2012.0</span>  <span class="mf">10.675136</span>
+<span class="mi">3</span>   <span class="mf">2013.0</span>  <span class="mf">13.409025</span>
+<span class="mi">4</span>   <span class="mf">2014.0</span>  <span class="mf">14.039268</span>
+<span class="mi">5</span>   <span class="mf">2015.0</span>  <span class="mf">11.741009</span>
+<span class="mi">6</span>   <span class="mf">2016.0</span>  <span class="mf">13.542446</span>
+<span class="mi">7</span>   <span class="mf">2017.0</span>  <span class="mf">11.971165</span>
+<span class="mi">8</span>   <span class="mf">2018.0</span>  <span class="mf">13.277415</span>
+<span class="mi">9</span>   <span class="mf">2019.0</span>  <span class="mf">13.699354</span>
+<span class="mi">10</span>  <span class="mf">2020.0</span>  <span class="mf">13.225932</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">1</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">0.60</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">0.86</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.013555000000000206</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">2</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">0.42</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">1.23</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012925000000000963</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">3</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">0.45</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">1.16</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012925000000000963</span>
+<span class="n">Time</span> <span class="n">taken</span> <span class="n">by</span> <span class="mi">4</span> <span class="n">workers</span><span class="p">:</span> <span class="mf">0.33</span> <span class="n">Speedup</span> <span class="n">was</span><span class="p">:</span> <span class="mf">1.57</span>
+<span class="n">Maximum</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">calculated</span> <span class="n">means</span><span class="p">:</span> <span class="mf">0.012925000000000963</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-10-1 docutils container">
+<p>(100000 means)</p>
+<div class="highlight-R notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Original pipeline: 5.36&quot;</span>
+
+<span class="n">Year</span>    <span class="n">Mean</span>
+<span class="m">2010</span>    <span class="m">12.97988</span>
+<span class="m">2011</span>    <span class="m">14.04280</span>
+<span class="m">2012</span>    <span class="m">10.66727</span>
+<span class="m">2013</span>    <span class="m">13.41303</span>
+<span class="m">2014</span>    <span class="m">14.04364</span>
+<span class="m">2015</span>    <span class="m">11.74586</span>
+<span class="m">2016</span>    <span class="m">13.54195</span>
+<span class="m">2017</span>    <span class="m">11.97510</span>
+<span class="m">2018</span>    <span class="m">13.27952</span>
+<span class="m">2019</span>    <span class="m">13.70200</span>
+<span class="m">2020</span>    <span class="m">13.22529</span>
+
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 1 workers: 5.52 Speedup was: 0.97&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.005160&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 2 workers: 3.72 Speedup was: 1.44&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.003600&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 3 workers: 3.58 Speedup was: 1.50&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.003597&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Time taken by 4 workers: 3.49 Speedup was: 1.54&quot;</span>
+<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;Maximum difference between calculated means: 0.003597&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>So this simple observation provided by the profiler gave us a performance
+benefits that completely overshadow any benefits that could be gained from the
+multiprocessing implementation.</p>
+</div>
+<div class="section" id="collecting-everything-together">
+<h2>Collecting everything together<a class="headerlink" href="#collecting-everything-together" title="Permalink to this headline">¶</a></h2>
+<p>When doing data analysis it is important to get a firm grasp of the basic
+questions: What am I doing? What is my ultimate goal?</p>
+<p>The road to solving data analysis problems can often be a winding one, and
+keeping concepts such as pipelines, understandable interfaces,
+functional modules and tidy format close at hand can reduce the risk of
+creating mazes of code that become hard to navigate out of.</p>
+<p>These processes are empowered by keeping in mind how the computer sees your
+work: as instructions for operations and binary data to be operated on. By
+recognizing the parts of your code that are most heavily involved with the
+machine: vectorized calculations and data transfer from storage to memory
+to cache, you can optimize that which does most of the work and leave the
+rest for the machine to handle.</p>
+<p>Throughout these workflows one should also revere the work created by other
+scientists around the world in the form of efficient libraries that allow
+us to do complex workflows with minimal work. Following the standards created
+by the communities and propagating the use of these libraries makes transferral
+of ideas easier.</p>
+<p>And transferring ideas is what science is all about.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../installation/" class="btn btn-neutral float-right" title="Software installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../chapter-3-modeling/" class="btn btn-neutral float-left" title="Chapter 3: Modeling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Aalto SciComp
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
